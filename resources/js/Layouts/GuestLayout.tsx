@@ -1,6 +1,7 @@
-import ApplicationLogo from '@/Components/ApplicationLogo';
-import { Link } from '@inertiajs/react';
-import { PropsWithChildren } from 'react';
+import ApplicationLogo from "@/Components/ApplicationLogo";
+import { Link } from "@inertiajs/react";
+import { PropsWithChildren } from "react";
+import { Toaster } from "@/Components/ui/sonner";
 
 export default function Guest({ children }: PropsWithChildren) {
     return (
@@ -14,6 +15,7 @@ export default function Guest({ children }: PropsWithChildren) {
             <div className="mt-6 w-full overflow-hidden bg-white px-6 py-4 shadow-md sm:max-w-md sm:rounded-lg">
                 {children}
             </div>
+            <Toaster />
         </div>
     );
 }
