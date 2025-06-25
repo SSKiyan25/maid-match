@@ -343,7 +343,7 @@ export default function Welcome({
                                         reliable!"
                                     </p>
                                     <div className="text-sm font-medium text-foreground">
-                                        Maria Santos, Makati
+                                        Anonymous
                                     </div>
                                 </CardContent>
                             </Card>
@@ -366,7 +366,7 @@ export default function Welcome({
                                         families."
                                     </p>
                                     <div className="text-sm font-medium text-foreground">
-                                        Ana Cruz, Quezon City
+                                        Anonymous
                                     </div>
                                 </CardContent>
                             </Card>
@@ -389,7 +389,7 @@ export default function Welcome({
                                         Match!"
                                     </p>
                                     <div className="text-sm font-medium text-foreground">
-                                        John Dela Cruz, BGC
+                                        Anonymous
                                     </div>
                                 </CardContent>
                             </Card>
@@ -454,10 +454,6 @@ export default function Welcome({
                 <footer className="border-t bg-card py-8">
                     <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
                         <p>&copy; 2025 Maid Match. All rights reserved.</p>
-                        <p className="mt-2">
-                            Built with Laravel v{laravelVersion} (PHP v
-                            {phpVersion})
-                        </p>
                     </div>
                 </footer>
             </div>
