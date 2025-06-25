@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Auth\AgencyRegisterController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -18,6 +19,13 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+// Agency Registration Routes (Public)
+Route::prefix('agency')->name('agency.')->group(function () {
+    Route::get('register', [AgencyRegisterController::class, 'create'])->name('register');
+    Route::post('register', [AgencyRegisterController::class, 'store'])->name('register.store');
+    Route::post('check-availability', [AgencyRegisterController::class, 'checkAvailability'])->name('check.availability');
+});
+
 // Role-specific dashboards
 Route::middleware(['auth', 'verified', 'role:employer'])->group(function () {
     Route::get('/employer/dashboard', function () {
@@ -29,6 +37,10 @@ Route::middleware(['auth', 'verified', 'role:maid'])->group(function () {
     Route::get('/maid/dashboard', function () {
         return Inertia::render('Maid/Dashboard');
     })->name('maid.dashboard');
+});
+
+Route::middleware(['auth', 'verified', 'role:agency'])->group(function () {
+    Route::get('/agency/dashboard', [AgencyRegisterController::class, 'dashboard'])->name('agency.dashboard');
 });
 
 Route::middleware('auth')->group(function () {

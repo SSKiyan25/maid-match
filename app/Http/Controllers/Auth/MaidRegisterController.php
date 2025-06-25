@@ -4,11 +4,10 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\MaidRegisterRequest;
-use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Models\Profile;
-use App\Models\Maid;
-use App\Models\MaidCharacterReference;
+use App\Models\Maid\Maid;
+use App\Models\Maid\MaidCharacterReference;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;

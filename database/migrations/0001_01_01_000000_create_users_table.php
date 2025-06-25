@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable(); // Made nullable for social login users
-            $table->enum('role', ['customer', 'maid', 'admin', 'agency'])->default('customer');
+            $table->enum('role', ['employer', 'maid', 'admin', 'agency'])->default('employer');
             $table->string('facebook_id')->nullable()->unique();
             $table->string('avatar')->nullable();
             $table->enum('status', ['active', 'inactive', 'suspended', 'pending'])->default('active');

@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Maid\Maid;
+use App\Models\Employer\Employer;
 
 class User extends Authenticatable
 {
@@ -71,11 +73,6 @@ class User extends Authenticatable
     /**
      * Helper methods
      */
-    public function isCustomer()
-    {
-        return $this->role === 'customer';
-    }
-
     public function isMaid()
     {
         return $this->role === 'maid';
