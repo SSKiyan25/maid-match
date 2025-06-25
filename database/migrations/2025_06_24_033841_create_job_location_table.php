@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('job_location', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('job_id')->constrained()->onDelete('cascade');
+            $table->foreignId('job_posting_id')->constrained()->onDelete('cascade');
             $table->string('brgy');
             $table->string('city');
             $table->string('landmark')->nullable();
@@ -26,7 +26,7 @@ return new class extends Migration
             $table->boolean('is_archived')->default(false);
             $table->timestamps();
 
-            $table->index(['job_id']);
+            $table->index(['job_posting_id']);
             $table->index(['city', 'brgy']); // For location-based searches
         });
     }

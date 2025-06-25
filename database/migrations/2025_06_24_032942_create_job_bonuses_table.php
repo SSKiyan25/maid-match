@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('job_bonuses', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('job_id')->constrained()->onDelete('cascade');
+            $table->foreignId('job_posting_id')->constrained()->onDelete('cascade');
             $table->string('title'); // "13th Month Pay", "Holiday Bonus", "Performance Bonus"
             $table->decimal('amount', 10, 2)->nullable(); // Can be null for non-monetary bonuses
             $table->enum('status', ['active', 'inactive', 'conditional'])->default('active');
@@ -24,7 +24,7 @@ return new class extends Migration
             $table->boolean('is_archived')->default(false);
             $table->timestamps();
 
-            $table->index(['job_id']);
+            $table->index(['job_posting_id']);
         });
     }
 

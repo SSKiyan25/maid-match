@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('job_applications', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('job_id')->constrained()->onDelete('cascade');
+            $table->foreignId('job_posting_id')->constrained()->onDelete('cascade');
             $table->foreignId('maid_id')->constrained()->onDelete('cascade');
             $table->enum('status', ['pending', 'reviewed', 'shortlisted', 'rejected', 'accepted', 'withdrawn'])->default('pending');
             $table->integer('ranking_position')->nullable(); // Employer's ranking of this application
@@ -25,8 +25,8 @@ return new class extends Migration
             $table->boolean('is_archived')->default(false);
             $table->timestamps();
 
-            $table->unique(['job_id', 'maid_id']); // Prevent duplicate applications
-            $table->index(['job_id']);
+            $table->unique(['job_posting_id', 'maid_id']); // Prevent duplicate applications
+            $table->index(['job_posting_id']);
             $table->index(['maid_id']);
             $table->index(['status', 'applied_at']);
         });

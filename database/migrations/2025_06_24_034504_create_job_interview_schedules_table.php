@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('job_interview_schedules', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('job_id')->constrained()->onDelete('cascade');
+            $table->foreignId('job_posting_id')->constrained()->onDelete('cascade');
             $table->foreignId('maid_id')->constrained()->onDelete('cascade');
             $table->string('title'); // "Initial Interview", "Final Interview", "Meet & Greet"
             $table->date('interview_date');
@@ -32,7 +32,7 @@ return new class extends Migration
             $table->boolean('is_archived')->default(false);
             $table->timestamps();
 
-            $table->index(['job_id']);
+            $table->index(['job_posting_id']);
             $table->index(['maid_id']);
             $table->index(['status']);
             $table->index(['interview_date', 'status']);
