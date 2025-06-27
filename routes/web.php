@@ -40,6 +40,12 @@ Route::middleware(['auth', 'verified', 'role:employer'])->group(function () {
     })->name('employer.dashboard');
 });
 
+Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
+    Route::get('/admin/dashboard', function () {
+        return Inertia::render('Admin/Dashboard');
+    })->name('admin.dashboard');
+});
+
 Route::middleware(['auth', 'verified', 'role:maid'])->group(function () {
     Route::get('/maid/dashboard', function () {
         return Inertia::render('Maid/Dashboard');
