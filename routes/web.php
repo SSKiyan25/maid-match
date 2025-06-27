@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\AgencyRegisterController;
+use App\Http\Controllers\Auth\EmployerRegisterController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -24,6 +25,12 @@ Route::prefix('agency')->name('agency.')->group(function () {
     Route::get('register', [AgencyRegisterController::class, 'create'])->name('register');
     Route::post('register', [AgencyRegisterController::class, 'store'])->name('register.store');
     Route::post('check-availability', [AgencyRegisterController::class, 'checkAvailability'])->name('check.availability');
+});
+
+// Employer Registration Routes (Public)
+Route::prefix('employer')->name('employer.')->group(function () {
+    Route::get('register', [EmployerRegisterController::class, 'create'])->name('register');
+    Route::post('register', [EmployerRegisterController::class, 'store'])->name('register.store');
 });
 
 // Role-specific dashboards

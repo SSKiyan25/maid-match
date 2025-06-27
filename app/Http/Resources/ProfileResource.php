@@ -21,15 +21,22 @@ class ProfileResource extends JsonResource
             'last_name' => $this->last_name,
             'full_name' => $this->full_name, // Uses the accessor from the model
             'phone_number' => $this->when(
-                !$this->is_phone_private || $this->isOwnProfile($request),
+                !$this->is_phone_private,
                 $this->phone_number
             ),
             'is_phone_private' => $this->is_phone_private,
+            'birth_date' => $this->birth_date?->format('Y-m-d'),
             'address' => $this->when(
-                !$this->is_address_private || $this->isOwnProfile($request),
+                !$this->is_address_private,
                 $this->address
             ),
+            'formatted_address' => $this->when(
+                !$this->is_address_private,
+                $this->formatted_address
+            ),
             'is_address_private' => $this->is_address_private,
+            'preferred_contact_methods' => $this->preferred_contact_methods,
+            'preferred_language' => $this->preferred_language,
             'is_archived' => $this->is_archived,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

@@ -38,7 +38,7 @@ export default function Register() {
                 "Background check reports",
             ],
             cta: "Find Help Now",
-            route: "register",
+            route: "employer.register",
             popular: false,
         },
         {

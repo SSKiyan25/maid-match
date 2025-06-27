@@ -111,7 +111,7 @@ export default function Welcome({
                         <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
                             <Button asChild size="lg" className="text-lg">
                                 <Link
-                                    href={route("register", {
+                                    href={route("employer.register", {
                                         type: "employer",
                                     })}
                                 >
@@ -415,7 +415,7 @@ export default function Welcome({
                                 className="bg-secondary-foreground text-secondary border-secondary-foreground hover:bg-secondary-foreground/90"
                             >
                                 <Link
-                                    href={route("register", {
+                                    href={route("employer.register", {
                                         type: "employer",
                                     })}
                                 >

@@ -22,6 +22,8 @@ class Employer extends Model
         'user_id',
         'household_description',
         'family_size',
+        'has_children',
+        'has_pets',
         'status',
         'maid_preferences',
         'is_verified',
@@ -29,6 +31,8 @@ class Employer extends Model
     ];
 
     protected $casts = [
+        'has_children' => 'boolean',
+        'has_pets' => 'boolean',
         'maid_preferences' => 'array',
         'is_verified' => 'boolean',
         'is_archived' => 'boolean',
@@ -98,6 +102,16 @@ class Employer extends Model
         return $query->where('status', 'looking');
     }
 
+    public function scopeWithChildren($query)
+    {
+        return $query->where('has_children', true);
+    }
+
+    public function scopeWithPets($query)
+    {
+        return $query->where('has_pets', true);
+    }
+
     /**
      * Accessors & Mutators
      */
@@ -134,14 +148,30 @@ class Employer extends Model
         $this->update(['is_archived' => true]);
     }
 
+    /**
+     * Efficient methods using database fields
+     */
     public function hasChildren()
     {
-        return $this->children()->count() > 0;
+        return $this->has_children;
     }
 
     public function hasPets()
     {
-        return $this->pets()->count() > 0;
+        return $this->has_pets;
+    }
+
+    /**
+     * Update flags when children/pets are added/removed
+     */
+    public function updateChildrenFlag()
+    {
+        $this->update(['has_children' => $this->children()->notArchived()->exists()]);
+    }
+
+    public function updatePetsFlag()
+    {
+        $this->update(['has_pets' => $this->pets()->notArchived()->exists()]);
     }
 
     public function getActiveJobPostingsCount()

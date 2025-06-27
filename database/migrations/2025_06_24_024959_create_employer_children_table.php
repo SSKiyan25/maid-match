@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('employer_children', function (Blueprint $table) {
             $table->id();
             $table->foreignId('employer_id')->constrained()->onDelete('cascade');
-            $table->integer('age');
+            $table->date('birth_date')->nullable();
             $table->string('name')->nullable();
             $table->string('photo_url')->nullable();
             $table->boolean('is_archived')->default(false);

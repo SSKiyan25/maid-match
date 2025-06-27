@@ -19,7 +19,7 @@ class RoleMiddleware
             return redirect()->route('login');
         }
 
-        if (!$request->user()->hasRole($role)) {
+        if ($request->user()->role !== $role) {
             abort(403, 'Access denied. You do not have the required role.');
         }
 

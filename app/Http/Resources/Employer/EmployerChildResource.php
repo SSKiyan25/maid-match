@@ -16,8 +16,10 @@ class EmployerChildResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'employer_id' => $this->employer_id,
             'name' => $this->name,
-            'age' => $this->age,
+            'birth_date' => $this->birth_date?->format('Y-m-d'),
+            'age' => $this->age, // Calculated from birth_date
             'photo_url' => $this->photo_url,
             'is_archived' => $this->is_archived,
 
@@ -26,8 +28,11 @@ class EmployerChildResource extends JsonResource
             'display_name' => $this->display_name,
 
             // Timestamps
-            'created_at' => $this->created_at?->toISOString(),
-            'updated_at' => $this->updated_at?->toISOString(),
+            'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
+
+            // Relationships
+            'employer' => $this->whenLoaded('employer'),
         ];
     }
 }

@@ -24,9 +24,7 @@ class EmployerRegisterController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('Auth/Register/Employer', [
-            'formOptions' => EmployerRegisterRequest::getFormOptions(),
-        ]);
+        return Inertia::render('Auth/Register/Employer/index');
     }
 
     /**
@@ -41,10 +39,8 @@ class EmployerRegisterController extends Controller
             $user = User::create([
                 'email' => $data['user']['email'],
                 'password' => Hash::make($data['user']['password']),
+                'role' => 'employer',
             ]);
-
-            // Assign employer role
-            $user->assignRole('employer');
 
             // Create profile
             Profile::create([

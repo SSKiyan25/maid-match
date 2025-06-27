@@ -18,7 +18,8 @@ return new class extends Migration
             $table->string('last_name');
             $table->string('phone_number')->nullable();
             $table->boolean('is_phone_private')->default(false);
-            $table->text('address')->nullable();
+            $table->date('birth_date')->nullable();
+            $table->json('address')->nullable();
             $table->boolean('is_address_private')->default(false);
             $table->boolean('is_archived')->default(false);
             $table->json('preferred_contact_methods')->nullable(); // ['phone', 'email', 'app_notification']

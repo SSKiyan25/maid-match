@@ -5,6 +5,7 @@ namespace App\Models\Employer;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Carbon\Carbon;
 
 class EmployerChild extends Model
 {
@@ -12,7 +13,7 @@ class EmployerChild extends Model
 
     protected $fillable = [
         'employer_id',
-        'age',
+        'birth_date',
         'name',
         'photo_url',
         'is_archived',
@@ -20,7 +21,7 @@ class EmployerChild extends Model
 
     protected $casts = [
         'is_archived' => 'boolean',
-        'age' => 'integer',
+        'birth_date' => 'date',
     ];
 
     /**
@@ -42,11 +43,13 @@ class EmployerChild extends Model
     public function scopeByAgeRange($query, $minAge = null, $maxAge = null)
     {
         if ($minAge !== null) {
-            $query->where('age', '>=', $minAge);
+            $maxBirthDate = Carbon::now()->subYears($minAge)->format('Y-m-d');
+            $query->where('birth_date', '<=', $maxBirthDate);
         }
 
         if ($maxAge !== null) {
-            $query->where('age', '<=', $maxAge);
+            $minBirthDate = Carbon::now()->subYears($maxAge + 1)->addDay()->format('Y-m-d');
+            $query->where('birth_date', '>=', $minBirthDate);
         }
 
         return $query;
@@ -55,20 +58,40 @@ class EmployerChild extends Model
     /**
      * Accessors
      */
+    public function getAgeAttribute()
+    {
+        if (!$this->birth_date) {
+            return null;
+        }
+
+        return $this->birth_date->diffInYears(Carbon::now());
+    }
+
     public function getAgeGroupAttribute()
     {
+        $age = $this->age;
+
+        if ($age === null) {
+            return 'unknown';
+        }
+
         return match (true) {
-            $this->age <= 3 => 'toddler',
-            $this->age <= 5 => 'preschooler',
-            $this->age <= 12 => 'school_age',
-            $this->age <= 17 => 'teenager',
+            $age <= 3 => 'toddler',
+            $age <= 5 => 'preschooler',
+            $age <= 12 => 'school_age',
+            $age <= 17 => 'teenager',
             default => 'adult'
         };
     }
 
     public function getDisplayNameAttribute()
     {
-        return $this->name ?: "Child ({$this->age} years old)";
+        if ($this->name) {
+            return $this->name;
+        }
+
+        $age = $this->age;
+        return $age ? "Child ({$age} years old)" : "Child";
     }
 
     /**

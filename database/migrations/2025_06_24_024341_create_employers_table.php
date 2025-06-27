@@ -16,6 +16,8 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->text('household_description')->nullable();
             $table->integer('family_size');
+            $table->boolean('has_pets')->default(false);
+            $table->boolean('has_children')->default(false);
             $table->enum('status', ['active', 'inactive', 'looking', 'fulfilled'])->default('active');
             $table->json('maid_preferences')->nullable();
             $table->boolean('is_verified')->default(false);

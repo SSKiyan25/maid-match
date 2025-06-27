@@ -22,6 +22,8 @@ class EmployerResource extends JsonResource
             'user_id' => $this->user_id,
             'household_description' => $this->household_description,
             'family_size' => $this->family_size,
+            'has_children' => $this->has_children,
+            'has_pets' => $this->has_pets,
             'status' => $this->status,
             'maid_preferences' => $this->maid_preferences,
             'is_verified' => $this->is_verified,
@@ -39,8 +41,8 @@ class EmployerResource extends JsonResource
             'job_postings' => JobPostingResource::collection($this->whenLoaded('jobPostings')),
 
             // Timestamps
-            'created_at' => $this->created_at?->toISOString(),
-            'updated_at' => $this->updated_at?->toISOString(),
+            'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
         ];
     }
 }
