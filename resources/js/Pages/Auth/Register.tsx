@@ -60,25 +60,6 @@ export default function Register() {
             route: "agency.register",
             popular: true,
         },
-        {
-            role: "maid",
-            title: "Find Employment",
-            subtitle: "Start your career journey",
-            description:
-                "Create your professional profile and connect with families looking for household help.",
-            icon: UserCheck,
-            colorClass:
-                "bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700",
-            features: [
-                "Create professional profile",
-                "Apply to job postings",
-                "Build your reputation",
-                "Flexible work options",
-            ],
-            cta: "Start Working",
-            route: "register",
-            popular: false,
-        },
     ];
 
     return (
@@ -99,7 +80,7 @@ export default function Register() {
                     </div>
 
                     {/* Registration Cards */}
-                    <div className="grid gap-6 lg:gap-8 xl:gap-10 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid gap-6 lg:gap-8 xl:gap-10 grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
                         {registrationOptions.map((option) => (
                             <Card
                                 key={option.role}

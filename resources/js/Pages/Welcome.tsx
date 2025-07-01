@@ -16,17 +16,13 @@ import {
     Clock,
     MapPin,
     Heart,
-    CheckCircle,
     Search,
-    UserCheck,
     Home,
 } from "lucide-react";
 import { ModeToggle } from "@/Components/mode-toggle";
 
 export default function Welcome({
     auth,
-    laravelVersion,
-    phpVersion,
 }: PageProps<{ laravelVersion: string; phpVersion: string }>) {
     // Helper function to get the correct dashboard route based on user role
     const getDashboardRoute = () => {
@@ -121,25 +117,14 @@ export default function Welcome({
                             </Button>
                             <Button
                                 asChild
-                                variant="outline"
-                                size="lg"
-                                className="text-lg"
-                            >
-                                <Link
-                                    href={route("register", { type: "maid" })}
-                                >
-                                    <UserCheck className="mr-2 h-5 w-5" />
-                                    I'm a Maid
-                                </Link>
-                            </Button>
-                            <Button
-                                asChild
                                 variant="secondary"
                                 size="lg"
                                 className="text-lg"
                             >
                                 <Link
-                                    href={route("register", { type: "agency" })}
+                                    href={route("agency.register", {
+                                        type: "agency",
+                                    })}
                                 >
                                     <Shield className="mr-2 h-5 w-5" />
                                     I'm an Agency
@@ -429,19 +414,9 @@ export default function Welcome({
                                 className="bg-secondary-foreground text-secondary border-secondary-foreground hover:bg-secondary-foreground/90"
                             >
                                 <Link
-                                    href={route("register", { type: "maid" })}
-                                >
-                                    Become a Maid
-                                </Link>
-                            </Button>
-                            <Button
-                                asChild
-                                size="lg"
-                                variant="outline"
-                                className="bg-secondary-foreground text-secondary border-secondary-foreground hover:bg-secondary-foreground/90"
-                            >
-                                <Link
-                                    href={route("register", { type: "agency" })}
+                                    href={route("agency.register", {
+                                        type: "agency",
+                                    })}
                                 >
                                     Join as Agency
                                 </Link>
