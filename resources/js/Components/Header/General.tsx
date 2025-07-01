@@ -29,9 +29,9 @@ export default function GeneralHeader({ user }: GeneralHeaderProps) {
         <header className="flex h-16 shrink-0 items-center bg-secondary border-b justify-between px-4 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
             {/* Left: Sidebar Trigger and Logo/App Name on Mobile */}
             <div className="flex items-center gap-2">
-                <SidebarTrigger className="-ml-1 text-primary-foreground" />
+                <SidebarTrigger className="text-secondary-foreground bg-primary/20 h-10 w-10" />
                 {isMobile && (
-                    <span className="flex text-primary-foreground items-center gap-1 ml-2 font-semibold text-lg">
+                    <span className="flex text-secondary-foreground items-center gap-1 ml-2 font-semibold text-lg">
                         <Home className="w-6 h-6" />
                         Maid Match
                     </span>

@@ -22,7 +22,7 @@ export default function MobileNavBar({ links }: MobileNavBarProps) {
                 <Link
                     key={label}
                     href={href}
-                    className="flex flex-col items-center text-xs text-primary-foreground  hover:text-primary transition"
+                    className="flex flex-col items-center text-xs text-secondary-foreground  hover:text-primary transition"
                 >
                     <Icon className="w-6 h-6 mb-1" />
                     {label}
