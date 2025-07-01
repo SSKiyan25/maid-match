@@ -16,7 +16,15 @@ return new class extends Migration
             $table->foreignId('job_posting_id')->constrained()->onDelete('cascade');
             $table->string('url');
             $table->string('caption')->nullable();
-            $table->enum('type', ['household', 'room', 'kitchen', 'workspace', 'other'])->default('household');
+            $table->enum('type', [
+                'interior',
+                'exterior',
+                'room',
+                'kitchen',
+                'bathroom',
+                'garden',
+                'general',
+            ])->default('general');
             $table->integer('sort_order')->default(0); // For ordering photos
             $table->boolean('is_primary')->default(false); // Main/featured photo
             $table->boolean('is_archived')->default(false);

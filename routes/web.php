@@ -3,6 +3,10 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\AgencyRegisterController;
 use App\Http\Controllers\Auth\EmployerRegisterController;
+use App\Http\Controllers\Employer\JobPostingController;
+use App\Http\Controllers\Employer\JobPosting\BonusController;
+use App\Http\Controllers\Employer\JobPosting\LocationController;
+use App\Http\Controllers\Employer\JobPosting\PhotoController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -60,6 +64,37 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+Route::middleware(['auth', 'verified', 'role:employer'])->prefix('employer')->name('employer.')->group(function () {
+    // Job Postings CRUD
+    Route::resource('job-postings', JobPostingController::class)
+        ->except(['show', 'destroy']); // You can add/remove as needed
+
+    // Archive and Archived routes for job postings
+    Route::patch('job-postings/{jobPosting}/archive', [JobPostingController::class, 'archive'])->name('job-postings.archive');
+    Route::get('job-postings-archived', [JobPostingController::class, 'archived'])->name('job-postings.archived');
+
+    // Bonuses
+    Route::resource('job-postings.bonuses', BonusController::class)
+        ->shallow()
+        ->except(['show', 'destroy']);
+    Route::patch('bonuses/{bonus}/archive', [BonusController::class, 'archive'])->name('bonuses.archive');
+    Route::get('job-postings/{jobPosting}/bonuses-archived', [BonusController::class, 'archived'])->name('bonuses.archived');
+
+    // Locations
+    Route::resource('job-postings.locations', LocationController::class)
+        ->shallow()
+        ->except(['show', 'destroy']);
+    Route::patch('locations/{location}/archive', [LocationController::class, 'archive'])->name('locations.archive');
+    Route::get('job-postings/{jobPosting}/locations-archived', [LocationController::class, 'archived'])->name('locations.archived');
+
+    // Photos
+    Route::resource('job-postings.photos', PhotoController::class)
+        ->shallow()
+        ->except(['show', 'destroy']);
+    Route::patch('photos/{photo}/archive', [PhotoController::class, 'archive'])->name('photos.archive');
+    Route::get('job-postings/{jobPosting}/photos-archived', [PhotoController::class, 'archived'])->name('photos.archived');
 });
 
 require __DIR__ . '/auth.php';

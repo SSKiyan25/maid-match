@@ -32,7 +32,11 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $request->user()
+                    ? (new \App\Http\Resources\UserResource(
+                        \App\Models\User::with('profile')->find($request->user()->id)
+                    ))->toArray(request())
+                    : null,
             ],
         ];
     }

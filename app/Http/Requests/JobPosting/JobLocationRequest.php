@@ -16,6 +16,32 @@ class JobLocationRequest extends FormRequest
     }
 
     /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'is_hidden' => $this->castToBoolean($this->input('is_hidden')),
+            'is_archived' => $this->castToBoolean($this->input('is_archived')),
+        ]);
+    }
+
+    /**
+     * Casts a value to boolean, handling "true"/"false" strings.
+     */
+    private function castToBoolean($value)
+    {
+        if (is_bool($value)) return $value;
+        if (is_numeric($value)) return (bool) $value;
+        if (is_string($value)) {
+            $v = strtolower($value);
+            if ($v === 'true' || $v === '1') return true;
+            if ($v === 'false' || $v === '0') return false;
+        }
+        return false;
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      */
     public function rules(): array

@@ -18,6 +18,32 @@ class JobPostingRequest extends FormRequest
     }
 
     /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'provides_toiletries' => $this->castToBoolean($this->input('provides_toiletries')),
+            'provides_food' => $this->castToBoolean($this->input('provides_food')),
+        ]);
+    }
+
+    /**
+     * Casts a value to boolean, handling "true"/"false" strings.
+     */
+    private function castToBoolean($value)
+    {
+        if (is_bool($value)) return $value;
+        if (is_numeric($value)) return (bool) $value;
+        if (is_string($value)) {
+            $v = strtolower($value);
+            if ($v === 'true' || $v === '1') return true;
+            if ($v === 'false' || $v === '0') return false;
+        }
+        return false;
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      */
     public function rules(): array
@@ -28,15 +54,15 @@ class JobPostingRequest extends FormRequest
             'work_types.*' => ['string', Rule::in(array_keys(JobPosting::WORK_TYPES))],
             'provides_toiletries' => ['nullable', 'boolean'],
             'provides_food' => ['nullable', 'boolean'],
-            'accommodation_type' => ['required', 'string', Rule::in(array_keys(JobPosting::getAccommodationTypes()))],
+            'accommodation_type' => ['required', 'string'],
             'min_salary' => ['nullable', 'numeric', 'min:0'],
             'max_salary' => ['nullable', 'numeric', 'min:0'],
             'day_off_preference' => ['nullable', 'string', 'max:255'],
-            'day_off_type' => ['required', 'string', Rule::in(array_keys(JobPosting::getDayOffTypes()))],
+            'day_off_type' => ['required', 'string'],
             'language_preferences' => ['nullable', 'array'],
             'language_preferences.*' => ['string', 'max:50'],
             'description' => ['required', 'string', 'min:50', 'max:2000'],
-            'status' => ['sometimes', 'string', Rule::in(array_keys(JobPosting::getStatuses()))],
+            'status' => ['sometimes', 'string'],
             'is_archived' => ['sometimes', 'boolean'],
         ];
     }

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('employer_id')->constrained()->onDelete('cascade');
             $table->string('title');
-            $table->json('work_types')->nullable(); // cleaning, cooking, childcare, eldercare, etc.
+            $table->json('work_types')->nullable();
             $table->boolean('provides_toiletries')->default(false);
             $table->boolean('provides_food')->default(false);
             $table->enum('accommodation_type', ['live_in', 'live_out', 'flexible'])->nullable();
@@ -23,7 +23,7 @@ return new class extends Migration
             $table->decimal('max_salary', 10, 2)->nullable();
             $table->string('day_off_preference')->nullable(); // "Sunday", "Flexible", "2 days per week"
             $table->enum('day_off_type', ['weekly', 'monthly', 'flexible', 'none'])->default('weekly');
-            $table->json('language_preferences')->nullable(); // ["English", "Tagalog", "Cebuano"]
+            $table->json('language_preferences')->nullable();
             $table->text('description')->nullable();
             $table->enum('status', ['active', 'inactive', 'filled', 'expired', 'draft'])->default('active');
             $table->boolean('is_archived')->default(false);

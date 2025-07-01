@@ -30,11 +30,13 @@ class JobPhoto extends Model
      * Photo types
      */
     const PHOTO_TYPES = [
-        'household' => 'Household Overview',
-        'room' => 'Room/Bedroom',
-        'kitchen' => 'Kitchen',
-        'workspace' => 'Workspace',
-        'other' => 'Other',
+        'interior'  => 'Interior',
+        'exterior'  => 'Exterior',
+        'room'      => 'Room/Workspace',
+        'kitchen'   => 'Kitchen',
+        'bathroom'  => 'Bathroom',
+        'garden'    => 'Garden/Outdoor',
+        'general'   => 'General',
     ];
 
     /**

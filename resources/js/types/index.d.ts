@@ -15,6 +15,7 @@ export interface User {
     roles?: Role[];
     created_at?: string;
     updated_at?: string;
+    avatar?: string;
 }
 
 export type PageProps<

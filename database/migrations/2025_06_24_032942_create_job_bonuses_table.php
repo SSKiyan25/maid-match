@@ -16,10 +16,32 @@ return new class extends Migration
             $table->foreignId('job_posting_id')->constrained()->onDelete('cascade');
             $table->string('title'); // "13th Month Pay", "Holiday Bonus", "Performance Bonus"
             $table->decimal('amount', 10, 2)->nullable(); // Can be null for non-monetary bonuses
-            $table->enum('status', ['active', 'inactive', 'conditional'])->default('active');
+            $table->enum('status', [
+                'active',
+                'pending',
+                'conditional',
+            ])->default('active');
             $table->text('description')->nullable(); // Details about the bonus
-            $table->enum('type', ['monetary', 'benefit', 'allowance'])->default('monetary');
-            $table->enum('frequency', ['one_time', 'monthly', 'quarterly', 'yearly', 'performance_based'])->nullable();
+            $table->enum('type', [
+                'monetary',
+                '13th_month',
+                'performance',
+                'holiday',
+                'loyalty',
+                'completion',
+                'referral',
+                'overtime',
+                'other',
+            ])->default('monetary');
+            $table->enum('frequency', [
+                'one_time',
+                'weekly',
+                'monthly',
+                'quarterly',
+                'yearly',
+                'upon_completion',
+                'performance_based',
+            ])->nullable();
             $table->text('conditions')->nullable(); // Requirements to get this bonus
             $table->boolean('is_archived')->default(false);
             $table->timestamps();

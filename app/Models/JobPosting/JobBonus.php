@@ -31,9 +31,15 @@ class JobBonus extends Model
      * Common bonus types
      */
     const BONUS_TYPES = [
-        'monetary' => 'Monetary Bonus',
-        'benefit' => 'Benefit/Perk',
-        'allowance' => 'Allowance',
+        'monetary'      => 'Monetary Bonus',
+        '13th_month'    => '13th Month Pay',
+        'performance'   => 'Performance Bonus',
+        'holiday'       => 'Holiday Bonus',
+        'loyalty'       => 'Loyalty Bonus',
+        'completion'    => 'Task Completion Bonus',
+        'referral'      => 'Referral Bonus',
+        'overtime'      => 'Overtime Pay',
+        'other'         => 'Other',
     ];
 
     /**
@@ -41,9 +47,11 @@ class JobBonus extends Model
      */
     const FREQUENCIES = [
         'one_time' => 'One Time',
+        'weekly' => 'Weekly',
         'monthly' => 'Monthly',
         'quarterly' => 'Quarterly',
         'yearly' => 'Yearly',
+        'upon_completion' => 'Upon Completion',
         'performance_based' => 'Performance Based',
     ];
 
@@ -52,7 +60,7 @@ class JobBonus extends Model
      */
     const STATUSES = [
         'active' => 'Active',
-        'inactive' => 'Inactive',
+        'pending' => 'Pending',
         'conditional' => 'Conditional',
     ];
 

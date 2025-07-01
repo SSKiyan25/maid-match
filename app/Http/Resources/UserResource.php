@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Log;
 
 class UserResource extends JsonResource
 {
@@ -14,6 +15,7 @@ class UserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        Log::info('Profile:', ['profile' => $this->profile]);
         return [
             'id' => $this->id,
             'email' => $this->email,
@@ -23,10 +25,12 @@ class UserResource extends JsonResource
             'email_verified_at' => $this->email_verified_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'profile' => $this->whenLoaded('profile'),
             'employer' => $this->whenLoaded('employer'),
             'maid' => $this->whenLoaded('maid'),
             'full_name' => $this->full_name,
+            'name' => $this->profile?->full_name ?? '', // This will be "First Last"
+            'profile' => new \App\Http\Resources\ProfileResource($this->profile),
+            'test_field' => 'test_value',
         ];
     }
 }
