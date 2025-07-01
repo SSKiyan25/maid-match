@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { validateStep2, parseAddress, stringifyAddress } from "../utils/step2Validation";
 import type { Step2Data, AddressData } from "../utils/types";
-import { is } from "date-fns/locale";
 
 export const useStep2Validation = (
     data: Step2Data,
