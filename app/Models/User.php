@@ -97,4 +97,9 @@ class User extends Authenticatable
     {
         return $this->profile ? $this->profile->first_name . ' ' . $this->profile->last_name : null;
     }
+
+    public function hasRole($role)
+    {
+        return $this->role === $role;
+    }
 }
