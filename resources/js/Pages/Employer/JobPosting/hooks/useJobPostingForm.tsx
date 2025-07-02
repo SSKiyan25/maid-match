@@ -8,10 +8,12 @@ import { validateStep3 } from "../utils/step3Validation";
 import { validateStep4 } from "../utils/step4Validation";
 
 interface JobPostingFormData extends JobPostingForm {
+    id?: number;
     location: JobLocation;
     bonuses: JobBonus[];
     photos: {
-        file: File;
+        file?: File;
+        url?: string;
         caption?: string;
         type: string;
         sort_order?: number;
@@ -19,29 +21,25 @@ interface JobPostingFormData extends JobPostingForm {
     }[];
 }
 
-export function useJobPostingForm() {
+export function useJobPostingForm(initialData?: Partial<JobPostingFormData>) {
     // Step-specific state
-    const [location, setLocation] = useState<JobLocation>({
-        brgy: "",
-        city: "",
-        province: "",
-        postal_code: "",
-        landmark: "",
-        directions: "",
-        latitude: null,
-        longitude: null,
-        is_hidden: false,
-    });
-    const [bonuses, setBonuses] = useState<JobBonus[]>([]);
-    const [photos, setPhotos] = useState<
-        {
-            file: File;
-            caption?: string;
-            type: string;
-            sort_order?: number;
-            is_primary?: boolean;
-        }[]
-    >([]);
+    const [location, setLocation] = useState<JobLocation>(
+        initialData?.location || {
+            brgy: "",
+            city: "",
+            province: "",
+            postal_code: "",
+            landmark: "",
+            directions: "",
+            latitude: null,
+            longitude: null,
+            is_hidden: false,
+        }
+    );
+    const [bonuses, setBonuses] = useState<JobBonus[]>(
+        initialData?.bonuses || []
+    );
+    const [photos, setPhotos] = useState<any[]>(initialData?.photos || []);
     const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set());
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submissionErrors, setSubmissionErrors] = useState<
@@ -51,28 +49,29 @@ export function useJobPostingForm() {
 
     // Main form state
     const { data, setData, errors } = useForm<JobPostingForm>({
-        title: "",
-        work_types: [],
-        provides_toiletries: false,
-        provides_food: false,
-        accommodation_type: "",
-        min_salary: null,
-        max_salary: null,
-        day_off_preference: "",
-        day_off_type: "",
-        language_preferences: [],
-        description: "",
+        title: initialData?.title || "",
+        work_types: initialData?.work_types || [],
+        provides_toiletries: initialData?.provides_toiletries ?? false,
+        provides_food: initialData?.provides_food ?? false,
+        accommodation_type: initialData?.accommodation_type || "",
+        min_salary: initialData?.min_salary ?? null,
+        max_salary: initialData?.max_salary ?? null,
+        day_off_preference: initialData?.day_off_preference || "",
+        day_off_type: initialData?.day_off_type || "",
+        language_preferences: initialData?.language_preferences || [],
+        description: initialData?.description || "",
     });
 
     // Compose all form data
     const formData: JobPostingFormData = useMemo(
         () => ({
             ...data,
+            ...(initialData?.id ? { id: initialData.id } : {}),
             location,
             bonuses,
             photos,
         }),
-        [data, location, bonuses, photos]
+        [data, location, bonuses, photos, initialData?.id]
     );
 
     // Update form data
@@ -82,22 +81,25 @@ export function useJobPostingForm() {
             isUpdatingRef.current = true;
 
             try {
+                // Always update local state for nested fields
                 if (updates.location !== undefined)
                     setLocation((prev) => ({ ...prev, ...updates.location }));
                 if (updates.bonuses !== undefined) setBonuses(updates.bonuses);
                 if (updates.photos !== undefined) setPhotos(updates.photos);
 
-                Object.entries(updates).forEach(([key, value]) => {
-                    if (
-                        value !== undefined &&
-                        !["location", "bonuses", "photos"].includes(key)
-                    ) {
-                        setData((prev) => ({
-                            ...prev,
-                            [key]: value,
-                        }));
-                        setTouchedFields((prev) => new Set([...prev, key]));
-                    }
+                // Always update setData for ALL fields, including nested
+                setData((prev) => ({
+                    ...prev,
+                    ...Object.fromEntries(
+                        Object.entries(updates).map(([key, value]) => [
+                            key,
+                            value,
+                        ])
+                    ),
+                }));
+
+                Object.keys(updates).forEach((key) => {
+                    setTouchedFields((prev) => new Set([...prev, key]));
                 });
             } finally {
                 isUpdatingRef.current = false;
@@ -202,6 +204,9 @@ export function useJobPostingForm() {
             if (photo.file instanceof File) {
                 formDataObj.append(`photos[${index}][file]`, photo.file);
             }
+            if (photo.url) {
+                formDataObj.append(`photos[${index}][url]`, photo.url);
+            }
             if (photo.caption) {
                 formDataObj.append(`photos[${index}][caption]`, photo.caption);
             }
@@ -222,12 +227,26 @@ export function useJobPostingForm() {
             }
         });
 
-        router.post(route("employer.job-postings.store"), formDataObj, {
+        // --- FIX: Always use POST + _method=PUT for edit ---
+        const isEdit = !!(initialData && initialData.id);
+        const routeName = isEdit
+            ? route("employer.job-postings.update", initialData!.id)
+            : route("employer.job-postings.store");
+
+        if (isEdit) {
+            formDataObj.append("_method", "PUT");
+        }
+
+        router.post(routeName, formDataObj, {
             forceFormData: true,
             onSuccess: () => {
                 setIsSubmitting(false);
                 setSubmissionErrors({});
-                toast.success("Job posting submitted successfully!");
+                toast.success(
+                    isEdit
+                        ? "Job posting updated successfully!"
+                        : "Job posting submitted successfully!"
+                );
             },
             onError: (errors) => {
                 setIsSubmitting(false);
@@ -237,7 +256,7 @@ export function useJobPostingForm() {
                 });
             },
         });
-    }, [data, location, bonuses, photos]);
+    }, [data, location, bonuses, photos, initialData]);
 
     const shouldShowValidationError = useCallback(
         (fieldName: string): boolean => {

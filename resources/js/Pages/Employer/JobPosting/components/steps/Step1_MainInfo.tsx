@@ -419,15 +419,25 @@ export default function Step1_MainInfo({
                                         id="min_salary"
                                         type="number"
                                         placeholder="15000"
-                                        value={data.min_salary || ""}
-                                        onChange={(e) =>
+                                        value={data.min_salary ?? ""}
+                                        onChange={(e) => {
                                             handleInputChange(
                                                 "min_salary",
                                                 e.target.value
-                                                    ? Number(e.target.value)
+                                            );
+                                        }}
+                                        onBlur={(e) => {
+                                            handleInputChange(
+                                                "min_salary",
+                                                e.target.value
+                                                    ? Number(
+                                                          Number(
+                                                              e.target.value
+                                                          ).toFixed(2)
+                                                      )
                                                     : null
-                                            )
-                                        }
+                                            );
+                                        }}
                                         className={`pl-10 h-11 ${
                                             displayErrors.min_salary
                                                 ? "border-red-500"
@@ -459,15 +469,25 @@ export default function Step1_MainInfo({
                                         id="max_salary"
                                         type="number"
                                         placeholder="25000"
-                                        value={data.max_salary || ""}
-                                        onChange={(e) =>
+                                        value={data.max_salary ?? ""}
+                                        onChange={(e) => {
                                             handleInputChange(
                                                 "max_salary",
                                                 e.target.value
-                                                    ? Number(e.target.value)
+                                            );
+                                        }}
+                                        onBlur={(e) => {
+                                            handleInputChange(
+                                                "max_salary",
+                                                e.target.value
+                                                    ? Number(
+                                                          Number(
+                                                              e.target.value
+                                                          ).toFixed(2)
+                                                      )
                                                     : null
-                                            )
-                                        }
+                                            );
+                                        }}
                                         className={`pl-10 h-11 ${
                                             displayErrors.max_salary
                                                 ? "border-red-500"

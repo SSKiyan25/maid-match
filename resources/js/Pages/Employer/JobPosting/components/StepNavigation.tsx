@@ -37,7 +37,6 @@ export default function StepNavigation({
 }: StepNavigationProps) {
     const isFirstStep = currentStep === 1;
     const isLastStep = currentStep === totalSteps;
-
     return (
         <div className="flex items-center justify-between pt-6 border-t border-border">
             {/* Previous Button */}

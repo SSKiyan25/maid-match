@@ -7,6 +7,7 @@ import { usePage } from "@inertiajs/react";
 import MobileNavBar, { MobileNavLink } from "@/Components/Mobile/navbar";
 import { Home, Briefcase, User as UserIcon, Search } from "lucide-react";
 import FloatingChatButton from "@/Components/Footer/FloatingChatButton";
+import { Toaster } from "@/Components/ui/sonner";
 
 interface EmployerLayoutProps extends PropsWithChildren {
     sidebarDefaultOpen?: boolean;
@@ -36,6 +37,7 @@ export default function EmployerLayout({
                         user={{ ...user, avatar: user.avatar ?? "" }}
                     />
                     {children}
+                    <Toaster />
                 </main>
                 <MobileNavBar links={employerMobileLinks} />
                 <FloatingChatButton />

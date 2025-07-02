@@ -17,6 +17,15 @@ class JobBonusRequest extends FormRequest
             (auth()->user()->hasRole('employer') || auth()->user()->hasRole('admin'));
     }
 
+    public function prepareForValidation()
+    {
+        if ($this->has('is_archived')) {
+            $this->merge([
+                'is_archived' => filter_var($this->input('is_archived'), FILTER_VALIDATE_BOOLEAN) ? 1 : 0,
+            ]);
+        }
+    }
+
     /**
      * Get the validation rules that apply to the request.
      */

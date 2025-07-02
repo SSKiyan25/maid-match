@@ -21,13 +21,18 @@ function validateDescription(description: string) {
     return { value: sanitizedValue };
 }
 
-function validateSalary(salary: number | null | undefined, field: string) {
-    if (salary !== undefined && salary !== null) {
-        if (typeof salary !== "number" || isNaN(salary) || salary < 0) {
-            return { error: `${field} must be a positive number.` };
-        }
+function validateSalary(
+    salary: number | string | null | undefined,
+    field: string
+) {
+    if (salary === undefined || salary === null || salary === "") {
+        return { value: null };
     }
-    return { value: salary };
+    const num = typeof salary === "string" ? parseFloat(salary) : salary;
+    if (typeof num !== "number" || isNaN(num) || num < 0) {
+        return { error: `${field} must be a positive number.` };
+    }
+    return { value: num };
 }
 
 function validateDayOffPreference(dayOff: string | undefined) {

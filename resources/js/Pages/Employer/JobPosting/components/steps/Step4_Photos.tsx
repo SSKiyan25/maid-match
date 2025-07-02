@@ -27,14 +27,15 @@ import {
     Image as ImageIcon,
     ArrowUp,
     ArrowDown,
-    Eye,
 } from "lucide-react";
 
 import { validateStep4 } from "../../utils/step4Validation";
 import { useStepValidation } from "../../hooks/useStepValidation";
+import { JobPhoto } from "../../utils/types";
 
 interface PhotoData {
-    file: File;
+    file?: File;
+    url?: string; // Optional for existing photos
     caption?: string;
     type: string;
     sort_order?: number;
@@ -71,7 +72,7 @@ export default function Step4_Photos({
     const [hasUserInteracted, setHasUserInteracted] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const { clientErrors, isValid } = useStepValidation(
+    const { clientErrors, isValid } = useStepValidation<PhotoData[]>(
         data,
         validateStep4,
         onValidationChange
@@ -324,16 +325,27 @@ export default function Step4_Photos({
                                         <CardContent className="p-4 space-y-4">
                                             {/* Photo Preview */}
                                             <div className="aspect-video bg-muted rounded-lg overflow-hidden">
-                                                <img
-                                                    src={URL.createObjectURL(
-                                                        photo.file
-                                                    )}
-                                                    alt={
-                                                        photo.caption ||
-                                                        `Photo ${index + 1}`
-                                                    }
-                                                    className="w-full h-full object-cover"
-                                                />
+                                                {photo.file instanceof File ? (
+                                                    <img
+                                                        src={URL.createObjectURL(
+                                                            photo.file
+                                                        )}
+                                                        alt={
+                                                            photo.caption ||
+                                                            `Photo ${index + 1}`
+                                                        }
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                ) : photo.url ? (
+                                                    <img
+                                                        src={`/storage/${photo.url}`}
+                                                        alt={
+                                                            photo.caption ||
+                                                            `Photo ${index + 1}`
+                                                        }
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                ) : null}
                                             </div>
 
                                             {/* Photo Details */}
@@ -474,26 +486,33 @@ export default function Step4_Photos({
                                                 </div>
 
                                                 {/* File Info */}
-                                                <div className="text-xs text-muted-foreground">
-                                                    <p
-                                                        className="truncate break-all max-w-full"
-                                                        title={photo.file.name}
-                                                    >
-                                                        File: {photo.file.name}
-                                                    </p>
-                                                    <p>
-                                                        Size:{" "}
-                                                        {(
-                                                            photo.file.size /
-                                                            1024 /
-                                                            1024
-                                                        ).toFixed(2)}{" "}
-                                                        MB
-                                                    </p>
-                                                    <p>
-                                                        Type: {photo.file.type}
-                                                    </p>
-                                                </div>
+                                                {photo.file && (
+                                                    <div className="text-xs text-muted-foreground">
+                                                        <p
+                                                            className="truncate break-all max-w-full"
+                                                            title={
+                                                                photo.file.name
+                                                            }
+                                                        >
+                                                            File:{" "}
+                                                            {photo.file.name}
+                                                        </p>
+                                                        <p>
+                                                            Size:{" "}
+                                                            {(
+                                                                photo.file
+                                                                    .size /
+                                                                1024 /
+                                                                1024
+                                                            ).toFixed(2)}{" "}
+                                                            MB
+                                                        </p>
+                                                        <p>
+                                                            Type:{" "}
+                                                            {photo.file.type}
+                                                        </p>
+                                                    </div>
+                                                )}
 
                                                 {/* File Validation Error */}
                                                 {errorsByIndex[index]?.file && (

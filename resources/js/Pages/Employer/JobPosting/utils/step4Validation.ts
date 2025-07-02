@@ -1,10 +1,9 @@
-import { JobPhoto } from "./types";
-
 export interface Step4ValidationResult {
     isValid: boolean;
     errors: Record<number, Record<string, string>>;
     sanitizedData?: {
-        file: File;
+        file?: File;
+        url?: string;
         caption?: string;
         type: string;
         sort_order?: number;
@@ -48,11 +47,12 @@ function validateCaption(caption: string | undefined) {
 }
 
 export function validateStep4(
-    data: { file: File; caption?: string; type: string; sort_order?: number; is_primary?: boolean }[]
+    data: { file?: File; url?: string; caption?: string; type: string; sort_order?: number; is_primary?: boolean }[]
 ): Step4ValidationResult {
     const errors: Record<number, Record<string, string>> = {};
     const sanitizedData: {
-        file: File;
+        file?: File;
+        url?: string;
         caption?: string;
         type: string;
         sort_order?: number;
@@ -62,17 +62,24 @@ export function validateStep4(
     data.forEach((photo, idx) => {
         const photoErrors: Record<string, string> = {};
         const sanitizedPhoto: Partial<{
-            file: File;
+            file?: File;
+            url?: string;
             caption?: string;
             type: string;
             sort_order?: number;
             is_primary?: boolean;
         }> = {};
 
-        // Validate file
-        const fileResult = validatePhotoFile(photo.file);
-        if (!fileResult.isValid) photoErrors.file = fileResult.error!;
-        else sanitizedPhoto.file = photo.file;
+        // Validate file or url
+        if (photo.file) {
+            const fileResult = validatePhotoFile(photo.file);
+            if (!fileResult.isValid) photoErrors.file = fileResult.error!;
+            else sanitizedPhoto.file = photo.file;
+        } else if (photo.url) {
+            sanitizedPhoto.url = photo.url;
+        } else {
+            photoErrors.file = "Photo file is required.";
+        }
 
         // Validate type
         const typeResult = validatePhotoType(photo.type);
@@ -99,10 +106,11 @@ export function validateStep4(
         if (Object.keys(photoErrors).length > 0) {
             errors[idx] = photoErrors;
         }
-        // Only push if file is valid
-        if (fileResult.isValid) {
+        // Only push if file is valid or url exists
+        if ((photo.file && !photoErrors.file) || (photo.url && !photoErrors.file)) {
             sanitizedData.push(sanitizedPhoto as {
-                file: File;
+                file?: File;
+                url?: string;
                 caption?: string;
                 type: string;
                 sort_order?: number;

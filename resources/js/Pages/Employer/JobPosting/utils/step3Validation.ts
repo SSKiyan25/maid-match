@@ -28,13 +28,27 @@ function validateBonusFrequency(frequency: string) {
     return { value: sanitizedValue };
 }
 
-function validateBonusAmount(amount: number | null | undefined) {
-    if (amount !== undefined && amount !== null) {
-        if (typeof amount !== "number" || isNaN(amount) || amount < 0) {
-            return { error: "Bonus amount must be a positive number." };
+// Accepts string or number for amount, only validates if it's a valid number
+function validateBonusAmount(amount: number | string | null | undefined) {
+    if (
+        amount !== undefined &&
+        amount !== null &&
+        amount !== "" &&
+        !isNaN(Number(amount))
+    ) {
+        const num = Number(amount);
+        if (num < 0) {
+            return { error: "Bonus amount should not be negative." };
         }
+        // Optionally, round to 2 decimals for sanitized value
+        return { value: Number(num.toFixed(2)) };
     }
-    return { value: amount };
+    // If empty, allow as null (optional field)
+    if (amount === "" || amount === null || amount === undefined) {
+        return { value: null };
+    }
+    // If not a valid number, don't show negative error, just skip
+    return { error: "Bonus amount must be a valid number." };
 }
 
 export function validateStep3(data: JobBonus[]): Step3ValidationResult {

@@ -5,22 +5,32 @@ namespace App\Http\Controllers\Employer;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\JobPosting\JobPostingRequest;
 use App\Models\JobPosting\JobPosting;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class JobPostingController extends Controller
 {
+    use AuthorizesRequests;
+
     // List all job postings (for index page)
     public function index()
     {
-        $jobPostings = JobPosting::withCount(['applications', 'interviews'])
+        $jobPostings = JobPosting::with([
+            'location',
+            'bonuses',
+            'photos',
+        ])
+            ->withCount(['applications', 'interviews'])
             ->where('employer_id', auth()->id())
             ->latest()
             ->get();
 
         return inertia('Employer/JobPosting/index', [
             'jobPostings' => $jobPostings,
+            'flash' => [
+                'success' => session('success'),
+            ],
         ]);
     }
-
     // Show create form
     public function create()
     {
@@ -42,6 +52,8 @@ class JobPostingController extends Controller
         }
         if ($request->has('bonuses')) {
             foreach ($request->input('bonuses') as $bonus) {
+                // Ensure is_archived is always 0 or 1
+                $bonus['is_archived'] = filter_var($bonus['is_archived'] ?? false, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
                 $jobPosting->bonuses()->create($bonus);
             }
         }
@@ -55,11 +67,15 @@ class JobPostingController extends Controller
                     $photoData['url'] = $file->storeAs("job-photos/{$jobPosting->id}", $filename, 'public');
                 }
                 unset($photoData['file']);
+                // Ensure is_archived is always 0 or 1 for photos if present
+                if (isset($photoData['is_archived'])) {
+                    $photoData['is_archived'] = filter_var($photoData['is_archived'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+                }
                 $jobPosting->photos()->create($photoData);
             }
         }
 
-        return redirect()->route('employer.job-postings.index')->with('success', 'Job posting created!');
+        return redirect()->route('employer.job-postings.index')->with('success', "Job posting \"{$jobPosting->title}\" created!");
     }
 
     // Show edit form
@@ -83,17 +99,102 @@ class JobPostingController extends Controller
         $validated = $request->validatedWithEmployer();
         $jobPosting->update($validated);
 
-        // Optionally, update related models here
+        // Update or create location
+        if ($request->has('location')) {
+            $locationData = $request->input('location');
+            $locationData['is_hidden'] = filter_var($locationData['is_hidden'] ?? false, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+            $locationData['is_archived'] = filter_var($locationData['is_archived'] ?? false, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+            if ($jobPosting->location) {
+                $jobPosting->location->update($locationData);
+            } else {
+                $jobPosting->location()->create($locationData);
+            }
+        }
 
-        return redirect()->route('employer.job-postings.index')->with('success', 'Job posting updated!');
+        // Update bonuses (delete all and recreate, or you can optimize like photos if needed)
+        if ($request->has('bonuses')) {
+            $jobPosting->bonuses()->delete();
+            foreach ($request->input('bonuses') as $bonus) {
+                $bonus['is_archived'] = filter_var($bonus['is_archived'] ?? false, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+                $jobPosting->bonuses()->create($bonus);
+            }
+        }
+
+        // Update photos: only delete photos that were removed, update existing, add new
+        if ($request->has('photos')) {
+            $submittedPhotos = $request->input('photos', []);
+            $existingPhotoIds = collect($submittedPhotos)
+                ->pluck('id')
+                ->filter()
+                ->all();
+
+            // Delete photos that were removed in the form
+            $jobPosting->photos()
+                ->whereNotIn('id', $existingPhotoIds)
+                ->delete();
+
+            foreach ($submittedPhotos as $index => $photoData) {
+                // If photo has an ID, update it; otherwise, create new
+                if (isset($photoData['id'])) {
+                    $photo = $jobPosting->photos()->find($photoData['id']);
+                    if ($photo) {
+                        // Optionally handle file update if new file uploaded
+                        if ($request->hasFile("photos.$index.file")) {
+                            $file = $request->file("photos.$index.file");
+                            $filename = time() . '_' . $file->getClientOriginalName();
+                            $photoData['url'] = $file->storeAs("job-photos/{$jobPosting->id}", $filename, 'public');
+                        }
+                        unset($photoData['file']);
+                        if (isset($photoData['is_archived'])) {
+                            $photoData['is_archived'] = filter_var($photoData['is_archived'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+                        }
+                        $photo->update($photoData);
+                    }
+                } else {
+                    // New photo
+                    if ($request->hasFile("photos.$index.file")) {
+                        $file = $request->file("photos.$index.file");
+                        $filename = time() . '_' . $file->getClientOriginalName();
+                        $photoData['url'] = $file->storeAs("job-photos/{$jobPosting->id}", $filename, 'public');
+                    }
+                    unset($photoData['file']);
+                    if (isset($photoData['is_archived'])) {
+                        $photoData['is_archived'] = filter_var($photoData['is_archived'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+                    }
+                    $jobPosting->photos()->create($photoData);
+                }
+            }
+        }
+
+        return redirect()
+            ->route('employer.job-postings.index')
+            ->with('success', "Job posting \"{$jobPosting->title}\" updated!");
     }
 
     // Archive (soft-delete) a job posting
     public function archive(JobPosting $jobPosting)
     {
         $this->authorize('update', $jobPosting);
+
+        // Archive the job posting
         $jobPosting->update(['is_archived' => true]);
-        return redirect()->route('employer.job-postings.index')->with('success', 'Job posting archived!');
+
+        // Archive related location
+        if ($jobPosting->location) {
+            $jobPosting->location->update(['is_archived' => true]);
+        }
+
+        // Archive related bonuses
+        foreach ($jobPosting->bonuses as $bonus) {
+            $bonus->update(['is_archived' => true]);
+        }
+
+        // Archive related photos
+        foreach ($jobPosting->photos as $photo) {
+            $photo->update(['is_archived' => true]);
+        }
+
+        return redirect()->route('employer.job-postings.index')->with('success', 'Job posting and related data archived!');
     }
 
     // List archived job postings

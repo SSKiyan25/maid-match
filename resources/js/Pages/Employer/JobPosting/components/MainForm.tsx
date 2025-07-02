@@ -20,7 +20,7 @@ interface JobPostingPageProps {
             email: string;
         };
     };
-    jobPosting?: any; // For edit mode
+    jobPosting?: any;
     isEdit?: boolean;
 }
 
@@ -53,7 +53,7 @@ export default function JobPostingPage({
         isSubmitting,
         errors,
         submissionErrors,
-    } = useJobPostingForm();
+    } = useJobPostingForm(isEdit ? jobPosting : undefined);
 
     const steps = [
         {
@@ -283,7 +283,7 @@ export default function JobPostingPage({
         <EmployerLayout sidebarDefaultOpen={false}>
             <Head title={isEdit ? "Edit Job Posting" : "Create Job Posting"} />
 
-            <div className="pb-20 pt-12 px-6">
+            <div className="pb-36 pt-12 px-6">
                 <div className="w-full mx-auto sm:px-6 lg:px-8">
                     {/* Header */}
                     <div className="text-center mb-8">

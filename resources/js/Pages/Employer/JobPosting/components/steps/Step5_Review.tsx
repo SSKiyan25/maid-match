@@ -18,7 +18,6 @@ import {
     Camera,
     AlertCircle,
     Info,
-    DollarSign,
     Clock,
     Star,
     Eye,
@@ -31,7 +30,8 @@ import {
 import { JobPostingForm, JobLocation, JobBonus } from "../../utils/types";
 
 interface PhotoData {
-    file: File;
+    file?: File;
+    url?: string;
     caption?: string;
     type: string;
     sort_order?: number;
@@ -63,6 +63,7 @@ export default function Step5_Review({
     submissionErrors,
     isEditMode = false,
 }: Step5ReviewProps) {
+    console.log("Review Step Form Data:", formData);
     const workTypeLabels: Record<string, string> = {
         cleaning: "House Cleaning",
         cooking: "Cooking",
@@ -530,13 +531,22 @@ export default function Step5_Review({
                                                 </p>
                                             </div>
                                             <div className="relative w-full max-w-md">
-                                                <img
-                                                    src={URL.createObjectURL(
-                                                        primaryPhoto.file
-                                                    )}
-                                                    alt="Primary photo"
-                                                    className="w-full h-48 object-cover rounded-lg"
-                                                />
+                                                {primaryPhoto.file instanceof
+                                                File ? (
+                                                    <img
+                                                        src={URL.createObjectURL(
+                                                            primaryPhoto.file
+                                                        )}
+                                                        alt="Primary photo"
+                                                        className="w-full h-48 object-cover rounded-lg"
+                                                    />
+                                                ) : primaryPhoto.url ? (
+                                                    <img
+                                                        src={`/storage/${primaryPhoto.url}`}
+                                                        alt="Primary photo"
+                                                        className="w-full h-48 object-cover rounded-lg"
+                                                    />
+                                                ) : null}
                                                 <div className="absolute bottom-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs">
                                                     {photoTypeLabels[
                                                         primaryPhoto.type
@@ -569,19 +579,34 @@ export default function Step5_Review({
                                                             key={index}
                                                             className="relative"
                                                         >
-                                                            <img
-                                                                src={URL.createObjectURL(
-                                                                    photo.file
-                                                                )}
-                                                                alt={
-                                                                    photo.caption ||
-                                                                    `Photo ${
-                                                                        index +
-                                                                        1
-                                                                    }`
-                                                                }
-                                                                className="w-full h-24 object-cover rounded-lg"
-                                                            />
+                                                            {photo.file instanceof
+                                                            File ? (
+                                                                <img
+                                                                    src={URL.createObjectURL(
+                                                                        photo.file
+                                                                    )}
+                                                                    alt={
+                                                                        photo.caption ||
+                                                                        `Photo ${
+                                                                            index +
+                                                                            1
+                                                                        }`
+                                                                    }
+                                                                    className="w-full h-24 object-cover rounded-lg"
+                                                                />
+                                                            ) : photo.url ? (
+                                                                <img
+                                                                    src={`/storage/${photo.url}`}
+                                                                    alt={
+                                                                        photo.caption ||
+                                                                        `Photo ${
+                                                                            index +
+                                                                            1
+                                                                        }`
+                                                                    }
+                                                                    className="w-full h-24 object-cover rounded-lg"
+                                                                />
+                                                            ) : null}
                                                             <div className="absolute bottom-1 left-1 bg-black/70 text-white px-1 py-0.5 rounded text-xs">
                                                                 {photoTypeLabels[
                                                                     photo.type

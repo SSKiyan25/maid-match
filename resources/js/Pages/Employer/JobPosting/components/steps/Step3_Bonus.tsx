@@ -350,17 +350,28 @@ export default function Step3_Bonus({
                                                         type="number"
                                                         placeholder="1000"
                                                         value={
-                                                            bonus.amount || ""
+                                                            bonus.amount ?? ""
                                                         }
                                                         onChange={(e) =>
                                                             handleBonusChange(
                                                                 index,
                                                                 "amount",
                                                                 e.target.value
+                                                            )
+                                                        }
+                                                        onBlur={(e) =>
+                                                            handleBonusChange(
+                                                                index,
+                                                                "amount",
+                                                                e.target.value
                                                                     ? Number(
-                                                                          e
-                                                                              .target
-                                                                              .value
+                                                                          Number(
+                                                                              e
+                                                                                  .target
+                                                                                  .value
+                                                                          ).toFixed(
+                                                                              2
+                                                                          )
                                                                       )
                                                                     : null
                                                             )
