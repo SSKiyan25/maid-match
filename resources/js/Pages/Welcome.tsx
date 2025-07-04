@@ -24,20 +24,23 @@ import { ModeToggle } from "@/Components/mode-toggle";
 export default function Welcome({
     auth,
 }: PageProps<{ laravelVersion: string; phpVersion: string }>) {
-    // Helper function to get the correct dashboard route based on user role
     const getDashboardRoute = () => {
         if (!auth.user) return route("dashboard");
 
-        // Check user roles and return appropriate dashboard
-        if (auth.user.roles?.some((role) => role.name === "employer")) {
+        // Use the single role property
+        const role = auth.user.role;
+
+        if (role === "employer") {
             return route("employer.dashboard");
-        } else if (auth.user.roles?.some((role) => role.name === "maid")) {
+        } else if (role === "maid") {
             return route("maid.dashboard");
-        } else if (auth.user.roles?.some((role) => role.name === "agency")) {
+        } else if (role === "agency") {
             return route("agency.dashboard");
+        } else if (role === "admin") {
+            return route("admin.dashboard");
         }
 
-        // Fallback to general dashboard
+        // Fallback (should not happen if roles are correct)
         return route("dashboard");
     };
 
