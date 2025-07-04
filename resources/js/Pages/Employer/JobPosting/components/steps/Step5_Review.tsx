@@ -63,7 +63,6 @@ export default function Step5_Review({
     submissionErrors,
     isEditMode = false,
 }: Step5ReviewProps) {
-    console.log("Review Step Form Data:", formData);
     const workTypeLabels: Record<string, string> = {
         cleaning: "House Cleaning",
         cooking: "Cooking",

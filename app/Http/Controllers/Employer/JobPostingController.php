@@ -111,7 +111,6 @@ class JobPostingController extends Controller
             }
         }
 
-        // Update bonuses (delete all and recreate, or you can optimize like photos if needed)
         if ($request->has('bonuses')) {
             $jobPosting->bonuses()->delete();
             foreach ($request->input('bonuses') as $bonus) {
@@ -120,7 +119,7 @@ class JobPostingController extends Controller
             }
         }
 
-        // Update photos: only delete photos that were removed, update existing, add new
+        // Only delete photos that were removed, update existing, add new
         if ($request->has('photos')) {
             $submittedPhotos = $request->input('photos', []);
             $existingPhotoIds = collect($submittedPhotos)
@@ -171,7 +170,6 @@ class JobPostingController extends Controller
             ->with('success', "Job posting \"{$jobPosting->title}\" updated!");
     }
 
-    // Archive (soft-delete) a job posting
     public function archive(JobPosting $jobPosting)
     {
         $this->authorize('update', $jobPosting);

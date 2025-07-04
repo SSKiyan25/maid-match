@@ -74,10 +74,10 @@ export const validatePhoto = (photo: File): { isValid: boolean; error?: string }
         return { isValid: true }; // Photo is optional
     }
 
-    // Check file size (2MB limit)
-    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+    // Check file size (5MB limit)
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
     if (photo.size > maxSize) {
-        return { isValid: false, error: "Photo file size must be less than 2MB" };
+        return { isValid: false, error: "Photo file size must be less than 5MB" };
     }
 
     // Check file type

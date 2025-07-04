@@ -20,7 +20,7 @@ class MaidCharacterReferenceResource extends JsonResource
             'verified_at' => $this->verified_at?->toISOString(),
             'is_archived' => $this->is_archived,
 
-            // Simple computed attributes
+            // Computed attributes from the model
             'verify_status_label' => $this->verify_status_label,
             'relationship_label' => $this->relationship_label,
 

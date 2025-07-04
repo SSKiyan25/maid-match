@@ -35,7 +35,7 @@ import {
     CheckCircle,
 } from "lucide-react";
 
-import type { Step5PetsProps, Pet } from "../../utils/types";
+import type { Step5PetsProps } from "../../utils/types";
 import { useStep5Validation } from "../../hooks/useStep5Validation";
 import { getPetTypeInfo } from "../../utils/step5Validation";
 

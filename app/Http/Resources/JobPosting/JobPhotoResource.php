@@ -23,7 +23,7 @@ class JobPhotoResource extends JsonResource
             'is_primary' => $this->is_primary,
             'is_archived' => $this->is_archived,
 
-            // Simple computed attributes
+            // Computed attributes from the model
             'type_label' => $this->type_label,
 
             // Timestamps

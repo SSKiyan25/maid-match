@@ -12,7 +12,6 @@ import { Textarea } from "@/Components/ui/textarea";
 import { Alert, AlertDescription } from "@/Components/ui/alert";
 import { Home, Users, AlertCircle, Info, MapPin } from "lucide-react";
 
-// Import types and hooks
 import type {
     Step2HouseholdInfoProps,
     Step2Data,

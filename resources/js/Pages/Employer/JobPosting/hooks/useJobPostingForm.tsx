@@ -108,7 +108,6 @@ export function useJobPostingForm(initialData?: Partial<JobPostingFormData>) {
         [setData]
     );
 
-    // Step validation
     const validateStep = useCallback(
         async (
             step: number,

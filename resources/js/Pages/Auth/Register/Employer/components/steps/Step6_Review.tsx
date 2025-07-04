@@ -39,7 +39,6 @@ export default function Step6_Review({
     submissionErrors,
 }: Step6ReviewProps) {
     const safeSubmissionErrors = submissionErrors ?? {};
-    console.log("Safe submission errors:", safeSubmissionErrors);
     const labels = {
         workType: {
             general_housework: "General Housework",

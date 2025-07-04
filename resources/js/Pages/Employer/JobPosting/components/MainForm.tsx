@@ -118,7 +118,6 @@ export default function JobPostingPage({
         [handleStepValidationChange]
     );
 
-    // Check if a step is accessible (clickable)
     const isStepAccessible = (stepId: number): boolean => {
         if (stepId === currentStep) return true;
         if (stepId < currentStep) return true;

@@ -4,7 +4,7 @@ import { usePage } from "@inertiajs/react";
 export default function EditJobPostingPage() {
     const props = usePage().props as {
         auth: { user: { id: number; name: string; email: string } };
-        jobPosting?: any; // Make jobPosting optional
+        jobPosting?: any;
     };
 
     return (

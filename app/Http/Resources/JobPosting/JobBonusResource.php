@@ -25,7 +25,7 @@ class JobBonusResource extends JsonResource
             'conditions' => $this->conditions,
             'is_archived' => $this->is_archived,
 
-            // Simple computed attributes
+            // Computed attributes from the model
             'type_label' => $this->type_label,
             'frequency_label' => $this->frequency_label,
             'status_label' => $this->status_label,

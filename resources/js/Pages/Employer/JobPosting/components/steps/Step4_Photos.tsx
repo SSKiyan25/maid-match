@@ -31,7 +31,6 @@ import {
 
 import { validateStep4 } from "../../utils/step4Validation";
 import { useStepValidation } from "../../hooks/useStepValidation";
-import { JobPhoto } from "../../utils/types";
 
 interface PhotoData {
     file?: File;

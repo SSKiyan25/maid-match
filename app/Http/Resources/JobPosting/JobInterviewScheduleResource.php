@@ -36,7 +36,7 @@ class JobInterviewScheduleResource extends JsonResource
             'confirmed_at' => $this->confirmed_at?->toISOString(),
             'is_archived' => $this->is_archived,
 
-            // Simple computed attributes
+            // Computed attributes from the model
             'status_label' => $this->status_label,
             'type_label' => $this->type_label,
 

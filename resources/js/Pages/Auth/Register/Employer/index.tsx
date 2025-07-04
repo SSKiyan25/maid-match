@@ -95,26 +95,6 @@ export default function EmployerRegister() {
         }));
     };
 
-    // Check if all required steps before a given step are completed
-    const areRequiredStepsCompleted = async (
-        targetStep: number
-    ): Promise<boolean> => {
-        for (let i = 1; i < targetStep; i++) {
-            const step = steps.find((s) => s.id === i);
-            if (step?.required) {
-                const isClientValid = stepValidation[i];
-                if (!isClientValid) {
-                    const isServerValid = await validateStep(i, formData);
-                    if (!isServerValid) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
-    };
-
-    // Check if a step is accessible (clickable)
     const isStepAccessible = (stepId: number): boolean => {
         // Current step is always accessible
         if (stepId === currentStep) return true;

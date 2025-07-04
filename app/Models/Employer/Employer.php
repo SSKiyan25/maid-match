@@ -148,9 +148,6 @@ class Employer extends Model
         $this->update(['is_archived' => true]);
     }
 
-    /**
-     * Efficient methods using database fields
-     */
     public function hasChildren()
     {
         return $this->has_children;

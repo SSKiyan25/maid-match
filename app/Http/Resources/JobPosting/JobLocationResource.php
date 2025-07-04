@@ -27,7 +27,7 @@ class JobLocationResource extends JsonResource
             'is_hidden' => $this->is_hidden,
             'is_archived' => $this->is_archived,
 
-            // Simple computed attributes
+            // Computed attributes from the model
             'full_address' => $this->full_address,
             'display_address' => $this->display_address,
 

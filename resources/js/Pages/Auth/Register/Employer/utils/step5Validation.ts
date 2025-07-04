@@ -62,10 +62,10 @@ export const validatePetPhoto = (photo: File): { isValid: boolean; error?: strin
         return { isValid: true }; // Photo is optional
     }
 
-    // Check file size (2MB limit)
-    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+    // Check file size (5MB limit)
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
     if (photo.size > maxSize) {
-        return { isValid: false, error: "Pet photo file size must be less than 2MB" };
+        return { isValid: false, error: "Pet photo file size must be less than 5MB" };
     }
 
     // Check file type
@@ -246,38 +246,4 @@ export const getPetTypeInfo = (petType: string): {
     };
 
     return petTypeMap[petType] || petTypeMap.other;
-};
-
-// Simple matching tips without medical advice
-export const getPetMatchingTips = (pets: Pet[]): string[] => {
-    const tips: string[] = [];
-    
-    if (pets.length === 0) {
-        return ['No pets - we can match you with any helper!'];
-    }
-
-    const petTypes = pets.map(pet => pet.type);
-    const categories = petTypes.map(type => getPetTypeInfo(type).category);
-
-    if (categories.includes('specialized')) {
-        tips.push('We\'ll find helpers comfortable with exotic pets');
-    }
-
-    if (petTypes.includes('dog')) {
-        tips.push('We\'ll prioritize helpers who enjoy dogs');
-    }
-
-    if (petTypes.includes('cat')) {
-        tips.push('We\'ll look for cat-friendly helpers');
-    }
-
-    if (pets.length > 3) {
-        tips.push('We\'ll find helpers experienced with multiple pets');
-    }
-
-    if (pets.some(pet => pet.photo)) {
-        tips.push('Pet photos help helpers recognize your pets');
-    }
-
-    return tips.length > 0 ? tips : ['🐾 We\'ll match you with pet-loving helpers'];
 };

@@ -21,8 +21,7 @@ import {
     Calendar,
 } from "lucide-react";
 
-// Import from utils
-import { Step1Data, ValidationResult } from "../../utils/types";
+import { Step1Data } from "../../utils/types";
 import {
     validateStep1,
     validateEmail,
