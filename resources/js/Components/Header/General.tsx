@@ -45,12 +45,16 @@ export default function GeneralHeader({ user }: GeneralHeaderProps) {
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <span className="cursor-pointer hover:bg-primary/40 rounded-full p-1 transition">
-                            <Avatar>
+                            <Avatar className="border-2 border-muted shadow-md">
                                 <AvatarImage
-                                    src={user.avatar ?? ""}
+                                    src={
+                                        user.avatar
+                                            ? `/storage/${user.avatar}`
+                                            : ""
+                                    }
                                     alt={user.name ?? "User"}
                                 />
-                                <AvatarFallback className="rounded-lg">
+                                <AvatarFallback>
                                     {(user.name ?? "User")
                                         .split(" ")
                                         .map((n) => n[0])
@@ -76,7 +80,11 @@ export default function GeneralHeader({ user }: GeneralHeaderProps) {
                                 <DropdownMenuSeparator />
                             </>
                         )}
-                        <DropdownMenuItem>Profile</DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <Link href={route("employer.profile.index")}>
+                                Profile
+                            </Link>
+                        </DropdownMenuItem>
                         <DropdownMenuItem>Settings</DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem

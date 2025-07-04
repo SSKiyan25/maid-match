@@ -47,9 +47,13 @@ export function NavUser({
                             size="lg"
                             className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                         >
-                            <Avatar className="h-8 w-8 rounded-lg">
+                            <Avatar className="h-8 w-8 rounded-lg border-2 border-muted shadow-md">
                                 <AvatarImage
-                                    src={user.avatar ?? ""}
+                                    src={
+                                        user.avatar
+                                            ? `/storage/${user.avatar}`
+                                            : ""
+                                    }
                                     alt={user.name ?? "User"}
                                 />
                                 <AvatarFallback className="rounded-lg">
@@ -82,7 +86,11 @@ export function NavUser({
                             <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                                 <Avatar className="h-8 w-8 rounded-lg">
                                     <AvatarImage
-                                        src={user.avatar ?? ""}
+                                        src={
+                                            user.avatar
+                                                ? `/storage/${user.avatar}`
+                                                : ""
+                                        }
                                         alt={user.name ?? "User"}
                                     />
                                     <AvatarFallback className="rounded-lg">

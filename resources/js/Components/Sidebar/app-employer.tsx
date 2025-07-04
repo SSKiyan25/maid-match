@@ -51,7 +51,7 @@ const data = {
     navMain: [
         {
             title: "Dashboard",
-            url: "#",
+            url: "/employer/dashboard",
             icon: LayoutDashboard,
             isActive: true,
         },
@@ -140,7 +140,7 @@ const data = {
                 },
                 {
                     title: "Profile Settings",
-                    url: "#",
+                    url: "/employer/profile",
                     icon: UserCog,
                 },
                 {

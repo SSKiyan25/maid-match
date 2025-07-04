@@ -25,7 +25,7 @@ class EmployerPetRequest extends FormRequest
         $rules = [
             'type' => ['required', 'string', Rule::in(array_keys(EmployerPet::PET_TYPES))],
             'name' => ['nullable', 'string', 'max:255'],
-            'photo_url' => ['nullable', 'string', 'max:500'],
+            'photo_url' => ['nullable', 'image', 'max:5120'], // 5MB max
             'is_archived' => ['sometimes', 'boolean'],
         ];
 
@@ -46,7 +46,8 @@ class EmployerPetRequest extends FormRequest
             'type.required' => 'Pet type is required.',
             'type.in' => 'Please select a valid pet type.',
             'name.max' => 'Pet name cannot exceed 255 characters.',
-            'photo_url.max' => 'Photo URL cannot exceed 500 characters.',
+            'photo_url.image' => 'Photo must be an image file (jpeg, png, bmp, gif, or svg).',
+            'photo_url.max' => 'Photo must not be larger than 5MB.',
         ];
     }
 

@@ -227,7 +227,6 @@ export function useJobPostingForm(initialData?: Partial<JobPostingFormData>) {
             }
         });
 
-        // --- FIX: Always use POST + _method=PUT for edit ---
         const isEdit = !!(initialData && initialData.id);
         const routeName = isEdit
             ? route("employer.job-postings.update", initialData!.id)

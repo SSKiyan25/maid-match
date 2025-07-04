@@ -1,12 +1,13 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\AgencyRegisterController;
 use App\Http\Controllers\Auth\EmployerRegisterController;
 use App\Http\Controllers\Employer\JobPostingController;
-use App\Http\Controllers\Employer\JobPosting\BonusController;
-use App\Http\Controllers\Employer\JobPosting\LocationController;
-use App\Http\Controllers\Employer\JobPosting\PhotoController;
+use App\Http\Controllers\Employer\Profile\UserUpdateController;
+use App\Http\Controllers\Employer\Profile\ProfileUpdateController;
+use App\Http\Controllers\Employer\Profile\EmployerUpdateController;
+use App\Http\Controllers\Employer\Profile\EmployerChildUpdateController;
+use App\Http\Controllers\Employer\Profile\EmployerPetUpdateController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -60,41 +61,42 @@ Route::middleware(['auth', 'verified', 'role:agency'])->group(function () {
     Route::get('/agency/dashboard', [AgencyRegisterController::class, 'dashboard'])->name('agency.dashboard');
 });
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-
 Route::middleware(['auth', 'verified', 'role:employer'])->prefix('employer')->name('employer.')->group(function () {
     // Job Postings CRUD
     Route::resource('job-postings', JobPostingController::class)
-        ->except(['show', 'destroy']); // You can add/remove as needed
+        ->except(['show', 'destroy']);
 
     // Archive and Archived routes for job postings
     Route::patch('job-postings/{jobPosting}/archive', [JobPostingController::class, 'archive'])->name('job-postings.archive');
     Route::get('job-postings-archived', [JobPostingController::class, 'archived'])->name('job-postings.archived');
 
-    // Bonuses
-    Route::resource('job-postings.bonuses', BonusController::class)
-        ->shallow()
-        ->except(['show', 'destroy']);
-    Route::patch('bonuses/{bonus}/archive', [BonusController::class, 'archive'])->name('bonuses.archive');
-    Route::get('job-postings/{jobPosting}/bonuses-archived', [BonusController::class, 'archived'])->name('bonuses.archived');
+    Route::get('/profile', [UserUpdateController::class, 'index'])->name('profile.index');
 
-    // Locations
-    Route::resource('job-postings.locations', LocationController::class)
-        ->shallow()
-        ->except(['show', 'destroy']);
-    Route::patch('locations/{location}/archive', [LocationController::class, 'archive'])->name('locations.archive');
-    Route::get('job-postings/{jobPosting}/locations-archived', [LocationController::class, 'archived'])->name('locations.archived');
+    // Employer Profile Update routes
+    Route::prefix('profile')->name('profile.')->group(function () {
+        Route::patch('/user', [UserUpdateController::class, 'update'])->name('user.update');
+        Route::patch('/profile', [ProfileUpdateController::class, 'update'])->name('profile.update');
+        Route::patch('/employer', [EmployerUpdateController::class, 'update'])->name('employer.update');
 
-    // Photos
-    Route::resource('job-postings.photos', PhotoController::class)
-        ->shallow()
-        ->except(['show', 'destroy']);
-    Route::patch('photos/{photo}/archive', [PhotoController::class, 'archive'])->name('photos.archive');
-    Route::get('job-postings/{jobPosting}/photos-archived', [PhotoController::class, 'archived'])->name('photos.archived');
+        // Use resource for children and pets
+        Route::resource('child', EmployerChildUpdateController::class)
+            ->only(['update', 'store', 'destroy'])
+            ->parameters(['child' => 'child'])
+            ->names([
+                'update' => 'child.update',
+                'store' => 'child.store',
+                'destroy' => 'child.destroy',
+            ]);
+
+        Route::resource('pet', EmployerPetUpdateController::class)
+            ->only(['update', 'store', 'destroy'])
+            ->parameters(['pet' => 'pet'])
+            ->names([
+                'update' => 'pet.update',
+                'store' => 'pet.store',
+                'destroy' => 'pet.destroy',
+            ]);
+    });
 });
 
 require __DIR__ . '/auth.php';

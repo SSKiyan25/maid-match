@@ -6,7 +6,7 @@ export default function EditJobPostingPage() {
         auth: { user: { id: number; name: string; email: string } };
         jobPosting?: any; // Make jobPosting optional
     };
-    console.log("EditJobPostingPage props:", props);
+
     return (
         <MainForm
             auth={props.auth}
