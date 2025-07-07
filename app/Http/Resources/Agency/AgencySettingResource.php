@@ -4,6 +4,7 @@ namespace App\Http\Resources\Agency;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\Agency\AgencyResource;
 
 class AgencySettingResource extends JsonResource
 {
@@ -46,9 +47,11 @@ class AgencySettingResource extends JsonResource
             'replacement_guarantee_days' => $this->replacement_guarantee_days,
             'replacement_policy' => $this->replacement_policy,
 
+            // Archive
+            'is_archived' => $this->is_archived,
+
             // Computed attributes from the model
             'preferred_work_types_labels' => $this->preferred_work_types_labels,
-            'service_areas_labels' => $this->service_areas_labels,
             'replacement_guarantee_label' => $this->replacement_guarantee_label,
 
             // Relationships

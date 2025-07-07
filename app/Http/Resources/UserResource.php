@@ -29,7 +29,7 @@ class UserResource extends JsonResource
             'maid' => $this->whenLoaded('maid'),
             'full_name' => $this->full_name,
             'name' => $this->profile?->full_name ?? '', // This will be "First Last"
-            'profile' => new \App\Http\Resources\ProfileResource($this->profile),
+            'profile' => $this->profile ? new \App\Http\Resources\ProfileResource($this->profile) : null,
             'test_field' => 'test_value',
         ];
     }

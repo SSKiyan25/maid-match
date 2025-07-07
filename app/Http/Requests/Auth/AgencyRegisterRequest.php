@@ -3,61 +3,53 @@
 namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class AgencyRegisterRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return true; // Open registration for agencies
+        return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     */
     public function rules(): array
     {
         return [
-            // User Account Fields
+            // Step 1.1: Email & Password (User)
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'avatar' => ['nullable', 'image', 'max:5120'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'password_confirmation' => ['required', 'string'],
 
-            // Essential Business Information
+            // Step 1.2: Essential Business Information (Agency)
             'name' => ['required', 'string', 'max:255', 'unique:agencies,name'],
-            'license_number' => ['required', 'string', 'max:100', 'unique:agencies,license_number'],
+            'license_number' => ['nullable', 'string', 'max:255', 'unique:agencies,license_number'],
+            'license_photo_front' => ['nullable', 'image', 'max:5120'],
+            'license_photo_back' => ['nullable', 'image', 'max:5120'],
             'description' => ['nullable', 'string', 'max:1000'],
-
-            // Primary Contact Information
-            'contact_person' => ['required', 'string', 'max:255'],
-            'phone_number' => ['required', 'string', 'max:20'],
+            'established_at' => ['nullable', 'date'],
             'business_email' => ['nullable', 'email', 'max:255', 'different:email'],
+            'business_phone' => ['nullable', 'string', 'max:255'],
+            'contact_person' => ['nullable', 'array'],
+            'contact_person.name' => ['nullable', 'string', 'max:255'],
+            'contact_person.phone' => ['nullable', 'string', 'max:255'],
+            'contact_person.email' => ['nullable', 'email', 'max:255'],
+            'contact_person.facebook' => ['nullable', 'string', 'max:255'],
 
-            // Business Location
-            'address' => ['required', 'string', 'max:500'],
-            'city' => ['required', 'string', 'max:100'],
-            'province' => ['required', 'string', 'max:100'],
+            // Step 2: Address (Agency)
+            'address' => ['required'], // Accept as string or array, will be normalized below
 
-            // Business Model (Optional for registration)
+            // Step 3: Other Information (Agency)
+            'website' => ['nullable', 'string', 'max:255'],
+            'facebook_page' => ['nullable', 'string', 'max:255'],
             'placement_fee' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],
             'show_fee_publicly' => ['nullable', 'boolean'],
-
-            // Terms and Conditions
-            'terms_accepted' => ['required', 'accepted'],
-            'privacy_accepted' => ['required', 'accepted'],
         ];
     }
 
-    /**
-     * Get custom messages for validator errors.
-     */
     public function messages(): array
     {
         return [
-            // User Account Messages
+            // User
             'email.required' => 'Email address is required.',
             'email.email' => 'Please enter a valid email address.',
             'email.unique' => 'This email address is already registered.',
@@ -65,100 +57,55 @@ class AgencyRegisterRequest extends FormRequest
             'password.min' => 'Password must be at least 8 characters.',
             'password.confirmed' => 'Password confirmation does not match.',
 
-            // Business Information Messages
+            // Agency
             'name.required' => 'Agency name is required.',
             'name.unique' => 'This agency name is already taken.',
-            'license_number.required' => 'Business license number is required.',
             'license_number.unique' => 'This license number is already registered.',
+            'license_photo.image' => 'License photo must be an image file.',
+            'license_photo.max' => 'License photo must not be larger than 5MB.',
             'description.max' => 'Description cannot exceed 1000 characters.',
-
-            // Contact Information Messages
-            'contact_person.required' => 'Contact person name is required.',
-            'phone_number.required' => 'Phone number is required.',
             'business_email.email' => 'Please enter a valid business email.',
             'business_email.different' => 'Business email must be different from login email.',
-
-            // Location Messages
-            'address.required' => 'Business address is required.',
-            'city.required' => 'City is required.',
-            'province.required' => 'Province is required.',
-
-            // Business Model Messages
+            'contact_person.array' => 'Contact person must be an array.',
+            'contact_person.name.max' => 'Contact person name cannot exceed 255 characters.',
+            'contact_person.phone.max' => 'Contact person phone cannot exceed 255 characters.',
+            'contact_person.email.email' => 'Contact person email must be valid.',
             'placement_fee.numeric' => 'Placement fee must be a valid number.',
             'placement_fee.min' => 'Placement fee cannot be negative.',
             'placement_fee.max' => 'Placement fee cannot exceed ₱999,999.99.',
 
-            // Terms Messages
-            'terms_accepted.required' => 'You must accept the terms and conditions.',
-            'terms_accepted.accepted' => 'You must accept the terms and conditions.',
-            'privacy_accepted.required' => 'You must accept the privacy policy.',
-            'privacy_accepted.accepted' => 'You must accept the privacy policy.',
+            // Address
+            'address.required' => 'Business address is required.',
         ];
     }
 
-    /**
-     * Get custom attribute names for validation messages.
-     */
-    public function attributes(): array
-    {
-        return [
-            'name' => 'agency name',
-            'license_number' => 'business license number',
-            'contact_person' => 'contact person',
-            'phone_number' => 'phone number',
-            'business_email' => 'business email',
-            'placement_fee' => 'placement fee',
-        ];
-    }
-
-    /**
-     * Prepare the data for validation.
-     */
     protected function prepareForValidation(): void
     {
-        // Clean and format phone number
-        if ($this->phone_number) {
-            $this->merge([
-                'phone_number' => preg_replace('/[^\d+]/', '', $this->phone_number),
-            ]);
-        }
-
         // Set default values
         $this->merge([
             'show_fee_publicly' => $this->show_fee_publicly ?? false,
         ]);
+
+        // Normalize address to array (like EmployerRegisterRequest)
+        if (isset($this->address) && is_string($this->address)) {
+            $decoded = json_decode($this->address, true);
+            if (is_array($decoded)) {
+                $this->merge(['address' => $decoded]);
+            } else {
+                $this->merge([
+                    'address' => [
+                        'street' => $this->address,
+                        'barangay' => '',
+                        'city' => '',
+                        'province' => '',
+                    ]
+                ]);
+            }
+        }
     }
 
     /**
-     * Get validated data formatted for agency creation.
-     */
-    public function getAgencyData(): array
-    {
-        $validated = $this->validated();
-
-        return [
-            // Basic agency information
-            'name' => $validated['name'],
-            'license_number' => $validated['license_number'],
-            'description' => $validated['description'] ?? null,
-            'contact_person' => $validated['contact_person'],
-            'phone_number' => $validated['phone_number'],
-            'business_email' => $validated['business_email'] ?? null,
-            'address' => $validated['address'],
-            'city' => $validated['city'],
-            'province' => $validated['province'],
-            'placement_fee' => $validated['placement_fee'] ?? null,
-            'show_fee_publicly' => $validated['show_fee_publicly'] ?? false,
-
-            // Set initial status
-            'status' => 'pending_verification',
-            'is_verified' => false,
-            'is_archived' => false,
-        ];
-    }
-
-    /**
-     * Get validated data formatted for user creation.
+     * Get validated data for User model.
      */
     public function getUserData(): array
     {
@@ -169,6 +116,50 @@ class AgencyRegisterRequest extends FormRequest
             'password' => bcrypt($validated['password']),
             'role' => 'agency',
             'status' => 'active',
+        ];
+    }
+
+    /**
+     * Get validated data for Profile model.
+     */
+    public function getProfileData(): array
+    {
+        $validated = $this->validated();
+
+        return [
+            'first_name' => $validated['contact_person']['name'] ?? null,
+            'phone_number' => $validated['contact_person']['phone'] ?? null,
+            'address' => $validated['address'],
+            'is_phone_private' => false,
+            'is_address_private' => false,
+        ];
+    }
+
+    /**
+     * Get validated data for Agency model.
+     */
+    public function getAgencyData(): array
+    {
+        $validated = $this->validated();
+
+        return [
+            'name' => $validated['name'],
+            'license_number' => $validated['license_number'] ?? null,
+            'license_photo_front' => $validated['license_photo_front'] ?? null,
+            'license_photo_back' => $validated['license_photo_back'] ?? null,
+            'description' => $validated['description'] ?? null,
+            'established_at' => $validated['established_at'] ?? null,
+            'business_email' => $validated['business_email'] ?? null,
+            'business_phone' => $validated['business_phone'] ?? null,
+            'contact_person' => $validated['contact_person'] ?? null,
+            'address' => $validated['address'] ?? null,
+            'website' => $validated['website'] ?? null,
+            'facebook_page' => $validated['facebook_page'] ?? null,
+            'placement_fee' => $validated['placement_fee'] ?? null,
+            'show_fee_publicly' => $validated['show_fee_publicly'] ?? false,
+            'status' => 'pending_verification',
+            'is_verified' => false,
+            'is_archived' => false,
         ];
     }
 }

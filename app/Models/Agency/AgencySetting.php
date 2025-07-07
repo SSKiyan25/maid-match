@@ -50,27 +50,18 @@ class AgencySetting extends Model
      * Common work types
      */
     const WORK_TYPES = [
-        'full_time' => 'Full-time Housekeeping',
-        'part_time' => 'Part-time Housekeeping',
-        'live_in' => 'Live-in Helper',
-        'child_care' => 'Child Care',
-        'elderly_care' => 'Elderly Care',
-        'cooking' => 'Cooking Specialist',
-        'cleaning' => 'Cleaning Specialist',
+        'cleaning' => 'General Cleaning',
+        'cooking' => 'Cooking',
+        'childcare' => 'Childcare',
+        'eldercare' => 'Elder Care',
         'pet_care' => 'Pet Care',
-    ];
-
-    /**
-     * Common service areas (Philippine regions/cities)
-     */
-    const SERVICE_AREAS = [
-        'metro_manila' => 'Metro Manila',
-        'cebu' => 'Cebu',
-        'davao' => 'Davao',
-        'baguio' => 'Baguio',
-        'iloilo' => 'Iloilo',
-        'cagayan_de_oro' => 'Cagayan de Oro',
-        'nationwide' => 'Nationwide',
+        'laundry' => 'Laundry',
+        'ironing' => 'Ironing',
+        'gardening' => 'Gardening',
+        'tutoring' => 'Tutoring',
+        'driving' => 'Driving',
+        'shopping' => 'Shopping/Errands',
+        'housekeeping' => 'General Housekeeping',
     ];
 
     /**
@@ -103,15 +94,6 @@ class AgencySetting extends Model
 
         return collect($this->preferred_work_types)
             ->map(fn($type) => self::WORK_TYPES[$type] ?? ucfirst(str_replace('_', ' ', $type)))
-            ->toArray();
-    }
-
-    public function getServiceAreasLabelsAttribute()
-    {
-        if (!$this->service_areas) return [];
-
-        return collect($this->service_areas)
-            ->map(fn($area) => self::SERVICE_AREAS[$area] ?? ucfirst(str_replace('_', ' ', $area)))
             ->toArray();
     }
 

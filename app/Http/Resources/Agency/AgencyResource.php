@@ -4,8 +4,6 @@ namespace App\Http\Resources\Agency;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Http\Resources\UserResource;
-use App\Http\Resources\Maid\MaidResource;
 
 class AgencyResource extends JsonResource
 {
@@ -19,64 +17,27 @@ class AgencyResource extends JsonResource
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
-
-            // Business Information
             'name' => $this->name,
             'license_number' => $this->license_number,
+            'license_photo_front' => $this->license_photo_front,
+            'license_photo_back' => $this->license_photo_back,
             'description' => $this->description,
-            'contact_person' => $this->contact_person,
-            'phone_number' => $this->phone_number,
+            'established_at' => $this->established_at,
             'business_email' => $this->business_email,
-
-            // Location
+            'business_phone' => $this->business_phone,
+            'contact_person' => $this->contact_person,
             'address' => $this->address,
-            'city' => $this->city,
-            'province' => $this->province,
-
-            // Business Model
+            'website' => $this->website,
+            'facebook_page' => $this->facebook_page,
             'placement_fee' => $this->placement_fee,
             'show_fee_publicly' => $this->show_fee_publicly,
-
-            // Status & Verification
             'status' => $this->status,
+            'is_premium' => $this->is_premium,
+            'premium_at' => $this->premium_at,
+            'premium_expires_at' => $this->premium_expires_at,
             'is_verified' => $this->is_verified,
-            'verified_at' => $this->verified_at?->toISOString(),
-
-            // Computed attributes from the model
-            'status_label' => $this->status_label,
-            'formatted_placement_fee' => $this->formatted_placement_fee,
-            'display_email' => $this->display_email,
-            'full_address' => $this->full_address,
-
-            // Business Metrics (only computed, no DB queries)
-            'active_maids_count' => $this->when(
-                $request->routeIs('agencies.show') || $request->has('include_stats'),
-                fn() => $this->getActiveMaidsCount()
-            ),
-            'hired_maids_count' => $this->when(
-                $request->routeIs('agencies.show') || $request->has('include_stats'),
-                fn() => $this->getHiredMaidsCount()
-            ),
-            'pending_inquiries_count' => $this->when(
-                $request->routeIs('agencies.show') || $request->has('include_stats'),
-                fn() => $this->getPendingInquiriesCount()
-            ),
-
-            // Primary photo for listings
-            'primary_photo_url' => $this->when(
-                $this->relationLoaded('photos'),
-                fn() => $this->primary_photo?->url
-            ),
-
-            // Relationships
-            'user' => new UserResource($this->whenLoaded('user')),
-            'maids' => MaidResource::collection($this->whenLoaded('maids')),
-            'agency_maids' => AgencyMaidResource::collection($this->whenLoaded('agencyMaids')),
-            'photos' => AgencyPhotoResource::collection($this->whenLoaded('photos')),
-            'settings' => new AgencySettingResource($this->whenLoaded('settings')),
-            'inquiries' => AgencyInquiryResource::collection($this->whenLoaded('inquiries')),
-
-            // Timestamps
+            'verified_at' => $this->verified_at,
+            'is_archived' => $this->is_archived,
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];

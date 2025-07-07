@@ -19,27 +19,39 @@ class Agency extends Model
         'user_id',
         'name',
         'license_number',
+        'license_photo_front',
+        'license_photo_back',
         'description',
-        'contact_person',
-        'phone_number',
+        'established_at',
         'business_email',
+        'business_phone',
+        'contact_person',
         'address',
-        'city',
-        'province',
+        'website',
+        'facebook_page',
         'placement_fee',
         'show_fee_publicly',
         'status',
+        'is_premium',
+        'premium_at',
+        'premium_expires_at',
         'is_verified',
         'verified_at',
         'is_archived',
     ];
 
     protected $casts = [
+        'address' => 'array',
         'placement_fee' => 'decimal:2',
         'show_fee_publicly' => 'boolean',
+        'is_premium' => 'boolean',
+        'premium_at' => 'datetime',
+        'premium_expires_at' => 'datetime',
         'is_verified' => 'boolean',
         'verified_at' => 'datetime',
         'is_archived' => 'boolean',
+        'contact_person' => 'array',
+        'established_at' => 'datetime',
     ];
 
     /**
@@ -130,16 +142,6 @@ class Agency extends Model
         return $this->business_email ?: $this->user->email;
     }
 
-    public function getFullAddressAttribute()
-    {
-        return "{$this->address}, {$this->city}, {$this->province}";
-    }
-
-    public function getPrimaryPhotoAttribute()
-    {
-        return $this->photos()->where('is_primary', true)->first();
-    }
-
     /**
      * Helper Methods
      */
@@ -185,5 +187,21 @@ class Agency extends Model
     public function getPendingInquiriesCount()
     {
         return $this->inquiries()->where('status', 'pending')->count();
+    }
+
+    public function getFormattedAddressAttribute(): string
+    {
+        if (!$this->address) {
+            return '';
+        }
+
+        $parts = array_filter([
+            $this->address['street'] ?? '',
+            $this->address['barangay'] ?? '',
+            $this->address['city'] ?? '',
+            $this->address['province'] ?? '',
+        ]);
+
+        return implode(', ', $parts);
     }
 }

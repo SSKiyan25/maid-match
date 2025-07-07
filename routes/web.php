@@ -58,7 +58,9 @@ Route::middleware(['auth', 'verified', 'role:maid'])->group(function () {
 });
 
 Route::middleware(['auth', 'verified', 'role:agency'])->group(function () {
-    Route::get('/agency/dashboard', [AgencyRegisterController::class, 'dashboard'])->name('agency.dashboard');
+    Route::get('/agency/dashboard', function () {
+        return Inertia::render('Agency/Dashboard');
+    })->name('agency.dashboard');
 });
 
 Route::middleware(['auth', 'verified', 'role:employer'])->prefix('employer')->name('employer.')->group(function () {
