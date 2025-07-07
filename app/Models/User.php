@@ -9,6 +9,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Maid\Maid;
 use App\Models\Employer\Employer;
+use App\Models\Agency\Agency;
 
 class User extends Authenticatable
 {
@@ -68,6 +69,11 @@ class User extends Authenticatable
     public function maid(): HasOne
     {
         return $this->hasOne(Maid::class);
+    }
+
+    public function agency(): HasOne
+    {
+        return $this->hasOne(Agency::class);
     }
 
     /**
