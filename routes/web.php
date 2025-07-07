@@ -8,6 +8,7 @@ use App\Http\Controllers\Employer\Profile\ProfileUpdateController;
 use App\Http\Controllers\Employer\Profile\EmployerUpdateController;
 use App\Http\Controllers\Employer\Profile\EmployerChildUpdateController;
 use App\Http\Controllers\Employer\Profile\EmployerPetUpdateController;
+use App\Http\Controllers\Agency\MaidController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -57,10 +58,13 @@ Route::middleware(['auth', 'verified', 'role:maid'])->group(function () {
     })->name('maid.dashboard');
 });
 
-Route::middleware(['auth', 'verified', 'role:agency'])->group(function () {
-    Route::get('/agency/dashboard', function () {
+Route::middleware(['auth', 'verified', 'role:agency'])->prefix('agency')->name('agency.')->group(function () {
+    Route::get('/dashboard', function () {
         return Inertia::render('Agency/Dashboard');
-    })->name('agency.dashboard');
+    })->name('dashboard');
+
+    // Maid CRUD for agency
+    Route::resource('maids', MaidController::class);
 });
 
 Route::middleware(['auth', 'verified', 'role:employer'])->prefix('employer')->name('employer.')->group(function () {

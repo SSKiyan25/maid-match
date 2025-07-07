@@ -127,6 +127,8 @@ const navMain = [
 ];
 
 const browseItems = [
+    { name: "Browse for maids", url: "/maids/browse", icon: Eye },
+    { name: "Browse for employers", url: "/employers/browse", icon: Star },
     { name: "Browse for Jobs", url: "/jobs/browse", icon: Briefcase },
 ];
 

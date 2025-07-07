@@ -26,6 +26,7 @@ import {
     DollarSign,
     Clock,
     FileImage,
+    PhilippinePeso,
 } from "lucide-react";
 import { InfoAlert } from "@/Components/Form/InfoAlert";
 
@@ -193,7 +194,7 @@ export default function Step6_Review({
     );
 
     return (
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
             <Card className="shadow-lg">
                 <CardHeader className="text-center pb-6">
                     <CardTitle className="text-2xl font-bold text-foreground">
@@ -367,7 +368,7 @@ export default function Step6_Review({
                                                 Budget Range
                                             </p>
                                             <p className="font-medium flex items-center gap-2">
-                                                <DollarSign className="w-3 h-3" />
+                                                <PhilippinePeso className="w-3 h-3" />
                                                 {formatBudget()}
                                             </p>
                                         </div>

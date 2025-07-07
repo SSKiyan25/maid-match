@@ -188,7 +188,7 @@ export default function Step5_Pets({
     };
 
     return (
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-5xl mx-auto">
             <Card className="shadow-lg">
                 <CardHeader className="text-center pb-6">
                     <CardTitle className="text-2xl font-bold text-foreground">

@@ -20,10 +20,9 @@ class JobPostingController extends Controller
             'photos',
         ])
             ->withCount(['applications', 'interviews'])
-            ->where('employer_id', auth()->id())
+            ->where('employer_id', auth()->user()->employer->id)
             ->latest()
             ->get();
-
         return inertia('Employer/JobPosting/index', [
             'jobPostings' => $jobPostings,
             'flash' => [

@@ -1,9 +1,6 @@
-import { Head } from "@inertiajs/react";
-import { useState, useCallback } from "react";
-import FormStepper from "@/Components/Form/Stepper";
-import StepNavigation from "../../../../Components/Form/StepNavigation";
-import { useJobPostingForm } from "../hooks/useJobPostingForm";
 import EmployerLayout from "@/Layouts/EmployerLayout";
+import MultiStepForm from "@/Components/Form/MultiStepForm";
+import { useJobPostingForm } from "../hooks/useJobPostingForm";
 
 // Step Components
 import Step1_MainInfo from "./steps/Step1_MainInfo";
@@ -29,22 +26,6 @@ export default function JobPostingPage({
     jobPosting,
     isEdit = false,
 }: JobPostingPageProps) {
-    const [currentStep, setCurrentStep] = useState(1);
-    const [completedSteps, setCompletedSteps] = useState<Set<number>>(
-        new Set([1])
-    );
-    const [showValidation, setShowValidation] = useState(false);
-
-    const [stepValidation, setStepValidation] = useState<
-        Record<number, boolean>
-    >({
-        1: false, // Step 1 starts as invalid until user fills required fields
-        2: false, // Step 2 starts as invalid
-        3: true, // Optional steps are valid by default
-        4: true, // Optional steps are valid by default
-        5: true, // Review step is valid by default
-    });
-
     const {
         formData,
         updateFormData,
@@ -88,133 +69,29 @@ export default function JobPostingPage({
         },
     ];
 
-    const currentStepData = steps.find((step) => step.id === currentStep);
-
-    const handleStepValidationChange = useCallback(
-        (step: number, isValid: boolean) => {
-            setStepValidation((prev) => ({
-                ...prev,
-                [step]: isValid,
-            }));
-        },
-        []
-    );
-
-    // Memoized handlers for each step to prevent infinite re-renders
-    const handleStep1ValidationChange = useCallback(
-        (isValid: boolean) => handleStepValidationChange(1, isValid),
-        [handleStepValidationChange]
-    );
-    const handleStep2ValidationChange = useCallback(
-        (isValid: boolean) => handleStepValidationChange(2, isValid),
-        [handleStepValidationChange]
-    );
-    const handleStep3ValidationChange = useCallback(
-        (isValid: boolean) => handleStepValidationChange(3, isValid),
-        [handleStepValidationChange]
-    );
-    const handleStep4ValidationChange = useCallback(
-        (isValid: boolean) => handleStepValidationChange(4, isValid),
-        [handleStepValidationChange]
-    );
-
-    const isStepAccessible = (stepId: number): boolean => {
-        if (stepId === currentStep) return true;
-        if (stepId < currentStep) return true;
-        return completedSteps.has(stepId) || stepId === currentStep + 1;
+    const initialStepValidation = {
+        1: false, // Step 1 starts as invalid until user fills required fields
+        2: false, // Step 2 starts as invalid
+        3: true, // Optional steps are valid by default
+        4: true, // Optional steps are valid by default
+        5: true, // Review step is valid by default
     };
 
-    const handleStepClick = (stepId: number) => {
-        if (isStepAccessible(stepId)) {
-            setShowValidation(false);
-            setCurrentStep(stepId);
-        }
-    };
-
-    const handleNext = async () => {
-        setShowValidation(true);
-        const isClientValid = stepValidation[currentStep];
-
-        if (!isClientValid) {
-            // Don't proceed if client validation fails
-            console.log(`Step ${currentStep} validation failed on client side`);
-            return;
-        }
-
-        // Also validate on server side for required steps
-        const currentStepInfo = steps.find((s) => s.id === currentStep);
-        if (currentStepInfo?.required) {
-            const isServerValid = await validateStep(currentStep, formData);
-            if (!isServerValid) {
-                console.log(
-                    `Step ${currentStep} validation failed on server side`
-                );
-                return;
-            }
-        }
-
-        // Proceed to next step
-        if (currentStep < steps.length) {
-            const newCompletedSteps = new Set(completedSteps);
-            newCompletedSteps.add(currentStep);
-            newCompletedSteps.add(currentStep + 1);
-            setCompletedSteps(newCompletedSteps);
-
-            setCurrentStep(currentStep + 1);
-        }
-    };
-
-    const handlePrevious = () => {
-        setShowValidation(false);
-        if (currentStep > 1) {
-            setCurrentStep(currentStep - 1);
-        }
-    };
-
-    const handleSkip = async () => {
-        setShowValidation(false);
-        if (!currentStepData?.required && currentStep < steps.length) {
-            const newCompletedSteps = new Set(completedSteps);
-            newCompletedSteps.add(currentStep);
-            newCompletedSteps.add(currentStep + 1);
-            setCompletedSteps(newCompletedSteps);
-
-            setCurrentStep(currentStep + 1);
-        }
-    };
-
-    const handleSubmit = async () => {
-        const allRequiredStepsValid = steps.every((step) => {
-            if (step.required) {
-                return stepValidation[step.id];
-            }
-            return true;
-        });
-
-        if (!allRequiredStepsValid) {
-            console.log("Cannot submit: Some required steps are invalid");
-            return;
-        }
-
-        await submitJobPosting();
-    };
-
-    const handleEdit = (step: number) => {
-        setShowValidation(false);
-        setCurrentStep(step);
-    };
-
-    const canProceed = stepValidation[currentStep];
-
-    const renderCurrentStep = () => {
-        switch (currentStep) {
+    const renderStep = (
+        step: number,
+        showValidation: boolean,
+        handleStepValidationChange: (step: number, isValid: boolean) => void
+    ) => {
+        switch (step) {
             case 1:
                 return (
                     <Step1_MainInfo
                         data={formData}
                         onChange={updateFormData}
                         errors={errors}
-                        onValidationChange={handleStep1ValidationChange}
+                        onValidationChange={(isValid: boolean) =>
+                            handleStepValidationChange(1, isValid)
+                        }
                         showValidation={showValidation}
                         isEditMode={isEdit}
                     />
@@ -227,7 +104,9 @@ export default function JobPostingPage({
                             updateFormData({ location: updates })
                         }
                         errors={errors}
-                        onValidationChange={handleStep2ValidationChange}
+                        onValidationChange={(isValid: boolean) =>
+                            handleStepValidationChange(2, isValid)
+                        }
                         showValidation={showValidation}
                         isEditMode={isEdit}
                     />
@@ -240,7 +119,9 @@ export default function JobPostingPage({
                             updateFormData({ bonuses: updates })
                         }
                         errors={errors as any}
-                        onValidationChange={handleStep3ValidationChange}
+                        onValidationChange={(isValid: boolean) =>
+                            handleStepValidationChange(3, isValid)
+                        }
                         showValidation={showValidation}
                         isEditMode={isEdit}
                     />
@@ -253,7 +134,9 @@ export default function JobPostingPage({
                             updateFormData({ photos: updates })
                         }
                         errors={errors as any}
-                        onValidationChange={handleStep4ValidationChange}
+                        onValidationChange={(isValid: boolean) =>
+                            handleStepValidationChange(4, isValid)
+                        }
                         showValidation={showValidation}
                         isEditMode={isEdit}
                     />
@@ -265,8 +148,10 @@ export default function JobPostingPage({
                         location={formData.location}
                         bonuses={formData.bonuses}
                         photos={formData.photos}
-                        onEdit={handleEdit}
-                        onSubmit={handleSubmit}
+                        onEdit={(step: number) => {
+                            // This will be handled by MultiStepForm's handleEdit
+                        }}
+                        onSubmit={submitJobPosting}
                         isSubmitting={isSubmitting}
                         errors={errors}
                         submissionErrors={submissionErrors}
@@ -279,60 +164,28 @@ export default function JobPostingPage({
     };
 
     return (
-        <EmployerLayout sidebarDefaultOpen={false}>
-            <Head title={isEdit ? "Edit Job Posting" : "Create Job Posting"} />
-
-            <div className="pb-36 pt-12 px-6">
-                <div className="w-full mx-auto sm:px-6 lg:px-8">
-                    {/* Header */}
-                    <div className="text-center mb-8">
-                        <h1 className="text-3xl font-bold text-foreground mb-2">
-                            {isEdit
-                                ? "Edit Your Job Posting"
-                                : "Create a New Job Posting"}
-                        </h1>
-                        <p className="text-muted-foreground">
-                            {isEdit
-                                ? "Update your job posting details and requirements"
-                                : "Find the perfect household helper for your family"}
-                        </p>
-                    </div>
-
-                    {/* Progress Stepper */}
-                    <FormStepper
-                        steps={steps}
-                        currentStep={currentStep}
-                        onStepClick={handleStepClick}
-                        isStepAccessible={isStepAccessible}
-                        completedSteps={completedSteps}
-                        stepValidation={stepValidation}
-                        isEditMode={isEdit}
-                        formType="job posting"
-                        gridCols={2} // Job posting with 2 columns
-                        showNavigation={true}
-                    />
-
-                    {/* Step Content */}
-                    <div className="mt-8 mb-8">{renderCurrentStep()}</div>
-
-                    {/* Navigation */}
-                    {currentStep < 5 && (
-                        <StepNavigation
-                            currentStep={currentStep}
-                            totalSteps={steps.length}
-                            canSkip={!currentStepData?.required}
-                            isSubmitting={isSubmitting}
-                            canProceed={canProceed}
-                            onPrevious={handlePrevious}
-                            onNext={handleNext}
-                            onSkip={handleSkip}
-                            onSubmit={handleSubmit}
-                            showValidation={showValidation}
-                            isEditMode={isEdit}
-                        />
-                    )}
-                </div>
-            </div>
-        </EmployerLayout>
+        <MultiStepForm
+            title={
+                isEdit ? "Edit Your Job Posting" : "Create a New Job Posting"
+            }
+            subtitle={
+                isEdit
+                    ? "Update your job posting details and requirements"
+                    : "Find the perfect household helper for your family"
+            }
+            steps={steps}
+            layout={EmployerLayout}
+            sidebarDefaultOpen={false}
+            gridCols={2} // Job posting uses 2 columns
+            isEditMode={isEdit}
+            formType="job posting"
+            isSubmitting={isSubmitting}
+            onValidateStep={validateStep}
+            onSubmit={submitJobPosting}
+            renderStep={renderStep}
+            formData={formData}
+            initialStepValidation={initialStepValidation}
+            allowNavigationWithErrors={false}
+        />
     );
 }

@@ -11,6 +11,7 @@ export default function JobPostingIndex() {
     const { props } = usePage();
     const flash = (props as { flash?: { success?: string } }).flash || {};
     const jobPostings = (usePage().props as any).jobPostings as JobPosting[];
+    console.log("Job Postings:", jobPostings);
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState<
         "all" | "active" | "archived"
@@ -95,7 +96,6 @@ export default function JobPostingIndex() {
 
                         <JobPostingList jobPostings={filteredAndSortedJobs} />
                     </div>
-                    {/* Test Toaster Button (for debugging purposes) */}
                 </div>
             </EmployerLayout>
         </>
