@@ -1,148 +1,75 @@
-import { validateAndSanitizeInput, validateFormSecurity } from './securityValidation';
+import { validateFormSecurity, validateAndSanitizeInput } from "@/utils/securityValidation";
+import { Step4Data, Child, ValidationResult } from "./types";
 
-export interface Child {
-    id: string;
-    name: string;
-    birth_date: string;
-    photo?: File;
+export interface Step4ValidationResult extends ValidationResult {
+    childErrors: Record<string, Record<string, string>>;
+    sanitizedData?: Step4Data;
+    hasData: boolean;
 }
 
-export interface Step4Data {
-    has_children: boolean;
-    children: Child[];
-    children_data?: string;
-    children_photos?: File[];
+// --- Utility Functions ---
+
+export function calculateAge(birthDate: string): number {
+    const birth = new Date(birthDate);
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+        age--;
+    }
+    
+    return age;
 }
 
-export const validateChildName = (name: string): { isValid: boolean; error?: string; sanitizedValue?: string } => {
-    if (!name || !name.trim()) {
-        return { isValid: true, sanitizedValue: '' }; // Name is optional
-    }
+export function getAgeGroup(age: number): string {
+    if (age < 1) return "Infant (0-1 year)";
+    if (age < 3) return "Toddler (1-3 years)";
+    if (age < 6) return "Preschooler (3-6 years)";
+    if (age < 13) return "School Age (6-13 years)";
+    if (age < 18) return "Teenager (13-18 years)";
+    return "Adult (18+ years)";
+}
 
-    const security = validateAndSanitizeInput(name, 'text', 50);
-    
-    if (!security.isValid) {
-        return { isValid: false, error: security.securityIssues.join(', ') };
-    }
+// --- Field Validators ---
 
-    const sanitizedName = security.sanitizedValue;
-    
-    if (sanitizedName.trim().length < 2) {
-        return { isValid: false, error: "Child's name must be at least 2 characters long" };
-    }
-    
-    return { isValid: true, sanitizedValue: sanitizedName };
-};
+function validateChildName(name: string) {
+    if (!name || !name.trim()) return { value: "" }; // Optional
+    const { isValid, sanitizedValue, securityIssues } = validateAndSanitizeInput(name, "text", 50);
+    if (!isValid) return { error: securityIssues.join(", ") };
+    if (sanitizedValue.trim().length < 2) return { error: "Child's name must be at least 2 characters long" };
+    return { value: sanitizedValue };
+}
 
-export const validateBirthDate = (birthDate: string): { isValid: boolean; error?: string; sanitizedValue?: string } => {
-    if (!birthDate || !birthDate.trim()) {
-        return { isValid: true, sanitizedValue: '' }; // Birth date is optional
-    }
-
-    const security = validateAndSanitizeInput(birthDate, 'text', 20);
-    
-    if (!security.isValid) {
-        return { isValid: false, error: security.securityIssues.join(', ') };
-    }
-
+function validateBirthDate(birthDate: string) {
+    if (!birthDate || !birthDate.trim()) return { error: "Birth date is required" }; // Now required
+    const { isValid, sanitizedValue, securityIssues } = validateAndSanitizeInput(birthDate, "text", 20);
+    if (!isValid) return { error: securityIssues.join(", ") };
     const date = new Date(birthDate);
     const today = new Date();
-    
-    // Check if it's a valid date
-    if (isNaN(date.getTime())) {
-        return { isValid: false, error: "Please enter a valid birth date" };
-    }
-    
-    // Check if birth date is not in the future
-    if (date > today) {
-        return { isValid: false, error: "Birth date cannot be in the future" };
-    }
-    
-    // Check if birth date is reasonable (not too old)
+    if (isNaN(date.getTime())) return { error: "Please enter a valid birth date" };
+    if (date > today) return { error: "Birth date cannot be in the future" };
     const hundredYearsAgo = new Date();
     hundredYearsAgo.setFullYear(hundredYearsAgo.getFullYear() - 100);
-    
-    if (date < hundredYearsAgo) {
-        return { isValid: false, error: "Please enter a valid birth date" };
-    }
-    
-    return { isValid: true, sanitizedValue: birthDate };
-};
+    if (date < hundredYearsAgo) return { error: "Please enter a valid birth date" };
+    return { value: birthDate };
+}
 
-export const validatePhoto = (photo: File): { isValid: boolean; error?: string } => {
-    if (!photo) {
-        return { isValid: true }; // Photo is optional
-    }
-
-    // Check file size (5MB limit)
-    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
-    if (photo.size > maxSize) {
-        return { isValid: false, error: "Photo file size must be less than 5MB" };
-    }
-
-    // Check file type
+function validatePhoto(photo?: File) {
+    if (!photo) return { isValid: true };
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (photo.size > maxSize) return { isValid: false, error: "Photo file size must be less than 5MB" };
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-    if (!allowedTypes.includes(photo.type)) {
-        return { isValid: false, error: "Please upload a valid image file (JPEG, PNG, GIF, or WebP)" };
-    }
-
-    // Check for potentially malicious files
+    if (!allowedTypes.includes(photo.type)) return { isValid: false, error: "Please upload a valid image file (JPEG, PNG, GIF, or WebP)" };
     const suspiciousExtensions = ['.exe', '.bat', '.cmd', '.scr', '.pif', '.com', '.vbs', '.js', '.jar'];
     const fileName = photo.name.toLowerCase();
-    
-    if (suspiciousExtensions.some(ext => fileName.includes(ext))) {
-        return { isValid: false, error: "Invalid file type detected" };
-    }
-
+    if (suspiciousExtensions.some(ext => fileName.includes(ext))) return { isValid: false, error: "Invalid file type detected" };
     return { isValid: true };
-};
+}
 
-export const validateChild = (child: Child): { isValid: boolean; errors: Record<string, string>; sanitizedChild?: Child } => {
-    const errors: Record<string, string> = {};
-    const sanitizedChild: Partial<Child> = { id: child.id };
+// --- Main Validation ---
 
-    // Validate name
-    const nameValidation = validateChildName(child.name);
-    if (!nameValidation.isValid) {
-        errors.name = nameValidation.error!;
-    } else {
-        sanitizedChild.name = nameValidation.sanitizedValue || '';
-    }
-
-    // Validate birth date
-    const birthDateValidation = validateBirthDate(child.birth_date);
-    if (!birthDateValidation.isValid) {
-        errors.birth_date = birthDateValidation.error!;
-    } else {
-        sanitizedChild.birth_date = birthDateValidation.sanitizedValue || '';
-    }
-
-    // Validate photo
-    if (child.photo) {
-        const photoValidation = validatePhoto(child.photo);
-        if (!photoValidation.isValid) {
-            errors.photo = photoValidation.error!;
-        } else {
-            sanitizedChild.photo = child.photo;
-        }
-    }
-
-    // Check if child has meaningful data
-    const hasData = !!(child.name.trim() || child.birth_date || child.photo);
-    
-    // If child has some data but is missing critical info, provide guidance
-    if (hasData && !child.birth_date && !child.name.trim()) {
-        errors.general = "Please provide either a name or birth date for this child";
-    }
-
-    return {
-        isValid: Object.keys(errors).length === 0,
-        errors,
-        sanitizedChild: sanitizedChild as Child
-    };
-};
-
-export const validateStep4 = (data: Step4Data) => {
+export function validateStep4(data: Step4Data): Step4ValidationResult {
     const errors: Record<string, string> = {};
     const childErrors: Record<string, Record<string, string>> = {};
     const sanitizedChildren: Child[] = [];
@@ -164,36 +91,62 @@ export const validateStep4 = (data: Step4Data) => {
         };
     }
 
-    // Validate each child
-    data.children.forEach((child, index) => {
-        const childValidation = validateChild(child);
-        
-        if (!childValidation.isValid) {
-            childErrors[child.id] = childValidation.errors;
-        } else if (childValidation.sanitizedChild) {
-            sanitizedChildren.push(childValidation.sanitizedChild);
+    // Validate each child where once a child is added, birth_date becomes required
+    data.children.forEach((child) => {
+        const cErrors: Record<string, string> = {};
+        const sanitizedChild: Partial<Child> = { id: child.id };
+
+        // Name (always optional)
+        const nameResult = validateChildName(child.name);
+        if (nameResult.error) cErrors.name = nameResult.error;
+        else sanitizedChild.name = nameResult.value || "";
+
+        // Birth date (REQUIRED once child is added)
+        const birthResult = validateBirthDate(child.birth_date);
+        if (birthResult.error) cErrors.birth_date = birthResult.error;
+        else sanitizedChild.birth_date = birthResult.value || "";
+
+        // Photo (always optional)
+        if (child.photo) {
+            const photoResult = validatePhoto(child.photo);
+            if (!photoResult.isValid) cErrors.photo = photoResult.error!;
+            else sanitizedChild.photo = child.photo;
+        }
+
+        // If this child has any data (even just a birth_date), we consider there are children
+        if (child.birth_date || child.name?.trim() || child.photo) {
             hasValidChildren = true;
+        }
+
+        // Add errors for this child if any exist
+        if (Object.keys(cErrors).length > 0) {
+            childErrors[child.id] = cErrors;
+        } else {
+            sanitizedChildren.push(sanitizedChild as Child);
         }
     });
 
-    // Check if there are too many children (reasonable limit)
+    // Limit check
     if (data.children.length > 10) {
         errors.general = "Maximum of 10 children can be added";
     }
+
+    // The step is invalid if there are any child errors
+    const isValid = Object.keys(errors).length === 0 && Object.keys(childErrors).length === 0;
 
     // Prepare sanitized data
     const childrenData = sanitizedChildren.map(child => ({
         name: child.name,
         birth_date: child.birth_date,
-        photo_url: null, // Will be set by backend after upload
+        photo_url: null,
     }));
 
     const photoFiles = sanitizedChildren
         .map(child => child.photo)
-        .filter((photo): photo is File => photo !== undefined);
+        .filter((photo): photo is File => !!photo);
 
     return {
-        isValid: Object.keys(errors).length === 0 && Object.keys(childErrors).length === 0,
+        isValid,
         errors,
         childErrors,
         sanitizedData: {
@@ -204,53 +157,4 @@ export const validateStep4 = (data: Step4Data) => {
         },
         hasData: hasValidChildren
     };
-};
-
-export const calculateAge = (birthDate: string): number | null => {
-    if (!birthDate) return null;
-    
-    const today = new Date();
-    const birth = new Date(birthDate);
-    
-    if (isNaN(birth.getTime())) return null;
-    
-    let age = today.getFullYear() - birth.getFullYear();
-    const monthDiff = today.getMonth() - birth.getMonth();
-    
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-        age--;
-    }
-    
-    return age >= 0 ? age : null;
-};
-
-export const getAgeGroup = (age: number | null): string => {
-    if (age === null) return "Unknown";
-    if (age < 1) return "Infant (0-1 year)";
-    if (age <= 3) return "Toddler (1-3 years)";
-    if (age <= 5) return "Preschooler (4-5 years)";
-    if (age <= 12) return "School Age (6-12 years)";
-    if (age <= 17) return "Teenager (13-17 years)";
-    return "Adult (18+ years)";
-};
-
-export const generateChildId = (): string => {
-    return `child_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-};
-
-export const getChildCompletionPercentage = (children: Child[]): number => {
-    if (!children || children.length === 0) return 0;
-    
-    let totalFields = 0;
-    let completedFields = 0;
-    
-    children.forEach(child => {
-        totalFields += 3; // name, birth_date, photo
-        
-        if (child.name && child.name.trim()) completedFields++;
-        if (child.birth_date) completedFields++;
-        if (child.photo) completedFields++;
-    });
-    
-    return totalFields > 0 ? Math.round((completedFields / totalFields) * 100) : 0;
-};
+}

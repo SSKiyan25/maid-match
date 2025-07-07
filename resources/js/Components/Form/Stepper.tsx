@@ -16,21 +16,31 @@ interface Step {
     description: string;
 }
 
-interface RegistrationStepperProps {
+interface FormStepperProps {
     steps: Step[];
     currentStep: number;
+    onStepClick?: (stepId: number) => void;
     isStepAccessible: (stepId: number) => boolean;
     completedSteps: Set<number>;
     stepValidation: Record<number, boolean>;
+    isEditMode?: boolean;
+    formType?: string; // e.g., "job posting", "registration", "profile update"
+    gridCols?: 2 | 3; // Desktop grid layout columns
+    showNavigation?: boolean; // Whether this is interactive (clickable) or just display
 }
 
-export default function RegistrationStepper({
+export default function FormStepper({
     steps,
     currentStep,
+    onStepClick,
     isStepAccessible,
     completedSteps,
     stepValidation,
-}: RegistrationStepperProps) {
+    isEditMode = false,
+    formType = "form",
+    gridCols = 3,
+    showNavigation = true,
+}: FormStepperProps) {
     const [showDetails, setShowDetails] = useState(false);
     const currentStepData = steps.find((step) => step.id === currentStep);
 
@@ -50,15 +60,19 @@ export default function RegistrationStepper({
     };
 
     const isStepClickable = (step: Step): boolean => {
-        const accessible = isStepAccessible(step.id);
+        if (!showNavigation || !onStepClick) return false;
 
-        if (step.id > currentStep) {
-            const currentStepInfo = steps.find((s) => s.id === currentStep);
-            if (currentStepInfo?.required && !stepValidation[currentStep]) {
-                return false;
-            }
+        // Check if ANY step has validation errors
+        const hasAnyValidationErrors = Object.values(stepValidation).some(
+            (isValid) => !isValid
+        );
+
+        // If ANY step is invalid, disable ALL navigation except staying on current step
+        if (hasAnyValidationErrors && step.id !== currentStep) {
+            return false;
         }
 
+        const accessible = isStepAccessible(step.id);
         return accessible;
     };
 
@@ -66,13 +80,16 @@ export default function RegistrationStepper({
         const accessible = isStepAccessible(step.id);
         const clickable = isStepClickable(step);
         const isValid = stepValidation[step.id];
+        const hasAnyValidationErrors = Object.values(stepValidation).some(
+            (isValid) => !isValid
+        );
+
+        if (hasAnyValidationErrors && step.id !== currentStep) {
+            return "Please fix all validation errors before navigating between steps";
+        }
 
         if (!accessible) {
             return "Complete previous required steps first";
-        }
-
-        if (!clickable && step.id > currentStep) {
-            return "Fix validation errors in current step before proceeding";
         }
 
         if (step.id < currentStep && !isValid) {
@@ -80,6 +97,19 @@ export default function RegistrationStepper({
         }
 
         return `${step.title} ${step.required ? "(Required)" : "(Optional)"}`;
+    };
+
+    const handleStepClick = (step: Step) => {
+        if (isStepClickable(step) && onStepClick) {
+            onStepClick(step.id);
+        }
+    };
+
+    const getFormTypeText = () => {
+        if (isEditMode) {
+            return `Updating ${formType}`;
+        }
+        return `Creating new ${formType}`;
     };
 
     return (
@@ -90,16 +120,16 @@ export default function RegistrationStepper({
                 <AlertDescription className="text-blue-800 dark:text-blue-200">
                     <p className="text-sm">
                         <span className="font-medium">
-                            Required steps (marked with *)
+                            {getFormTypeText()} - Required steps (marked with *)
                         </span>{" "}
-                        must be completed before you can proceed to other
-                        sections. Optional steps can be skipped.
+                        must be completed before you can{" "}
+                        {isEditMode ? "save changes" : "proceed"}. Optional
+                        steps can be skipped.
                     </p>
                 </AlertDescription>
             </Alert>
 
-            {/* Show validation warning if current step is invalid */}
-            {!stepValidation[currentStep] && currentStepData?.required && (
+            {Object.values(stepValidation).some((isValid) => !isValid) && (
                 <Alert className="mb-4 bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800">
                     <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                     <AlertDescription className="text-amber-800 dark:text-amber-200">
@@ -107,8 +137,9 @@ export default function RegistrationStepper({
                             <span className="font-medium">
                                 Validation Required:
                             </span>{" "}
-                            Please fix the errors in the current step before
-                            proceeding to other sections.
+                            Please fix all validation errors before navigating
+                            between steps. Step navigation is currently
+                            disabled.
                         </p>
                     </AlertDescription>
                 </Alert>
@@ -153,6 +184,7 @@ export default function RegistrationStepper({
                             </h3>
                             <p className="text-xs text-muted-foreground dark:text-muted-foreground">
                                 Step {currentStep} of {steps.length}
+                                {isEditMode && " • Editing"}
                             </p>
                         </div>
                     </div>
@@ -201,6 +233,7 @@ export default function RegistrationStepper({
                             <button
                                 key={step.id}
                                 disabled={!clickable}
+                                onClick={() => handleStepClick(step)}
                                 title={getStepTooltip(step)}
                                 className={`h-2 rounded-full transition-all duration-200 relative ${
                                     status === "completed"
@@ -245,6 +278,7 @@ export default function RegistrationStepper({
                         return (
                             <div
                                 key={step.id}
+                                onClick={() => handleStepClick(step)}
                                 className={`flex items-start gap-3 p-3 rounded-lg transition-all border ${
                                     status === "current"
                                         ? "bg-primary/5 dark:bg-primary/10 border-primary/20 dark:border-primary/30"
@@ -351,7 +385,7 @@ export default function RegistrationStepper({
             {/* Desktop Grid Layout */}
             <div className="hidden lg:block">
                 <div className="bg-card dark:bg-card rounded-lg border border-border dark:border-border shadow-sm p-4">
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className={`grid grid-cols-${gridCols} gap-4`}>
                         {steps.map((step, index) => {
                             const status = getStepStatus(step);
                             const clickable = isStepClickable(step);
@@ -360,6 +394,7 @@ export default function RegistrationStepper({
                             return (
                                 <div
                                     key={step.id}
+                                    onClick={() => handleStepClick(step)}
                                     className={`relative p-4 rounded-lg border transition-all duration-200 ${
                                         status === "current"
                                             ? "bg-primary/5 dark:bg-primary/10 border-primary/30 dark:border-primary/40"
@@ -455,9 +490,9 @@ export default function RegistrationStepper({
                                         </p>
                                     </div>
 
-                                    {/* Connection Arrow */}
+                                    {/* Connection Arrow (only for grid layouts) */}
                                     {index < steps.length - 1 &&
-                                        index % 3 !== 2 && (
+                                        index % gridCols !== gridCols - 1 && (
                                             <div className="absolute top-1/2 -right-2 transform -translate-y-1/2">
                                                 <div
                                                     className={`w-4 h-0.5 ${

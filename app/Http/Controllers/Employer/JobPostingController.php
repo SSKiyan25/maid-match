@@ -31,13 +31,12 @@ class JobPostingController extends Controller
             ],
         ]);
     }
-    // Show create form
+
     public function create()
     {
         return inertia('Employer/JobPosting/Create');
     }
 
-    // Store new job posting
     public function store(JobPostingRequest $request)
     {
         $validated = $request->validatedWithEmployer();
@@ -78,7 +77,6 @@ class JobPostingController extends Controller
         return redirect()->route('employer.job-postings.index')->with('success', "Job posting \"{$jobPosting->title}\" created!");
     }
 
-    // Show edit form
     public function edit(JobPosting $jobPosting)
     {
         $this->authorize('update', $jobPosting);
@@ -91,7 +89,6 @@ class JobPostingController extends Controller
         ]);
     }
 
-    // Update job posting
     public function update(JobPostingRequest $request, JobPosting $jobPosting)
     {
         $this->authorize('update', $jobPosting);
@@ -174,7 +171,6 @@ class JobPostingController extends Controller
     {
         $this->authorize('update', $jobPosting);
 
-        // Archive the job posting
         $jobPosting->update(['is_archived' => true]);
 
         // Archive related location

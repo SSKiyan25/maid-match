@@ -1,119 +1,106 @@
-import { validateAndSanitizeInput, validateSelectValue } from './securityValidation';
-import { Step3Data } from "./types";
+import { validateFormSecurity, validateAndSanitizeInput } from "@/utils/securityValidation";
+import { Step3Data, ValidationResult } from "./types";
 
-// Define allowed values for select fields
-const ALLOWED_WORK_TYPES = [
-    'general_housework', 'childcare', 'elderly_care', 'cooking_cleaning',
-    'laundry_ironing', 'pet_care', 'all_around'
-];
+export interface Step3ValidationResult extends ValidationResult {
+    warnings: Record<string, string>;
+    sanitizedData?: Step3Data;
+    hasData: boolean;
+}
 
-const ALLOWED_ACCOMMODATIONS = ['live_in', 'live_out', 'flexible'];
+function validateBudget(budget: number | undefined, field: string) {
+    if (budget === undefined || budget === null || budget === 0) return { value: undefined };
+    if (typeof budget !== "number" || isNaN(budget) || budget < 0) {
+        return { error: `${field} must be a positive number.` };
+    }
+    return { value: budget };
+}
 
-const ALLOWED_SCHEDULES = [
-    'full_time', 'part_time', 'weekdays_only', 'weekends_only', 'as_needed'
-];
+function validateSpecialRequirements(text: string | undefined) {
+    if (!text) return { value: "" };
+    const { isValid, sanitizedValue, securityIssues } = validateAndSanitizeInput(text, "textarea", 500);
+    if (!isValid) return { error: securityIssues.join(", ") };
+    if (sanitizedValue.length > 500) return { error: "Special requirements cannot exceed 500 characters." };
+    return { value: sanitizedValue };
+}
 
-const ALLOWED_EXPERIENCE_LEVELS = [
-    'no_experience', 'some_experience', 'experienced', 'very_experienced', 'specific_skills'
-];
-
-export const validateStep3 = (currentData: Step3Data) => {
-    const newErrors: Record<string, string> = {};
+export function validateStep3(data: Step3Data): Step3ValidationResult {
+    const errors: Record<string, string> = {};
     const warnings: Record<string, string> = {};
+    const sanitizedData: Partial<Step3Data> = {};
 
-    // Validate work type
-    if (currentData.work_type) {
-        const workTypeValidation = validateSelectValue(currentData.work_type, ALLOWED_WORK_TYPES);
-        if (!workTypeValidation.isValid) {
-            newErrors.work_type = workTypeValidation.error!;
-        }
+    // Security check for all fields
+    const fieldTypes = {
+        work_type: "select",
+        accommodation: "select",
+        schedule: "select",
+        experience_needed: "select",
+        special_requirements: "textarea",
+    } as const;
+    const securityCheck = validateFormSecurity(data, fieldTypes);
+    if (!securityCheck.isSecure) {
+        securityCheck.suspiciousFields.forEach((field) => {
+            errors[field as string] = "Suspicious or invalid input detected.";
+        });
     }
 
-    // Validate accommodation
-    if (currentData.accommodation) {
-        const accommodationValidation = validateSelectValue(currentData.accommodation, ALLOWED_ACCOMMODATIONS);
-        if (!accommodationValidation.isValid) {
-            newErrors.accommodation = accommodationValidation.error!;
+    // Directly assign select values (already validated by UI)
+    sanitizedData.work_type = data.work_type || "";
+    sanitizedData.accommodation = data.accommodation || "";
+    sanitizedData.schedule = data.schedule || "";
+    sanitizedData.experience_needed = data.experience_needed || "";
+
+    // Budget min/max
+    const minBudgetResult = validateBudget(data.budget_min, "Minimum budget");
+    if (minBudgetResult.error) errors.budget_min = minBudgetResult.error;
+    else sanitizedData.budget_min = minBudgetResult.value;
+
+    const maxBudgetResult = validateBudget(data.budget_max, "Maximum budget");
+    if (maxBudgetResult.error) errors.budget_max = maxBudgetResult.error;
+    else sanitizedData.budget_max = maxBudgetResult.value;
+
+    // Budget logic
+    if (
+        sanitizedData.budget_min !== undefined &&
+        sanitizedData.budget_max !== undefined
+    ) {
+        if (sanitizedData.budget_min! > sanitizedData.budget_max!) {
+            errors.budget_min = "Minimum budget cannot be greater than maximum budget.";
+        }
+        if (sanitizedData.budget_min! < 5000) {
+            warnings.budget_min = "Consider if this budget is realistic for the Philippines market.";
+        }
+        if (sanitizedData.budget_max! > 100000) {
+            warnings.budget_max = "This seems like a very high budget range.";
         }
     }
-
-    // Validate schedule
-    if (currentData.schedule) {
-        const scheduleValidation = validateSelectValue(currentData.schedule, ALLOWED_SCHEDULES);
-        if (!scheduleValidation.isValid) {
-            newErrors.schedule = scheduleValidation.error!;
-        }
+    if (
+        (sanitizedData.budget_min !== undefined && sanitizedData.budget_max === undefined) ||
+        (sanitizedData.budget_max !== undefined && sanitizedData.budget_min === undefined)
+    ) {
+        errors.budget_range = "Please provide both minimum and maximum budget or leave both empty.";
     }
 
-    // Validate experience needed
-    if (currentData.experience_needed) {
-        const experienceValidation = validateSelectValue(currentData.experience_needed, ALLOWED_EXPERIENCE_LEVELS);
-        if (!experienceValidation.isValid) {
-            newErrors.experience_needed = experienceValidation.error!;
-        }
+    // Special requirements
+    const specialReqResult = validateSpecialRequirements(data.special_requirements);
+    if (specialReqResult.error) errors.special_requirements = specialReqResult.error;
+    else sanitizedData.special_requirements = specialReqResult.value;
+
+    // Compatibility warnings
+    if (sanitizedData.work_type === "elderly_care" && sanitizedData.accommodation === "live_out") {
+        warnings.accommodation = "Elderly care typically works better with live-in arrangements.";
     }
-
-    // Budget validation with security
-    if (currentData.budget_min || currentData.budget_max) {
-        const minStr = currentData.budget_min?.toString() || '';
-        const maxStr = currentData.budget_max?.toString() || '';
-        
-        const minSecurity = validateAndSanitizeInput(minStr, 'number', 10);
-        const maxSecurity = validateAndSanitizeInput(maxStr, 'number', 10);
-
-        if (!minSecurity.isValid) {
-            newErrors.budget_min = minSecurity.securityIssues.join(', ');
-        }
-        if (!maxSecurity.isValid) {
-            newErrors.budget_max = maxSecurity.securityIssues.join(', ');
-        }
-
-        // Logical validation
-        if (currentData.budget_min && currentData.budget_max) {
-            if (currentData.budget_min > currentData.budget_max) {
-                newErrors.budget_range = "Minimum budget cannot be greater than maximum budget";
-            }
-            if (currentData.budget_min < 5000) {
-                warnings.budget_min = "Consider if this budget is realistic for the Philippines market";
-            }
-            if (currentData.budget_max > 100000) {
-                warnings.budget_max = "This seems like a very high budget range";
-            }
-        }
-
-        // Budget consistency check
-        if ((currentData.budget_min && !currentData.budget_max) || 
-            (!currentData.budget_min && currentData.budget_max)) {
-            newErrors.budget_range = "Please provide both minimum and maximum budget or leave both empty";
-        }
-    }
-
-    // Validate special requirements
-    if (currentData.special_requirements) {
-        const specialReqSecurity = validateAndSanitizeInput(currentData.special_requirements, 'textarea', 500);
-        if (!specialReqSecurity.isValid) {
-            newErrors.special_requirements = specialReqSecurity.securityIssues.join(', ');
-        } else if (specialReqSecurity.sanitizedValue.length > 500) {
-            newErrors.special_requirements = "Special requirements cannot exceed 500 characters";
-        }
-    }
-
-    // Work type and accommodation compatibility warnings
-    if (currentData.work_type === "elderly_care" && currentData.accommodation === "live_out") {
-        warnings.accommodation = "Elderly care typically works better with live-in arrangements";
-    }
-
-    if (currentData.work_type === "childcare" && currentData.schedule === "weekends_only") {
-        warnings.schedule = "Childcare usually requires more regular scheduling";
+    if (sanitizedData.work_type === "childcare" && sanitizedData.schedule === "weekends_only") {
+        warnings.schedule = "Childcare usually requires more regular scheduling.";
     }
 
     return {
-        isValid: Object.keys(newErrors).length === 0,
-        errors: newErrors,
-        warnings: warnings,
-        hasData: hasAnyData(currentData)
+        isValid: Object.keys(errors).length === 0,
+        errors,
+        warnings,
+        sanitizedData: sanitizedData as Step3Data,
+        hasData: hasAnyData(data),
     };
-};
+}
 
 export const hasAnyData = (data: Step3Data): boolean => {
     return !!(
@@ -130,11 +117,11 @@ export const hasAnyData = (data: Step3Data): boolean => {
 export const createMaidPreferences = (data: Step3Data): string => {
     // Sanitize before creating JSON
     const specialReqSecurity = validateAndSanitizeInput(data.special_requirements || '', 'textarea', 500);
-    
+
     const maidPreferences = {
         work_type: data.work_type || null,
         accommodation: data.accommodation || null,
-        budget_range: (data.budget_min || data.budget_max) 
+        budget_range: (data.budget_min || data.budget_max)
             ? `₱${data.budget_min || 0} - ₱${data.budget_max || 0}`
             : null,
         schedule: data.schedule || null,
@@ -153,17 +140,17 @@ export const createMaidPreferences = (data: Step3Data): string => {
 export const getCompletionPercentage = (data: Step3Data): number => {
     const fields = [
         'work_type',
-        'accommodation', 
+        'accommodation',
         'schedule',
         'experience_needed'
     ];
-    
+
     const budgetComplete = !!(data.budget_min && data.budget_max);
     const fieldsComplete = fields.filter(field => !!data[field as keyof Step3Data]).length;
     const specialReqComplete = !!data.special_requirements;
-    
+
     const totalPossible = fields.length + 1 + 1; // fields + budget + special_req
     const completed = fieldsComplete + (budgetComplete ? 1 : 0) + (specialReqComplete ? 1 : 0);
-    
+
     return Math.round((completed / totalPossible) * 100);
 };

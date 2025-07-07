@@ -27,6 +27,7 @@ import {
     Clock,
     FileImage,
 } from "lucide-react";
+import { InfoAlert } from "@/Components/Form/InfoAlert";
 
 import type { Step6ReviewProps } from "../../utils/types";
 
@@ -598,53 +599,32 @@ export default function Step6_Review({
                         </Alert>
 
                         {Object.keys(safeSubmissionErrors).length > 0 && (
-                            <Alert className="bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800">
-                                <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
-                                <AlertDescription className="text-red-800 dark:text-red-200">
-                                    <strong>
-                                        Please fix the following errors:
-                                    </strong>
-                                    <ul className="mt-2 list-disc list-inside">
-                                        {Object.entries(
-                                            safeSubmissionErrors
-                                        ).map(([field, error]) => (
-                                            <li key={field} className="text-sm">
-                                                {error}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </AlertDescription>
-                            </Alert>
+                            <InfoAlert
+                                icon={
+                                    <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                                }
+                                colorClass="bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
+                                title="Please fix the following errors:"
+                                tips={Object.values(safeSubmissionErrors).map(
+                                    (error) => String(error)
+                                )}
+                            />
                         )}
 
-                        <Alert className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
-                            <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                            <AlertDescription className="text-blue-800 dark:text-blue-200">
-                                <strong>What happens next:</strong>
-                                <ul className="mt-2 text-sm space-y-1">
-                                    <li>
-                                        • Your account will be created and
-                                        verified
-                                    </li>
-                                    <li>
-                                        • You'll receive a welcome email with
-                                        next steps
-                                    </li>
-                                    <li>
-                                        • You can start browsing helper profiles
-                                        immediately
-                                    </li>
-                                    <li>
-                                        • Our matching algorithm will suggest
-                                        compatible helpers
-                                    </li>
-                                    <li>
-                                        • You can add or update requirements
-                                        anytime from your profile
-                                    </li>
-                                </ul>
-                            </AlertDescription>
-                        </Alert>
+                        <InfoAlert
+                            icon={
+                                <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                            }
+                            colorClass="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800"
+                            title="What happens next:"
+                            tips={[
+                                "Your account will be created and verified",
+                                "You'll receive a welcome email with next steps",
+                                "You can start browsing helper profiles immediately",
+                                "Our matching algorithm will suggest compatible helpers",
+                                "You can add or update requirements anytime from your profile",
+                            ]}
+                        />
                     </div>
 
                     {/* Submit Button */}

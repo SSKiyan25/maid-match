@@ -20,15 +20,11 @@ import {
     AlertCircle,
     Calendar,
 } from "lucide-react";
+import { InfoAlert } from "@/Components/Form/InfoAlert";
 
 import { Step1Data } from "../../utils/types";
-import {
-    validateStep1,
-    validateEmail,
-    validatePassword,
-    validateName,
-    validatePhoneNumber,
-} from "../../utils/step1Validation";
+import { useStepValidation } from "../../../../../../hooks/useStepValidation";
+import { validateStep1 } from "../../utils/step1Validation";
 import {
     formatPhoneNumber,
     calculatePasswordStrength,
@@ -54,114 +50,30 @@ export default function Step1_BasicInfo({
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [passwordStrength, setPasswordStrength] = useState(0);
-    const [clientErrors, setClientErrors] = useState<Record<string, string>>(
-        {}
+    const [hasUserInteracted, setHasUserInteracted] = useState(false);
+
+    const { clientErrors, isValid } = useStepValidation(
+        data,
+        validateStep1,
+        onValidationChange
     );
 
-    const initialRender = useRef(true);
-    const [hasUserInteracted, setHasUserInteracted] = useState(false);
     const prevIsValid = useRef<boolean | null>(null);
 
     useEffect(() => {
-        if (initialRender.current) {
-            initialRender.current = false;
-            return;
+        if (onValidationChange && isValid !== prevIsValid.current) {
+            onValidationChange(isValid);
+            prevIsValid.current = isValid;
         }
-        if (!hasUserInteracted) return;
-
-        const validation = validateStep1(data);
-        setClientErrors(validation.errors);
-
-        // Only call onValidationChange if validity changed
-        if (onValidationChange && validation.isValid !== prevIsValid.current) {
-            onValidationChange(validation.isValid);
-            prevIsValid.current = validation.isValid;
-        }
-    }, [data, onValidationChange, hasUserInteracted]);
+    }, [isValid, onValidationChange]);
 
     const handleInputChange = (field: keyof Step1Data, value: string) => {
-        // Mark that user has interacted with the form
         setHasUserInteracted(true);
 
         onChange({ [field]: value });
 
         if (field === "password") {
             setPasswordStrength(calculatePasswordStrength(value));
-        }
-
-        // Only do real-time validation if user has already interacted
-        if (hasUserInteracted) {
-            const newErrors = { ...clientErrors };
-
-            switch (field) {
-                case "email":
-                    const emailValidation = validateEmail(value);
-                    if (!emailValidation.isValid && emailValidation.error) {
-                        newErrors.email = emailValidation.error;
-                    } else {
-                        delete newErrors.email;
-                    }
-                    break;
-
-                case "password":
-                    const passwordValidation = validatePassword(value);
-                    if (
-                        !passwordValidation.isValid &&
-                        passwordValidation.error
-                    ) {
-                        newErrors.password = passwordValidation.error;
-                    } else {
-                        delete newErrors.password;
-                    }
-                    break;
-
-                case "password_confirmation":
-                    if (data.password !== value) {
-                        newErrors.password_confirmation =
-                            "Passwords do not match";
-                    } else {
-                        delete newErrors.password_confirmation;
-                    }
-                    break;
-
-                case "first_name":
-                    const firstNameValidation = validateName(
-                        value,
-                        "First name"
-                    );
-                    if (
-                        !firstNameValidation.isValid &&
-                        firstNameValidation.error
-                    ) {
-                        newErrors.first_name = firstNameValidation.error;
-                    } else {
-                        delete newErrors.first_name;
-                    }
-                    break;
-
-                case "last_name":
-                    const lastNameValidation = validateName(value, "Last name");
-                    if (
-                        !lastNameValidation.isValid &&
-                        lastNameValidation.error
-                    ) {
-                        newErrors.last_name = lastNameValidation.error;
-                    } else {
-                        delete newErrors.last_name;
-                    }
-                    break;
-
-                case "phone_number":
-                    const phoneValidation = validatePhoneNumber(value);
-                    if (!phoneValidation.isValid && phoneValidation.error) {
-                        newErrors.phone_number = phoneValidation.error;
-                    } else {
-                        delete newErrors.phone_number;
-                    }
-                    break;
-            }
-
-            setClientErrors(newErrors);
         }
     };
 
@@ -184,11 +96,8 @@ export default function Step1_BasicInfo({
         );
     };
 
-    // Use client errors if available, otherwise use server errors
     const displayErrors =
-        showValidation && Object.keys(clientErrors).length > 0
-            ? clientErrors
-            : {};
+        showValidation || hasUserInteracted ? clientErrors : {};
 
     const passwordsMatch =
         data.password &&
@@ -198,7 +107,7 @@ export default function Step1_BasicInfo({
     const isPhoneValid = !data.phone_number || !displayErrors.phone_number;
 
     return (
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-5xl mx-auto">
             <Card className="shadow-lg">
                 <CardHeader className="text-center pb-6">
                     <CardTitle className="text-2xl font-bold text-foreground">

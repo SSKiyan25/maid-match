@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useState, useCallback, useMemo } from "react";
 import {
     Card,
     CardContent,
@@ -30,7 +30,11 @@ import {
 } from "lucide-react";
 
 import type { Step3RequirementsProps, Step3Data } from "../../utils/types";
-import { useStep3Validation } from "../../hooks/useStep3Validation";
+import { useStepValidation } from "../../../../../../hooks/useStepValidation";
+import {
+    validateStep3,
+    getCompletionPercentage,
+} from "../../utils/step3Validation";
 
 export default function Step3_Requirements({
     data,
@@ -39,35 +43,36 @@ export default function Step3_Requirements({
     onValidationChange,
     showValidation = false,
 }: Step3RequirementsProps) {
-    const {
-        clientErrors,
-        warnings,
-        completionPercentage,
-        handleInputChange,
-        isValid,
-    } = useStep3Validation(data);
+    const [hasUserInteracted, setHasUserInteracted] = useState(false);
 
-    const prevIsValid = useRef<boolean | null>(null);
+    const validationData = useMemo(() => data, [data]);
 
-    useEffect(() => {
-        if (onValidationChange && isValid !== prevIsValid.current) {
-            onValidationChange(isValid);
-            prevIsValid.current = isValid;
-        }
-    }, [isValid, onValidationChange]);
+    const memoizedValidator = useCallback(
+        (validationData: Step3Data) => validateStep3(validationData),
+        []
+    );
 
-    // Use client errors if available, otherwise use server errors
-    const displayErrors =
-        showValidation && Object.keys(clientErrors).length > 0
-            ? clientErrors
-            : {};
+    const { clientErrors, isValid } = useStepValidation(
+        validationData,
+        memoizedValidator,
+        onValidationChange
+    );
 
-    const inputChangeHandler = (
+    const handleInputChange = (
         field: keyof Step3Data,
         value: string | number
     ) => {
-        handleInputChange(field, value, onChange);
+        setHasUserInteracted(true);
+        onChange({ [field]: value });
     };
+
+    // Calculate completion percentage
+    const completionPercentage = getCompletionPercentage(data);
+
+    const validationResult = validateStep3(data);
+    const warnings = validationResult.warnings || {};
+    const displayErrors =
+        showValidation || hasUserInteracted ? clientErrors : {};
 
     return (
         <div className="max-w-2xl mx-auto">
@@ -129,7 +134,7 @@ export default function Step3_Requirements({
                         <Select
                             value={data.work_type}
                             onValueChange={(value) =>
-                                inputChangeHandler("work_type", value)
+                                handleInputChange("work_type", value)
                             }
                         >
                             <SelectTrigger
@@ -190,7 +195,7 @@ export default function Step3_Requirements({
                             <Select
                                 value={data.accommodation}
                                 onValueChange={(value) =>
-                                    inputChangeHandler("accommodation", value)
+                                    handleInputChange("accommodation", value)
                                 }
                             >
                                 <SelectTrigger
@@ -243,7 +248,7 @@ export default function Step3_Requirements({
                             <Select
                                 value={data.schedule}
                                 onValueChange={(value) =>
-                                    inputChangeHandler("schedule", value)
+                                    handleInputChange("schedule", value)
                                 }
                             >
                                 <SelectTrigger
@@ -316,7 +321,7 @@ export default function Step3_Requirements({
                                         placeholder="15,000"
                                         value={data.budget_min || ""}
                                         onChange={(e) =>
-                                            inputChangeHandler(
+                                            handleInputChange(
                                                 "budget_min",
                                                 parseInt(e.target.value) || 0
                                             )
@@ -355,7 +360,7 @@ export default function Step3_Requirements({
                                         placeholder="25,000"
                                         value={data.budget_max || ""}
                                         onChange={(e) =>
-                                            inputChangeHandler(
+                                            handleInputChange(
                                                 "budget_max",
                                                 parseInt(e.target.value) || 0
                                             )
@@ -388,6 +393,18 @@ export default function Step3_Requirements({
                                 {displayErrors.budget_range}
                             </p>
                         )}
+                        {displayErrors.budget_min && (
+                            <p className="text-sm text-red-500 flex items-center gap-1">
+                                <AlertCircle className="w-3 h-3" />
+                                {displayErrors.budget_min}
+                            </p>
+                        )}
+                        {displayErrors.budget_max && (
+                            <p className="text-sm text-red-500 flex items-center gap-1">
+                                <AlertCircle className="w-3 h-3" />
+                                {displayErrors.budget_max}
+                            </p>
+                        )}
                     </div>
 
                     {/* Experience Needed */}
@@ -401,7 +418,7 @@ export default function Step3_Requirements({
                         <Select
                             value={data.experience_needed}
                             onValueChange={(value) =>
-                                inputChangeHandler("experience_needed", value)
+                                handleInputChange("experience_needed", value)
                             }
                         >
                             <SelectTrigger className="h-11">
@@ -425,6 +442,12 @@ export default function Step3_Requirements({
                                 </SelectItem>
                             </SelectContent>
                         </Select>
+                        {displayErrors.experience_needed && (
+                            <p className="text-sm text-red-500 flex items-center gap-1">
+                                <AlertCircle className="w-3 h-3" />
+                                {displayErrors.experience_needed}
+                            </p>
+                        )}
                     </div>
 
                     {/* Special Requirements */}
@@ -440,7 +463,7 @@ export default function Step3_Requirements({
                             placeholder="Any specific requirements, personality traits, skills, or important notes..."
                             value={data.special_requirements}
                             onChange={(e) =>
-                                inputChangeHandler(
+                                handleInputChange(
                                     "special_requirements",
                                     e.target.value
                                 )

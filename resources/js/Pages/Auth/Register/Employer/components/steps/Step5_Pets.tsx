@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import {
     Card,
     CardContent,
@@ -35,9 +35,9 @@ import {
     CheckCircle,
 } from "lucide-react";
 
-import type { Step5PetsProps } from "../../utils/types";
-import { useStep5Validation } from "../../hooks/useStep5Validation";
-import { getPetTypeInfo } from "../../utils/step5Validation";
+import type { Step5PetsProps, Pet } from "../../utils/types";
+import { useStepValidation } from "../../../../../../hooks/useStepValidation";
+import { validateStep5, getPetTypeInfo } from "../../utils/step5Validation";
 
 export default function Step5_Pets({
     data,
@@ -46,17 +46,20 @@ export default function Step5_Pets({
     onValidationChange,
     showValidation = false,
 }: Step5PetsProps) {
-    const {
-        clientErrors,
-        petErrors,
-        completionPercentage,
-        matchingTips,
-        handlePetChange,
-        handlePhotoUpload,
-        addPet,
-        removePet,
-        isValid,
-    } = useStep5Validation(data);
+    const [hasUserInteracted, setHasUserInteracted] = useState(false);
+
+    const validationData = useMemo(() => data, [data]);
+
+    const memoizedValidator = useCallback(
+        (validationData: typeof data) => validateStep5(validationData),
+        []
+    );
+
+    const { clientErrors, isValid } = useStepValidation(
+        validationData,
+        memoizedValidator,
+        onValidationChange
+    );
 
     const prevIsValid = useRef<boolean | null>(null);
 
@@ -67,11 +70,93 @@ export default function Step5_Pets({
         }
     }, [isValid, onValidationChange]);
 
-    // Use client errors if available, otherwise use server errors
-    const displayErrors =
-        showValidation && Object.keys(clientErrors).length > 0
-            ? clientErrors
-            : {};
+    // Helper functions for pet management
+    const addPet = useCallback(() => {
+        setHasUserInteracted(true);
+        const newPet: Pet = {
+            id: Date.now().toString(),
+            type: "",
+            name: "",
+            photo: undefined,
+        };
+        onChange({
+            has_pets: true,
+            pets: [...(data.pets || []), newPet],
+        });
+    }, [data.pets, onChange]);
+
+    const removePet = useCallback(
+        (petId: string) => {
+            setHasUserInteracted(true);
+            const updatedPets = (data.pets || []).filter(
+                (pet) => pet.id !== petId
+            );
+            onChange({
+                pets: updatedPets,
+                has_pets: updatedPets.length > 0,
+            });
+        },
+        [data.pets, onChange]
+    );
+
+    const handlePetChange = useCallback(
+        (petId: string, field: keyof Pet, value: string | File | null) => {
+            setHasUserInteracted(true);
+            const updatedPets = (data.pets || []).map((pet) =>
+                pet.id === petId ? { ...pet, [field]: value } : pet
+            );
+            onChange({ pets: updatedPets });
+        },
+        [data.pets, onChange]
+    );
+
+    const handlePhotoUpload = useCallback(
+        (petId: string, file: File | null) => {
+            handlePetChange(petId, "photo", file);
+        },
+        [handlePetChange]
+    );
+
+    const petErrors = useMemo(() => {
+        if (clientErrors.petErrors) {
+            return clientErrors.petErrors;
+        }
+        return {};
+    }, [clientErrors.petErrors]);
+
+    const displayErrors = useMemo(() => {
+        return showValidation || hasUserInteracted ? petErrors : {};
+    }, [showValidation, hasUserInteracted, petErrors]);
+
+    // Memoize matching tips
+    const matchingTips = useMemo(() => {
+        if (!data.pets || data.pets.length === 0) return [];
+        const tips: string[] = [];
+        const petTypes = [
+            ...new Set(data.pets.map((pet) => pet.type).filter(Boolean)),
+        ];
+        if (petTypes.includes("dog")) {
+            tips.push(
+                "We'll find helpers experienced with dog care and walking"
+            );
+        }
+        if (petTypes.includes("cat")) {
+            tips.push("We'll match you with cat-friendly helpers");
+        }
+        if (
+            petTypes.some((type) =>
+                ["bird", "fish", "rabbit", "hamster"].includes(type)
+            )
+        ) {
+            tips.push("We'll find helpers comfortable with small pets");
+        }
+        if (petTypes.includes("other")) {
+            tips.push(
+                "We'll match you with helpers open to unique pet situations"
+            );
+        }
+        return tips;
+    }, [data.pets]);
 
     const petTypes = [
         { value: "dog", label: "Dog", icon: Dog },
@@ -113,28 +198,6 @@ export default function Step5_Pets({
                         Tell us about your pets so we can find helpers who are
                         comfortable with animals (completely optional)
                     </CardDescription>
-
-                    {/* Completion Progress */}
-                    {data.pets && data.pets.length > 0 && (
-                        <div className="mt-4 space-y-2">
-                            <div className="flex justify-between items-center">
-                                <span className="text-sm text-muted-foreground">
-                                    Pet Info Completion
-                                </span>
-                                <span className="text-sm font-medium text-foreground">
-                                    {completionPercentage}%
-                                </span>
-                            </div>
-                            <Progress
-                                value={completionPercentage}
-                                className="h-2"
-                            />
-                            <p className="text-xs text-muted-foreground text-center">
-                                More details help us find better pet-friendly
-                                matches
-                            </p>
-                        </div>
-                    )}
                 </CardHeader>
 
                 <CardContent className="space-y-6">
@@ -197,7 +260,7 @@ export default function Step5_Pets({
                             <Button
                                 type="button"
                                 variant="outline"
-                                onClick={() => addPet(onChange)}
+                                onClick={addPet}
                                 className="w-full h-12 border-dashed border-2 hover:border-primary/50"
                             >
                                 <Plus className="w-4 h-4 mr-2" />
@@ -255,10 +318,7 @@ export default function Step5_Pets({
                                                     variant="outline"
                                                     size="sm"
                                                     onClick={() =>
-                                                        removePet(
-                                                            pet.id,
-                                                            onChange
-                                                        )
+                                                        removePet(pet.id)
                                                     }
                                                     className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
                                                 >
@@ -285,8 +345,7 @@ export default function Step5_Pets({
                                                             handlePetChange(
                                                                 pet.id,
                                                                 "type",
-                                                                value,
-                                                                onChange
+                                                                value
                                                             )
                                                         }
                                                     >
@@ -363,8 +422,7 @@ export default function Step5_Pets({
                                                             handlePetChange(
                                                                 pet.id,
                                                                 "name",
-                                                                e.target.value,
-                                                                onChange
+                                                                e.target.value
                                                             )
                                                         }
                                                         className={`h-11 ${
@@ -414,8 +472,7 @@ export default function Step5_Pets({
                                                                     null;
                                                                 handlePhotoUpload(
                                                                     pet.id,
-                                                                    file,
-                                                                    onChange
+                                                                    file
                                                                 );
                                                             }}
                                                             className="hidden"
@@ -479,8 +536,7 @@ export default function Step5_Pets({
                                                                     onClick={() =>
                                                                         handlePhotoUpload(
                                                                             pet.id,
-                                                                            null,
-                                                                            onChange
+                                                                            null
                                                                         )
                                                                     }
                                                                     className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
@@ -505,7 +561,7 @@ export default function Step5_Pets({
                                                 <p className="text-xs text-muted-foreground">
                                                     Optional - A photo helps
                                                     helpers recognize your pet.
-                                                    Max file size: 2MB
+                                                    Max file size: 5MB
                                                 </p>
                                             </div>
 
@@ -553,7 +609,7 @@ export default function Step5_Pets({
                                 <Button
                                     type="button"
                                     variant="outline"
-                                    onClick={() => addPet(onChange)}
+                                    onClick={addPet}
                                     className="w-full h-12 border-dashed border-2 hover:border-primary/50"
                                 >
                                     <Plus className="w-4 h-4 mr-2" />

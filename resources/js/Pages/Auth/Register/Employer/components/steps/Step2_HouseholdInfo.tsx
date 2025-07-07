@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import { useState, useCallback, useMemo } from "react";
 import {
     Card,
     CardContent,
@@ -11,13 +11,19 @@ import { Label } from "@/Components/ui/label";
 import { Textarea } from "@/Components/ui/textarea";
 import { Alert, AlertDescription } from "@/Components/ui/alert";
 import { Home, Users, AlertCircle, Info, MapPin } from "lucide-react";
+import { InfoAlert } from "@/Components/Form/InfoAlert";
 
 import type {
     Step2HouseholdInfoProps,
     Step2Data,
     AddressData,
 } from "../../utils/types";
-import { useStep2Validation } from "../../hooks/useStep2Validation";
+import { useStepValidation } from "../../../../../../hooks/useStepValidation";
+import {
+    validateStep2,
+    parseAddress,
+    stringifyAddress,
+} from "../../utils/step2Validation";
 
 export default function Step2_HouseholdInfo({
     data,
@@ -26,35 +32,47 @@ export default function Step2_HouseholdInfo({
     onValidationChange,
     showValidation = false,
 }: Step2HouseholdInfoProps) {
-    const { clientErrors, addressData, updateAddressData, isValid } =
-        useStep2Validation(data);
+    const [hasUserInteracted, setHasUserInteracted] = useState(false);
+    const addressData = parseAddress(data.address || "");
+    const validationData = useMemo(
+        () => ({
+            ...data,
+            addressData,
+        }),
+        [data, addressData]
+    );
 
-    const prevIsValid = useRef<boolean | null>(null);
+    const memoizedValidator = useCallback(
+        (validationData: any) => validateStep2(validationData),
+        []
+    );
 
-    useEffect(() => {
-        if (onValidationChange && isValid !== prevIsValid.current) {
-            onValidationChange(isValid);
-            prevIsValid.current = isValid;
-        }
-    }, [isValid, onValidationChange]);
+    const { clientErrors, isValid } = useStepValidation(
+        validationData,
+        memoizedValidator,
+        onValidationChange
+    );
 
     const handleInputChange = (
         field: keyof Step2Data,
         value: string | number
     ) => {
+        setHasUserInteracted(true);
         onChange({ [field]: value });
     };
 
     const handleAddressChange = (field: keyof AddressData, value: string) => {
-        const addressString = updateAddressData(field, value);
-        handleInputChange("address", addressString);
+        setHasUserInteracted(true);
+        const updatedAddressData = {
+            ...addressData,
+            [field]: value,
+        };
+        const addressString = stringifyAddress(updatedAddressData);
+        onChange({ address: addressString });
     };
 
-    // Use client errors if available, otherwise use server errors
     const displayErrors =
-        showValidation && Object.keys(clientErrors).length > 0
-            ? clientErrors
-            : {};
+        showValidation || hasUserInteracted ? clientErrors : {};
 
     return (
         <div className="max-w-2xl mx-auto">
@@ -223,7 +241,6 @@ export default function Step2_HouseholdInfo({
                             )}
                         </div>
                     </div>
-
                     {/* Family Information Section */}
                     <div className="space-y-4 pt-6 border-t border-border">
                         <div className="flex items-center gap-2 mb-4">
@@ -319,83 +336,59 @@ export default function Step2_HouseholdInfo({
                             )}
                         </div>
                     </div>
-
                     {/* Address Example */}
-                    <div className="pt-6 border-t border-border">
-                        <Alert className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
+                    <InfoAlert
+                        icon={
                             <Info className="h-4 w-4 text-green-600 dark:text-green-400" />
-                            <AlertDescription className="text-green-800 dark:text-green-200">
-                                <div className="space-y-2">
-                                    <p>
-                                        <strong>Address Example:</strong>
-                                    </p>
-                                    <div className="text-sm bg-white dark:bg-gray-800 p-3 rounded border">
-                                        <p>
-                                            <strong>Street:</strong> 123 Main
-                                            Street, Green Valley Subdivision
-                                        </p>
-                                        <p>
-                                            <strong>Barangay:</strong> Barangay
-                                            San Antonio
-                                        </p>
-                                        <p>
-                                            <strong>City:</strong> Quezon City
-                                        </p>
-                                        <p>
-                                            <strong>Province:</strong> Metro
-                                            Manila
-                                        </p>
-                                    </div>
-                                </div>
-                            </AlertDescription>
-                        </Alert>
-                    </div>
+                        }
+                        colorClass="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+                        title="Address Example:"
+                        footer={
+                            <div className="text-sm bg-white dark:bg-gray-800 p-3 rounded border">
+                                <p>
+                                    <strong>Street:</strong> 123 Main Street,
+                                    Green Valley Subdivision
+                                </p>
+                                <p>
+                                    <strong>Barangay:</strong> Barangay San
+                                    Antonio
+                                </p>
+                                <p>
+                                    <strong>City:</strong> Quezon City
+                                </p>
+                                <p>
+                                    <strong>Province:</strong> Metro Manila
+                                </p>
+                            </div>
+                        }
+                    />
 
-                    {/* Examples Section */}
-                    <div>
-                        <Alert className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+                    {/* Household Description Examples */}
+                    <InfoAlert
+                        icon={
                             <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                            <AlertDescription className="text-blue-800 dark:text-blue-200">
-                                <div className="space-y-2">
-                                    <p>
-                                        <strong>
-                                            Household Description Examples:
-                                        </strong>
-                                    </p>
-                                    <ul className="text-sm space-y-1 ml-4">
-                                        <li>
-                                            • "2-story townhouse with 3
-                                            bedrooms, modern kitchen, small
-                                            garden"
-                                        </li>
-                                        <li>
-                                            • "Condo unit on 15th floor with
-                                            elevator access, parking available"
-                                        </li>
-                                        <li>
-                                            • "Traditional house with elderly
-                                            grandparents, quiet neighborhood"
-                                        </li>
-                                        <li>
-                                            • "Busy family home with young
-                                            children, open kitchen concept"
-                                        </li>
-                                    </ul>
-                                </div>
-                            </AlertDescription>
-                        </Alert>
-                    </div>
+                        }
+                        colorClass="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800"
+                        title="Household Description Examples:"
+                        tips={[
+                            '• "2-story townhouse with 3 bedrooms, modern kitchen, small garden"',
+                            '• "Condo unit on 15th floor with elevator access, parking available"',
+                            '• "Traditional house with elderly grandparents, quiet neighborhood"',
+                            '• "Busy family home with young children, open kitchen concept"',
+                        ]}
+                    />
 
                     {/* Privacy Alert */}
-                    <Alert className="bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800">
-                        <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-                        <AlertDescription className="text-amber-800 dark:text-amber-200">
-                            <strong>Privacy Note:</strong> Your address will
-                            only be shared with helpers you've matched with and
-                            approved. We use this information to help find
-                            helpers in your area.
-                        </AlertDescription>
-                    </Alert>
+                    <InfoAlert
+                        icon={
+                            <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                        }
+                        colorClass="bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800"
+                    >
+                        <strong>Privacy Note:</strong> Your address will only be
+                        shared with helpers you've matched with and approved. We
+                        use this information to help find helpers in your area.
+                    </InfoAlert>
                 </CardContent>
             </Card>
         </div>

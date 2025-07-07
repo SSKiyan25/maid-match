@@ -23,15 +23,14 @@ import {
     Plus,
     Trash2,
     AlertCircle,
-    DollarSign,
     PhilippinePeso,
     FileText,
     Star,
 } from "lucide-react";
-
+import { InfoAlert } from "@/Components/Form/InfoAlert";
 import { JobBonus } from "../../utils/types";
 import { validateStep3 } from "../../utils/step3Validation";
-import { useStepValidation } from "../../hooks/useStepValidation";
+import { useStepValidation } from "../../../../../hooks/useStepValidation";
 
 interface Step3BonusProps {
     data: JobBonus[];
@@ -127,7 +126,6 @@ export default function Step3_Bonus({
         onChange(updatedBonuses);
     };
 
-    // Use client errors if available and user has interacted, otherwise use server errors
     const displayErrors =
         showValidation &&
         hasUserInteracted &&
@@ -586,34 +584,20 @@ export default function Step3_Bonus({
                     )}
 
                     {/* Info Alert */}
-                    <Alert className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
-                        <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                        <AlertDescription className="text-blue-800 dark:text-blue-200">
-                            <p className="font-medium mb-2">💡 Bonus Tips:</p>
-                            <ul className="text-sm space-y-1 list-disc list-inside">
-                                <li>
-                                    Clear bonus structures attract better
-                                    candidates
-                                </li>
-                                <li>
-                                    Performance-based bonuses motivate excellent
-                                    work
-                                </li>
-                                <li>
-                                    Consider seasonal bonuses (13th month,
-                                    holidays)
-                                </li>
-                                <li>
-                                    Be specific about conditions to avoid
-                                    misunderstandings
-                                </li>
-                                <li>
-                                    Bonuses are optional but can make your
-                                    posting stand out
-                                </li>
-                            </ul>
-                        </AlertDescription>
-                    </Alert>
+                    <InfoAlert
+                        icon={
+                            <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                        }
+                        colorClass="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800"
+                        title="💡 Bonus Tips:"
+                        tips={[
+                            "Clear bonus structures attract better candidates",
+                            "Performance-based bonuses motivate excellent work",
+                            "Consider seasonal bonuses (13th month, holidays)",
+                            "Be specific about conditions to avoid misunderstandings",
+                            "Bonuses are optional but can make your posting stand out",
+                        ]}
+                    />
                 </CardContent>
             </Card>
         </div>

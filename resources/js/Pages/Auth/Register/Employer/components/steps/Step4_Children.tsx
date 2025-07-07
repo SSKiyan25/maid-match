@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import {
     Card,
     CardContent,
@@ -10,7 +10,6 @@ import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { Button } from "@/Components/ui/button";
 import { Alert, AlertDescription } from "@/Components/ui/alert";
-import { Progress } from "@/Components/ui/progress";
 import {
     Baby,
     Plus,
@@ -25,26 +24,32 @@ import {
 } from "lucide-react";
 
 import type { Step4ChildrenProps, Child } from "../../utils/types";
-import { useStep4Validation } from "../../hooks/useStep4Validation";
-import { calculateAge, getAgeGroup } from "../../utils/step4Validation";
+import { useStepValidation } from "../../../../../../hooks/useStepValidation";
+import {
+    validateStep4,
+    calculateAge,
+    getAgeGroup,
+} from "../../utils/step4Validation";
 
 export default function Step4_Children({
     data,
     onChange,
-    errors,
     onValidationChange,
     showValidation = false,
 }: Step4ChildrenProps) {
-    const {
-        clientErrors,
-        childErrors,
-        completionPercentage,
-        handleChildChange,
-        handlePhotoUpload,
-        addChild,
-        removeChild,
-        isValid,
-    } = useStep4Validation(data);
+    const [hasUserInteracted, setHasUserInteracted] = useState(false);
+    const validationData = useMemo(() => data, [data]);
+
+    const memoizedValidator = useCallback(
+        (validationData: typeof data) => validateStep4(validationData),
+        []
+    );
+
+    const { clientErrors, isValid } = useStepValidation(
+        validationData,
+        memoizedValidator,
+        onValidationChange
+    );
 
     const prevIsValid = useRef<boolean | null>(null);
 
@@ -55,11 +60,64 @@ export default function Step4_Children({
         }
     }, [isValid, onValidationChange]);
 
-    // Use client errors if available, otherwise use server errors
-    const displayErrors =
-        showValidation && Object.keys(clientErrors).length > 0
-            ? clientErrors
-            : {};
+    // Helper functions for child management
+    const addChild = useCallback(() => {
+        setHasUserInteracted(true);
+        const newChild: Child = {
+            id: Date.now().toString(),
+            name: "",
+            birth_date: "",
+            photo: undefined,
+        };
+        onChange({
+            has_children: true,
+            children: [...(data.children || []), newChild],
+        });
+    }, [data.children, onChange]);
+
+    const removeChild = useCallback(
+        (childId: string) => {
+            setHasUserInteracted(true);
+            const updatedChildren = (data.children || []).filter(
+                (child) => child.id !== childId
+            );
+            onChange({
+                children: updatedChildren,
+                has_children: updatedChildren.length > 0,
+            });
+        },
+        [data.children, onChange]
+    );
+
+    const handleChildChange = useCallback(
+        (childId: string, field: keyof Child, value: string | File | null) => {
+            setHasUserInteracted(true);
+            const updatedChildren = (data.children || []).map((child) =>
+                child.id === childId ? { ...child, [field]: value } : child
+            );
+            onChange({ children: updatedChildren });
+        },
+        [data.children, onChange]
+    );
+
+    const handlePhotoUpload = useCallback(
+        (childId: string, file: File | null) => {
+            handleChildChange(childId, "photo", file);
+        },
+        [handleChildChange]
+    );
+
+    const childErrors = useMemo(() => {
+        if (clientErrors.childErrors) {
+            return clientErrors.childErrors;
+        }
+        return {};
+    }, [clientErrors.childErrors]);
+
+    // Use client errors from hook if user has interacted and showValidation is true
+    const displayErrors = useMemo(() => {
+        return showValidation || hasUserInteracted ? childErrors : {};
+    }, [showValidation, hasUserInteracted, childErrors]);
 
     return (
         <div className="max-w-2xl mx-auto">
@@ -72,28 +130,6 @@ export default function Step4_Children({
                         Tell us about your children so we can find helpers with
                         the right childcare experience (completely optional)
                     </CardDescription>
-
-                    {/* Completion Progress */}
-                    {data.children && data.children.length > 0 && (
-                        <div className="mt-4 space-y-2">
-                            <div className="flex justify-between items-center">
-                                <span className="text-sm text-muted-foreground">
-                                    Children Info Completion
-                                </span>
-                                <span className="text-sm font-medium text-foreground">
-                                    {completionPercentage}%
-                                </span>
-                            </div>
-                            <Progress
-                                value={completionPercentage}
-                                className="h-2"
-                            />
-                            <p className="text-xs text-muted-foreground text-center">
-                                More details help us find better childcare
-                                matches
-                            </p>
-                        </div>
-                    )}
                 </CardHeader>
 
                 <CardContent className="space-y-6">
@@ -157,8 +193,11 @@ export default function Step4_Children({
                             <Button
                                 type="button"
                                 variant="outline"
-                                onClick={() => addChild(onChange)}
+                                onClick={addChild}
                                 className="w-full h-12 border-dashed border-2 hover:border-primary/50"
+                                disabled={data.children.some(
+                                    (child) => !child.birth_date
+                                )}
                             >
                                 <Plus className="w-4 h-4 mr-2" />
                                 Add Child Information (Optional)
@@ -192,10 +231,7 @@ export default function Step4_Children({
                                                 variant="outline"
                                                 size="sm"
                                                 onClick={() =>
-                                                    removeChild(
-                                                        child.id,
-                                                        onChange
-                                                    )
+                                                    removeChild(child.id)
                                                 }
                                                 className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
                                             >
@@ -223,8 +259,7 @@ export default function Step4_Children({
                                                         handleChildChange(
                                                             child.id,
                                                             "name",
-                                                            e.target.value,
-                                                            onChange
+                                                            e.target.value
                                                         )
                                                     }
                                                     className={`h-11 ${
@@ -256,7 +291,7 @@ export default function Step4_Children({
                                                     htmlFor={`child_${child.id}_birth_date`}
                                                     className="text-sm font-medium"
                                                 >
-                                                    Birth Date
+                                                    Birth Date *
                                                 </Label>
                                                 <div className="relative">
                                                     <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -268,8 +303,7 @@ export default function Step4_Children({
                                                             handleChildChange(
                                                                 child.id,
                                                                 "birth_date",
-                                                                e.target.value,
-                                                                onChange
+                                                                e.target.value
                                                             )
                                                         }
                                                         className={`pl-10 h-11 ${
@@ -284,23 +318,20 @@ export default function Step4_Children({
                                                                 .toISOString()
                                                                 .split("T")[0]
                                                         }
+                                                        required
                                                     />
                                                 </div>
-                                                {childErrors[child.id]
+                                                {displayErrors[child.id]
                                                     ?.birth_date && (
                                                     <p className="text-sm text-red-500 flex items-center gap-1">
                                                         <AlertCircle className="w-3 h-3" />
                                                         {
-                                                            childErrors[
+                                                            displayErrors[
                                                                 child.id
                                                             ].birth_date
                                                         }
                                                     </p>
                                                 )}
-                                                <p className="text-xs text-muted-foreground">
-                                                    Optional - Helps match with
-                                                    age-appropriate caregivers
-                                                </p>
                                             </div>
                                         </div>
 
@@ -327,8 +358,7 @@ export default function Step4_Children({
                                                                 null;
                                                             handlePhotoUpload(
                                                                 child.id,
-                                                                file,
-                                                                onChange
+                                                                file
                                                             );
                                                         }}
                                                         className="hidden"
@@ -392,8 +422,7 @@ export default function Step4_Children({
                                                                 onClick={() =>
                                                                     handlePhotoUpload(
                                                                         child.id,
-                                                                        null,
-                                                                        onChange
+                                                                        null
                                                                     )
                                                                 }
                                                                 className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
@@ -419,7 +448,7 @@ export default function Step4_Children({
                                                 Optional - A photo can help
                                                 helpers identify your child, but
                                                 it's completely optional. Max
-                                                file size: 2MB
+                                                file size: 5MB
                                             </p>
                                         </div>
 
@@ -467,7 +496,7 @@ export default function Step4_Children({
                                 <Button
                                     type="button"
                                     variant="outline"
-                                    onClick={() => addChild(onChange)}
+                                    onClick={addChild}
                                     className="w-full h-12 border-dashed border-2 hover:border-primary/50"
                                 >
                                     <Plus className="w-4 h-4 mr-2" />

@@ -28,9 +28,9 @@ import {
     ArrowUp,
     ArrowDown,
 } from "lucide-react";
-
+import { InfoAlert } from "@/Components/Form/InfoAlert";
 import { validateStep4 } from "../../utils/step4Validation";
-import { useStepValidation } from "../../hooks/useStepValidation";
+import { useStepValidation } from "../../../../../hooks/useStepValidation";
 
 interface PhotoData {
     file?: File;
@@ -161,7 +161,6 @@ export default function Step4_Photos({
         fileInputRef.current?.click();
     };
 
-    // Use client errors if available and user has interacted, otherwise use server errors
     const displayErrors =
         showValidation &&
         hasUserInteracted &&
@@ -532,38 +531,21 @@ export default function Step4_Photos({
                     )}
 
                     {/* Info Alert */}
-                    <Alert className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
-                        <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                        <AlertDescription className="text-blue-800 dark:text-blue-200">
-                            <p className="font-medium mb-2">
-                                📸 Photo Guidelines:
-                            </p>
-                            <ul className="text-sm space-y-1 list-disc list-inside">
-                                <li>
-                                    High-quality photos attract more candidates
-                                </li>
-                                <li>
-                                    Show different areas: bedrooms, kitchen,
-                                    common areas
-                                </li>
-                                <li>
-                                    Good lighting makes photos more appealing
-                                </li>
-                                <li>
-                                    The first photo (primary) appears in search
-                                    results
-                                </li>
-                                <li>
-                                    Captions help explain what candidates will
-                                    see
-                                </li>
-                                <li>
-                                    Keep photos current and representative of
-                                    actual conditions
-                                </li>
-                            </ul>
-                        </AlertDescription>
-                    </Alert>
+                    <InfoAlert
+                        icon={
+                            <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                        }
+                        colorClass="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800"
+                        title="📸 Photo Guidelines:"
+                        tips={[
+                            "High-quality photos attract more candidates",
+                            "Show different areas: bedrooms, kitchen, common areas",
+                            "Good lighting makes photos more appealing",
+                            "The first photo (primary) appears in search results",
+                            "Captions help explain what candidates will see",
+                            "Keep photos current and representative of actual conditions",
+                        ]}
+                    />
                 </CardContent>
             </Card>
         </div>

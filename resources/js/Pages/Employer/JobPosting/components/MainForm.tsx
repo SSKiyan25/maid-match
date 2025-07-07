@@ -1,7 +1,7 @@
 import { Head } from "@inertiajs/react";
 import { useState, useCallback } from "react";
-import FormStepper from "./FormStepper";
-import StepNavigation from "./StepNavigation";
+import FormStepper from "@/Components/Form/Stepper";
+import StepNavigation from "../../../../Components/Form/StepNavigation";
 import { useJobPostingForm } from "../hooks/useJobPostingForm";
 import EmployerLayout from "@/Layouts/EmployerLayout";
 
@@ -307,6 +307,9 @@ export default function JobPostingPage({
                         completedSteps={completedSteps}
                         stepValidation={stepValidation}
                         isEditMode={isEdit}
+                        formType="job posting"
+                        gridCols={2} // Job posting with 2 columns
+                        showNavigation={true}
                     />
 
                     {/* Step Content */}

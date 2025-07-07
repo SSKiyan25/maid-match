@@ -1,9 +1,10 @@
 import { Head } from "@inertiajs/react";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import GuestLayout from "@/Layouts/GuestLayout";
-import RegistrationStepper from "./components/RegistrationStepper";
-import StepNavigation from "./components/StepNavigation";
+import FormStepper from "@/Components/Form/Stepper";
+import StepNavigation from "../../../../Components/Form/StepNavigation";
 import { useEmployerRegistration } from "./hooks/useEmployerRegistration";
+import { toast } from "sonner";
 
 // Step Components
 import Step1_BasicInfo from "./components/steps/Step1_BasicInfo";
@@ -30,6 +31,13 @@ export default function EmployerRegister() {
         5: true, // Optional steps are valid by default
         6: true, // Review step is valid by default
     });
+
+    const handleStepClick = (stepId: number) => {
+        if (isStepAccessible(stepId)) {
+            setShowValidation(false);
+            setCurrentStep(stepId);
+        }
+    };
 
     const {
         formData,
@@ -88,12 +96,26 @@ export default function EmployerRegister() {
 
     const currentStepData = steps.find((step) => step.id === currentStep);
 
-    const handleStepValidationChange = (step: number, isValid: boolean) => {
-        setStepValidation((prev) => ({
-            ...prev,
-            [step]: isValid,
-        }));
-    };
+    const handleStepValidationChange = useCallback(
+        (step: number, isValid: boolean) => {
+            setStepValidation((prev) => {
+                const newValidation = { ...prev, [step]: isValid };
+
+                // If current step becomes invalid, disable navigation to other steps
+                // This is handled in the Stepper component, but log it here for debugging
+                if (step === currentStep && !isValid) {
+                    // toast.error(
+                    //     "Current step is invalid. Please fix the errors before proceeding."
+                    // );
+                    console.log(
+                        "Current step became invalid - navigation will be restricted"
+                    );
+                }
+                return newValidation;
+            });
+        },
+        [currentStep]
+    );
 
     const isStepAccessible = (stepId: number): boolean => {
         // Current step is always accessible
@@ -111,8 +133,6 @@ export default function EmployerRegister() {
         const isClientValid = stepValidation[currentStep];
 
         if (!isClientValid) {
-            // Don't proceed if client validation fails
-            console.log(`Step ${currentStep} validation failed on client side`);
             return;
         }
 
@@ -121,9 +141,6 @@ export default function EmployerRegister() {
         if (currentStepInfo?.required) {
             const isServerValid = await validateStep(currentStep, formData);
             if (!isServerValid) {
-                console.log(
-                    `Step ${currentStep} validation failed on server side`
-                );
                 return;
             }
         }
@@ -141,6 +158,18 @@ export default function EmployerRegister() {
     };
 
     const handlePrevious = () => {
+        // Check if any step has validation errors
+        const hasAnyValidationErrors = Object.values(stepValidation).some(
+            (isValid) => !isValid
+        );
+
+        if (hasAnyValidationErrors) {
+            toast.error(
+                "Cannot navigate: There are validation errors in the form"
+            );
+            return;
+        }
+
         setShowValidation(false);
         if (currentStep > 1) {
             setCurrentStep(currentStep - 1);
@@ -148,6 +177,17 @@ export default function EmployerRegister() {
     };
 
     const handleSkip = async () => {
+        // Check if any step has validation errors
+        const hasAnyValidationErrors = Object.values(stepValidation).some(
+            (isValid) => !isValid
+        );
+
+        if (hasAnyValidationErrors) {
+            toast.error("Cannot skip: There are validation errors in the form");
+            console.log("Cannot skip: There are validation errors in the form");
+            return;
+        }
+
         setShowValidation(false);
         if (!currentStepData?.required && currentStep < steps.length) {
             // Mark current step as completed and make next step accessible
@@ -160,6 +200,11 @@ export default function EmployerRegister() {
         }
     };
 
+    const hasAnyValidationErrors = Object.values(stepValidation).some(
+        (isValid) => !isValid
+    );
+    const canProceed = !!stepValidation[currentStep];
+
     const handleSubmit = async () => {
         // Validate all required steps before submitting
         const allRequiredStepsValid = steps.every((step) => {
@@ -170,7 +215,6 @@ export default function EmployerRegister() {
         });
 
         if (!allRequiredStepsValid) {
-            console.log("Cannot submit: Some required steps are invalid");
             return;
         }
 
@@ -181,8 +225,6 @@ export default function EmployerRegister() {
         setShowValidation(false);
         setCurrentStep(step);
     };
-
-    const canProceed = stepValidation[currentStep];
 
     const renderCurrentStep = () => {
         switch (currentStep) {
@@ -279,12 +321,17 @@ export default function EmployerRegister() {
                     </div>
 
                     {/* Progress Stepper */}
-                    <RegistrationStepper
+                    <FormStepper
                         steps={steps}
                         currentStep={currentStep}
+                        onStepClick={handleStepClick}
                         isStepAccessible={isStepAccessible}
                         completedSteps={completedSteps}
                         stepValidation={stepValidation}
+                        isEditMode={false}
+                        formType="employer registration"
+                        gridCols={3} // Registration with 3 columns
+                        showNavigation={true}
                     />
 
                     {/* Step Content */}
@@ -294,7 +341,10 @@ export default function EmployerRegister() {
                     <StepNavigation
                         currentStep={currentStep}
                         totalSteps={steps.length}
-                        canSkip={!currentStepData?.required}
+                        canSkip={
+                            !currentStepData?.required &&
+                            !hasAnyValidationErrors
+                        }
                         isSubmitting={isSubmitting}
                         canProceed={canProceed}
                         onPrevious={handlePrevious}

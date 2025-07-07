@@ -42,12 +42,12 @@ class EmployerRegisterRequest extends FormRequest
             // Children data (Step 4) - Optional
             'has_children' => ['boolean'],
             'children_data' => ['nullable', 'string'], // JSON string
-            'children_photos.*' => ['nullable', 'image', 'max:2048'], // Child photo uploads
+            'children_photos.*' => ['nullable', 'image', 'max:5120'], // Child photo uploads
 
             // Pets data (Step 5) - Optional
             'has_pets' => ['boolean'],
             'pets_data' => ['nullable', 'string'], // JSON string
-            'pets_photos.*' => ['nullable', 'image', 'max:2048'], // Pet photo uploads
+            'pets_photos.*' => ['nullable', 'image', 'max:5120'], // Pet photo uploads
         ];
     }
 

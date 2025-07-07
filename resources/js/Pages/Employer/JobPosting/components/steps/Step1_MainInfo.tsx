@@ -29,10 +29,10 @@ import {
     Utensils,
     Bath,
 } from "lucide-react";
-
+import { InfoAlert } from "@/Components/Form/InfoAlert";
 import { JobPostingForm } from "../../utils/types";
 import { validateStep1 } from "../../utils/step1Validation";
-import { useStepValidation } from "../../hooks/useStepValidation";
+import { useStepValidation } from "../../../../../hooks/useStepValidation";
 
 interface Step1MainInfoProps {
     data: JobPostingForm;
@@ -645,31 +645,19 @@ export default function Step1_MainInfo({
                     </div>
 
                     {/* Info Alert */}
-                    <Alert className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
-                        <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                        <AlertDescription className="text-blue-800 dark:text-blue-200">
-                            <p className="font-medium mb-2">
-                                💡 Tips for a great job posting:
-                            </p>
-                            <ul className="text-sm space-y-1 list-disc list-inside">
-                                <li>
-                                    Be specific about duties and expectations
-                                </li>
-                                <li>
-                                    Mention any special requirements (e.g.,
-                                    cooking skills, pet care)
-                                </li>
-                                <li>
-                                    Include details about working hours and
-                                    schedule flexibility
-                                </li>
-                                <li>
-                                    Be transparent about salary range to attract
-                                    serious candidates
-                                </li>
-                            </ul>
-                        </AlertDescription>
-                    </Alert>
+                    <InfoAlert
+                        icon={
+                            <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                        }
+                        colorClass="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800"
+                        title="💡 Tips for a great job posting:"
+                        tips={[
+                            "Be specific about duties and expectations",
+                            "Mention any special requirements (e.g., cooking skills, pet care)",
+                            "Include details about working hours and schedule flexibility",
+                            "Be transparent about salary range to attract serious candidates",
+                        ]}
+                    />
                 </CardContent>
             </Card>
         </div>

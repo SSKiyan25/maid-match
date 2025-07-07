@@ -21,10 +21,10 @@ import {
     Landmark,
     MapPinned,
 } from "lucide-react";
-
+import { InfoAlert } from "@/Components/Form/InfoAlert";
 import { JobLocation } from "../../utils/types";
 import { validateStep2 } from "../../utils/step2Validation";
-import { useStepValidation } from "../../hooks/useStepValidation";
+import { useStepValidation } from "../../../../../hooks/useStepValidation";
 
 interface Step2LocationProps {
     data: JobLocation;
@@ -93,7 +93,6 @@ export default function Step2_Location({
         );
     };
 
-    // Use client errors if available and user has interacted, otherwise use server errors
     const displayErrors =
         showValidation &&
         hasUserInteracted &&
@@ -528,32 +527,19 @@ export default function Step2_Location({
                     </div>
 
                     {/* Info Alert */}
-                    <Alert className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
-                        <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                        <AlertDescription className="text-blue-800 dark:text-blue-200">
-                            <p className="font-medium mb-2">
-                                🏠 Location Guidelines:
-                            </p>
-                            <ul className="text-sm space-y-1 list-disc list-inside">
-                                <li>
-                                    Be as accurate as possible to help
-                                    applicants find you
-                                </li>
-                                <li>
-                                    Use the privacy setting if you prefer to
-                                    share details later
-                                </li>
-                                <li>
-                                    GPS coordinates help with mapping and
-                                    distance calculations
-                                </li>
-                                <li>
-                                    Good directions can help applicants estimate
-                                    commute time
-                                </li>
-                            </ul>
-                        </AlertDescription>
-                    </Alert>
+                    <InfoAlert
+                        icon={
+                            <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                        }
+                        colorClass="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800"
+                        title="🏠 Location Guidelines:"
+                        tips={[
+                            "Be as accurate as possible to help applicants find you",
+                            "Use the privacy setting if you prefer to share details later",
+                            "GPS coordinates help with mapping and distance calculations",
+                            "Good directions can help applicants estimate commute time",
+                        ]}
+                    />
                 </CardContent>
             </Card>
         </div>
