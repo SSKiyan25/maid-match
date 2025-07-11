@@ -10,6 +10,7 @@ import MaidsList from "./components/MaidsList";
 interface MaidsIndexProps extends PageProps {
     maids: any[];
     agency: any;
+    stats: any;
     flash: {
         success?: string;
         error?: string;
@@ -23,11 +24,7 @@ export default function MaidsIndexPage(props: MaidsIndexProps) {
         sortBy: "newest",
     });
 
-    // Show toast notifications for flash messages
     useEffect(() => {
-        console.log("Props:", props);
-        console.log("Maid Data:", props.maids);
-        console.log("Agency Data:", props.agency);
         if (props.flash?.success) {
             toast.success(props.flash.success);
         }
@@ -48,7 +45,7 @@ export default function MaidsIndexPage(props: MaidsIndexProps) {
         <AgencyLayout>
             <Head title="Agency Maids" />
             <div className="container px-10 py-8 pb-36 sm:py-16 sm:px-24">
-                <MaidsHeader />
+                <MaidsHeader stats={props.stats} />
                 <MaidsFilter onFilterChange={handleFilterChange} />
                 <MaidsList maids={props.maids} filters={filters} />
             </div>

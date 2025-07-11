@@ -34,9 +34,31 @@ class MaidController extends Controller
             ->latest()
             ->get();
 
+        // Calculate statistics
+        $stats = [
+            'total' => AgencyMaid::where('agency_id', $agency->id)->count(),
+            'available' => AgencyMaid::where('agency_id', $agency->id)
+                ->whereHas('maid', function ($query) {
+                    $query->where('status', 'available');
+                })->count(),
+            'employed' => AgencyMaid::where('agency_id', $agency->id)
+                ->whereHas('maid', function ($query) {
+                    $query->where('status', 'employed');
+                })->count(),
+            'verified' => AgencyMaid::where('agency_id', $agency->id)
+                ->whereHas('maid', function ($query) {
+                    $query->where('is_verified', true);
+                })->count(),
+            'premium' => AgencyMaid::where('agency_id', $agency->id)
+                ->where('is_premium', true)->count(),
+            'archived' => AgencyMaid::where('agency_id', $agency->id)
+                ->where('is_archived', true)->count(),
+        ];
+
         return inertia('Agency/Maids/index', [
             'maids' => $maids,
             'agency' => new AgencyResource($agency),
+            'stats' => $stats,
             'flash' => [
                 'success' => session('success'),
                 'error' => session('error'),
