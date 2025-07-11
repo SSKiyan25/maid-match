@@ -1,5 +1,5 @@
 import { Head } from "@inertiajs/react";
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import FormStepper from "@/Components/Form/Stepper";
 import StepNavigation from "@/Components/Form/StepNavigation";
 import { useMultiStepForm, Step } from "@/hooks/useMultiStepForm";

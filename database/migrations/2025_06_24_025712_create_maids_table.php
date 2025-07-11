@@ -30,7 +30,7 @@ return new class extends Migration
             $table->json('availability_schedule')->nullable();
             $table->string('emergency_contact_name')->nullable();
             $table->string('emergency_contact_phone')->nullable();
-            $table->json('verification_badges')->nullable(); // ['id_verified', 'background_check', 'skill_certified']
+            $table->json('verification_badges')->nullable();
             $table->boolean('is_verified')->default(false);
             $table->boolean('is_archived')->default(false);
             $table->timestamps();

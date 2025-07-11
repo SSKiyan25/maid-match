@@ -81,14 +81,15 @@ export function useMultiStepForm({
         }
 
         // Server-side validation for required steps
-        if (currentStepData?.required && onValidateStep) {
-            const isServerValid = await onValidateStep(currentStep, formData);
-            if (!isServerValid) {
-                return;
-            }
-        }
+        // if (currentStepData?.required && onValidateStep) {
+        //     console.log("Validating step on server:", currentStep);
+        //     console.log("Validation Error:", stepValidation[currentStep]);
+        //     const isServerValid = await onValidateStep(currentStep, formData);
+        //     if (!isServerValid) {
+        //         return;
+        //     }
+        // }
 
-        // Proceed to next step
         if (currentStep < steps.length) {
             const newCompletedSteps = new Set(completedSteps);
             newCompletedSteps.add(currentStep);

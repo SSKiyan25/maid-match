@@ -63,8 +63,12 @@ Route::middleware(['auth', 'verified', 'role:agency'])->prefix('agency')->name('
         return Inertia::render('Agency/Dashboard');
     })->name('dashboard');
 
-    // Maid CRUD for agency
-    Route::resource('maids', MaidController::class);
+    // Maid CRUD for agency, except show
+    Route::resource('maids', MaidController::class)
+        ->except(['show'])
+        ->parameters(['maids' => 'agencyMaid']);
+    Route::patch('maids/{user}/archive', [MaidController::class, 'archive'])->name('maids.archive');
+    Route::post('maids/{user}/update-avatar', [MaidController::class, 'updateAvatar'])->name('maids.update-avatar');
 });
 
 Route::middleware(['auth', 'verified', 'role:employer'])->prefix('employer')->name('employer.')->group(function () {

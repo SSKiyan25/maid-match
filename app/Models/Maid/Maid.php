@@ -11,6 +11,7 @@ use App\Models\Employer\Employer;
 use App\Models\User;
 use App\Models\JobPosting\JobApplication;
 use App\Models\Agency\Agency;
+use App\Models\Agency\AgencyMaid;
 
 class Maid extends Model
 {
@@ -18,54 +19,43 @@ class Maid extends Model
 
     protected $fillable = [
         'user_id',
-        'agency_id',
-        'registration_type',
-        'agency_assigned_at',
         'bio',
         'skills',
         'nationality',
         'languages',
+        'social_media_links',
         'marital_status',
         'has_children',
         'expected_salary',
         'is_willing_to_relocate',
+        'preferred_accommodation',
         'earliest_start_date',
         'years_experience',
         'status',
+        'availability_schedule',
+        'emergency_contact_name',
+        'emergency_contact_phone',
+        'verification_badges',
         'is_verified',
         'is_archived',
+        'agency_id',
+        'registration_type',
+        'agency_assigned_at',
     ];
 
     protected $casts = [
         'skills' => 'array',
         'languages' => 'array',
+        'social_media_links' => 'array',
         'has_children' => 'boolean',
         'is_willing_to_relocate' => 'boolean',
         'expected_salary' => 'decimal:2',
         'earliest_start_date' => 'date',
         'years_experience' => 'integer',
+        'availability_schedule' => 'array',
+        'verification_badges' => 'array',
         'is_verified' => 'boolean',
         'is_archived' => 'boolean',
-        'agency_assigned_at' => 'datetime',
-    ];
-
-    const COMMON_SKILLS = [
-        'cleaning' => 'General Cleaning',
-        'cooking' => 'Cooking',
-        'childcare' => 'Childcare',
-        'eldercare' => 'Elder Care',
-        'pet_care' => 'Pet Care',
-        'laundry' => 'Laundry',
-        'ironing' => 'Ironing',
-        'gardening' => 'Gardening',
-        'driving' => 'Driving',
-        'tutoring' => 'Tutoring',
-    ];
-
-    const REGISTRATION_TYPES = [
-        'individual' => 'Individual',
-        'agency' => 'Agency',
-        'none' => 'Not Set',
     ];
 
     /**
@@ -168,12 +158,6 @@ class Maid extends Model
         if ($this->documents()->exists()) $level++;
         if ($this->characterReferences()->exists()) $level++;
         return $level;
-    }
-
-    // Add agency-related accessors
-    public function getRegistrationTypeLabelAttribute()
-    {
-        return self::REGISTRATION_TYPES[$this->registration_type] ?? ucfirst($this->registration_type);
     }
 
     public function getIsManagedByAgencyAttribute()

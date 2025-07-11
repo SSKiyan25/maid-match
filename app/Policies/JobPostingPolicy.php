@@ -39,8 +39,8 @@ class JobPostingPolicy
      */
     public function update(User $user, JobPosting $jobPosting): bool
     {
-        // Only the owner (employer) can update their job posting
-        return $jobPosting->employer_id === $user->id;
+        // Only the employer owner can update their job posting
+        return $user->employer && $jobPosting->employer_id === $user->employer->id;
     }
 
     /**
@@ -48,8 +48,8 @@ class JobPostingPolicy
      */
     public function delete(User $user, JobPosting $jobPosting): bool
     {
-        // Only the owner (employer) can delete/archive their job posting
-        return $jobPosting->employer_id === $user->id;
+        // Only the employer owner can delete/archive their job posting
+        return $user->employer && $jobPosting->employer_id === $user->employer->id;
     }
 
     /**
@@ -57,8 +57,8 @@ class JobPostingPolicy
      */
     public function restore(User $user, JobPosting $jobPosting): bool
     {
-        // Only the owner (employer) can restore their job posting
-        return $jobPosting->employer_id === $user->id;
+        // Only the employer owner can restore their job posting
+        return $user->employer && $jobPosting->employer_id === $user->employer->id;
     }
 
     /**
@@ -66,7 +66,7 @@ class JobPostingPolicy
      */
     public function forceDelete(User $user, JobPosting $jobPosting): bool
     {
-        // Only the owner (employer) can force delete their job posting
-        return $jobPosting->employer_id === $user->id;
+        // Only the employer owner can force delete their job posting
+        return $user->employer && $jobPosting->employer_id === $user->employer->id;
     }
 }

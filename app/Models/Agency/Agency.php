@@ -72,12 +72,9 @@ class Agency extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function maids(): BelongsToMany
+    public function maids(): HasMany
     {
-        return $this->belongsToMany(Maid::class, 'agency_maids')
-            ->withPivot(['status', 'is_premium', 'is_trained', 'agency_notes', 'agency_fee', 'assigned_at', 'status_changed_at'])
-            ->withTimestamps()
-            ->wherePivot('is_archived', false);
+        return $this->hasMany(Maid::class, 'agency_id');
     }
 
     public function agencyMaids(): HasMany
