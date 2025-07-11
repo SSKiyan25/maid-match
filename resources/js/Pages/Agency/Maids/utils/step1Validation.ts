@@ -16,7 +16,6 @@ function validateEmail(email: string | undefined) {
         validateAndSanitizeInput(email ?? "", "email", 255);
     if (!isValid) return { error: securityIssues.join(", ") };
     if (!sanitizedValue) return { error: "Email is required." };
-    // Simple email regex for client-side
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(sanitizedValue))
         return { error: "Invalid email address." };

@@ -19,14 +19,6 @@ import {
 } from "@/Components/ui/select";
 import { Alert, AlertDescription } from "@/Components/ui/alert";
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/Components/ui/table";
-import {
     AlertCircle,
     File,
     FileBadge,
@@ -230,7 +222,6 @@ export default function Step3_Documents({
         setShowForm(true);
 
         // Note: can't set the file input value for security reasons
-        // Will show the current file name in the UI instead
     };
 
     const removeDocument = (index: number) => {

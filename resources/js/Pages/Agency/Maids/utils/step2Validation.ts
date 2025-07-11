@@ -228,7 +228,7 @@ export function validateStep2(data: CreateMaidFormData): Step2ValidationResult {
     if (data.maid.emergency_contact_phone && emergencyPhoneResult.error) {
         errors.emergency_contact_phone = emergencyPhoneResult.error;
         sanitizedMaid.emergency_contact_phone =
-            data.maid.emergency_contact_phone; // keep original for error display
+            data.maid.emergency_contact_phone;
     } else {
         sanitizedMaid.emergency_contact_phone =
             emergencyPhoneResult.value || null;
@@ -282,11 +282,11 @@ export function validateStep2(data: CreateMaidFormData): Step2ValidationResult {
         isValid: Object.keys(errors).length === 0,
         errors,
         sanitizedData: {
-            user: data.user, // pass through from original data
-            profile: data.profile, // pass through from original data
+            user: data.user,
+            profile: data.profile,
             maid: sanitizedMaid as MaidInput,
             agency_maid: sanitizedAgencyMaid as AgencyMaidInput,
-            documents: data.documents ?? [], // pass through from original data
+            documents: data.documents ?? [],
         },
     };
 }

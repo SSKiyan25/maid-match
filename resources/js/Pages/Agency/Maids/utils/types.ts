@@ -43,7 +43,7 @@ export interface MaidInput {
     earliest_start_date?: string | null;
     years_experience?: number;
     status?: "available" | "employed" | "unavailable" | null;
-    availability_schedule?: any[]; // You can define a more specific type if needed
+    availability_schedule?: any[];
     emergency_contact_name?: string | null;
     emergency_contact_phone?: string | null;
     verification_badges?: string[];

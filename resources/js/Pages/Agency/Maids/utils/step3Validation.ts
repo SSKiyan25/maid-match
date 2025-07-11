@@ -74,7 +74,7 @@ function validateDocument(
                         );
                     }
 
-                    // Also verify that both front and back are present
+                    // Verify that both front and back are present
                     const isDocFront = doc.title
                         .toLowerCase()
                         .includes("front");

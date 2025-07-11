@@ -109,7 +109,6 @@ export function useMaidForm(initialData?: Partial<MaidFormData>) {
                 if (updates.documents !== undefined)
                     setDocuments(updates.documents);
 
-                // For nested objects, merge deeply if needed
                 setData((prev) => ({
                     ...prev,
                     ...Object.fromEntries(

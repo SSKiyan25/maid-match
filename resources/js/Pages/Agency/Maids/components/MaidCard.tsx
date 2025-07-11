@@ -1,6 +1,5 @@
 import React from "react";
 import { Badge } from "@/Components/ui/badge";
-import { Button } from "@/Components/ui/button";
 import { Card, CardContent, CardFooter } from "@/Components/ui/card";
 import {
     Tooltip,
@@ -18,17 +17,6 @@ import {
     Users,
     Wallet,
 } from "lucide-react";
-import {
-    AlertDialog,
-    AlertDialogContent,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogTrigger,
-} from "@/Components/ui/alert-dialog";
 import { MaidData } from "@/types";
 
 import MaidAvatarDialog from "./MaidAvatarDialog";
@@ -72,12 +60,6 @@ export default function MaidCard({ maid, onArchive }: MaidCardProps) {
             style: "currency",
             currency: "PHP",
         }).format(parseFloat(amount));
-    };
-
-    const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            console.log("Selected avatar file:", e.target.files[0]);
-        }
     };
 
     return (
