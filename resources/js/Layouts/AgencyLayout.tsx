@@ -24,6 +24,7 @@ import {
     Eye,
     Palette,
     DollarSign,
+    Archive,
 } from "lucide-react";
 import FloatingChatButton from "@/Components/Footer/FloatingChatButton";
 import { Toaster } from "@/Components/ui/sonner";
@@ -69,6 +70,11 @@ const navMain = [
                 title: "Bulk Import",
                 url: "/agency/maids/import",
                 icon: Upload,
+            },
+            {
+                title: "Archived Maids",
+                url: "/agency/maids/archived",
+                icon: Archive,
             },
         ],
     },
