@@ -19,6 +19,7 @@ interface GeneralHeaderProps {
         name: string;
         email: string;
         avatar: string;
+        role: string;
     };
 }
 
@@ -81,7 +82,13 @@ export default function GeneralHeader({ user }: GeneralHeaderProps) {
                             </>
                         )}
                         <DropdownMenuItem asChild>
-                            <Link href={route("employer.profile.index")}>
+                            <Link
+                                href={
+                                    user.role === "agency"
+                                        ? route("agency.settings.profile.index")
+                                        : route("employer.profile.index")
+                                }
+                            >
                                 Profile
                             </Link>
                         </DropdownMenuItem>

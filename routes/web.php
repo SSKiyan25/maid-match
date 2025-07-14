@@ -1,17 +1,30 @@
 <?php
 
+use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
+
+// Auth & Registration Controllers
 use App\Http\Controllers\Auth\AgencyRegisterController;
 use App\Http\Controllers\Auth\EmployerRegisterController;
+
+// Employer Controllers
 use App\Http\Controllers\Employer\JobPostingController;
 use App\Http\Controllers\Employer\Profile\UserUpdateController;
 use App\Http\Controllers\Employer\Profile\ProfileUpdateController;
 use App\Http\Controllers\Employer\Profile\EmployerUpdateController;
 use App\Http\Controllers\Employer\Profile\EmployerChildUpdateController;
 use App\Http\Controllers\Employer\Profile\EmployerPetUpdateController;
+
+// Agency Controllers
 use App\Http\Controllers\Agency\MaidController;
-use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
+use App\Http\Controllers\Agency\Profile\UpdateController;
+use App\Http\Controllers\Agency\Profile\PhotoUpdateController;
+use App\Http\Controllers\Agency\SettingUpdateController;
+
+// General Controllers
+use App\Http\Controllers\UserController;
+
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -69,6 +82,22 @@ Route::middleware(['auth', 'verified', 'role:agency'])->prefix('agency')->name('
         ->parameters(['maids' => 'agencyMaid']);
     Route::patch('maids/{user}/archive', [MaidController::class, 'archive'])->name('maids.archive');
     Route::post('maids/{user}/update-avatar', [MaidController::class, 'updateAvatar'])->name('maids.update-avatar');
+
+    // Agency Profile Settings (user, agency info, and photos in one page)
+    Route::prefix('settings/profile')->name('settings.profile.')->group(function () {
+        Route::get('/', [UpdateController::class, 'index'])->name('index');
+        Route::patch('/user', [UserController::class, 'update'])->name('user.update');
+        Route::patch('/{agency}', [UpdateController::class, 'update'])->name('update');
+
+        // Agency Photos under profile settings
+        Route::post('/photos', [PhotoUpdateController::class, 'store'])->name('photos.store');
+        Route::patch('/photos/{photo}', [PhotoUpdateController::class, 'update'])->name('photos.update');
+        Route::delete('/photos/{photo}', [PhotoUpdateController::class, 'destroy'])->name('photos.destroy');
+    });
+
+
+    // Agency Settings (configuration)
+    Route::patch('settings/configuration/{setting}', [SettingUpdateController::class, 'update'])->name('settings.configuration.update');
 });
 
 Route::middleware(['auth', 'verified', 'role:employer'])->prefix('employer')->name('employer.')->group(function () {

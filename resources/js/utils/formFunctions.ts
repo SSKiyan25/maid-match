@@ -46,3 +46,12 @@ export const formatDate = (dateString?: string): string => {
         return dateString;
     }
 };
+
+export function toDateInputValue(dateString: string) {
+    if (!dateString) return "";
+    const d = new Date(dateString);
+    // Pad month and day with leading zeros
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${d.getFullYear()}-${month}-${day}`;
+}

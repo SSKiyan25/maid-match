@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Agency;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class AgencyRequest extends FormRequest
 {
@@ -20,10 +21,17 @@ class AgencyRequest extends FormRequest
      */
     public function rules(): array
     {
+        $agencyId = $this->route('agency');
+
         $rules = [
             'user_id' => ['required', 'exists:users,id'],
             'name' => ['required', 'string', 'max:255'],
-            'license_number' => ['nullable', 'string', 'max:255', 'unique:agencies,license_number,' . $this->route('agency')],
+            'license_number' => [
+                'nullable',
+                'string',
+                'max:255',
+                Rule::unique('agencies', 'license_number')->ignore($agencyId),
+            ],
             'license_photo_front' => ['nullable', 'image', 'max:5120'], // 5MB max
             'license_photo_back' => ['nullable', 'image', 'max:5120'], // 5MB max
             'description' => ['nullable', 'string'],
@@ -50,7 +58,7 @@ class AgencyRequest extends FormRequest
                 'required',
                 'string',
                 'max:255',
-                'unique:agencies,license_number,' . $this->route('agency'),
+                Rule::unique('agencies', 'license_number')->ignore($agencyId),
             ];
         }
 

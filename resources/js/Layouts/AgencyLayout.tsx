@@ -22,8 +22,8 @@ import {
     Star,
     BadgeCheck,
     Eye,
-    Palette,
-    DollarSign,
+    PhilippinePeso,
+    Bolt,
     Archive,
 } from "lucide-react";
 import FloatingChatButton from "@/Components/Footer/FloatingChatButton";
@@ -114,19 +114,14 @@ const navMain = [
                 icon: Building2,
             },
             {
-                title: "Customization",
-                url: "/agency/settings/customization",
-                icon: Palette,
-            },
-            {
                 title: "Placement Fee",
                 url: "/agency/settings/fees",
-                icon: DollarSign,
+                icon: PhilippinePeso,
             },
             {
-                title: "Branding",
-                url: "/agency/settings/branding",
-                icon: BadgeCheck,
+                title: "Agency Configuration",
+                url: "/agency/settings/configuration",
+                icon: Bolt,
             },
         ],
     },
