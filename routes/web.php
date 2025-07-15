@@ -22,6 +22,9 @@ use App\Http\Controllers\Agency\Profile\UpdateController;
 use App\Http\Controllers\Agency\Profile\PhotoUpdateController;
 use App\Http\Controllers\Agency\SettingUpdateController;
 
+// Browse Controllers
+use App\Http\Controllers\Browse\ForJobPostsController;
+
 // General Controllers
 use App\Http\Controllers\UserController;
 
@@ -136,6 +139,17 @@ Route::middleware(['auth', 'verified', 'role:employer'])->prefix('employer')->na
                 'destroy' => 'pet.destroy',
             ]);
     });
+});
+
+Route::prefix('browse')->name('browse.')->group(function () {
+    Route::get('job-posts', [ForJobPostsController::class, 'index'])
+        ->name('job-posts.index');
+
+    Route::get('job-posts/near-you', [ForJobPostsController::class, 'nearYou'])
+        ->name('job-posts.near-you');
+
+    Route::get('job-posts/recommended', [ForJobPostsController::class, 'recommended'])
+        ->name('job-posts.recommended');
 });
 
 require __DIR__ . '/auth.php';

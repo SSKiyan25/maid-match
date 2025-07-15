@@ -36,7 +36,7 @@ interface AgencyLayoutProps extends PropsWithChildren {
 const agencyMobileLinks: MobileNavLink[] = [
     { label: "Dashboard", icon: Home, href: "/agency/dashboard" },
     { label: "Maids", icon: Users, href: "/agency/maids" },
-    { label: "Jobs", icon: Briefcase, href: "/agency/job-posts" },
+    { label: "Jobs", icon: Briefcase, href: "/browse/job-posts" },
     { label: "Settings", icon: Settings, href: "/agency/settings/profile" },
 ];
 
@@ -130,7 +130,7 @@ const navMain = [
 const browseItems = [
     { name: "Browse for maids", url: "/maids/browse", icon: Eye },
     { name: "Browse for employers", url: "/employers/browse", icon: Star },
-    { name: "Browse for Jobs", url: "/jobs/browse", icon: Briefcase },
+    { name: "Browse for Jobs", url: "/browse/job-posts", icon: Briefcase },
 ];
 
 export default function AgencyLayout({
