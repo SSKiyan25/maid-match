@@ -10,19 +10,23 @@ import { ChevronLeft } from "lucide-react";
 import { PageProps } from "@/types";
 
 export default function Show() {
-    const { jobPost, agencyMaids } =
-        usePage<PageProps<{ jobPost: any; agencyMaids: any }>>().props;
+    const { jobPost, agencyMaids, agencyCredits, agencyApplications } = usePage<
+        PageProps<{
+            jobPost: any;
+            agencyMaids: any;
+            agencyCredits: any;
+            agencyApplications: any[];
+        }>
+    >().props;
     const [selectedMaids, setSelectedMaids] = useState<any[]>([]);
-    const [availableCredits, setAvailableCredits] = useState(10); // Placeholder for agency credits
-    console.log("Job Post:", jobPost);
-    console.log("Agency Maids:", agencyMaids);
+
     const handleSelectMaid = (maid: any) => {
         if (selectedMaids.some((m: any) => m.id === maid.id)) {
             setSelectedMaids(
                 selectedMaids.filter((m: any) => m.id !== maid.id)
             );
         } else {
-            if (selectedMaids.length < availableCredits) {
+            if (selectedMaids.length < agencyCredits) {
                 setSelectedMaids([...selectedMaids, maid]);
             }
         }
@@ -71,14 +75,16 @@ export default function Show() {
                         <MaidSelectionList
                             maids={agencyMaids}
                             selectedMaids={selectedMaids}
+                            setSelectedMaids={setSelectedMaids}
                             onSelectMaid={handleSelectMaid}
-                            availableCredits={availableCredits}
+                            availableCredits={agencyCredits}
                             jobPost={jobPost}
+                            agencyApplications={agencyApplications}
                         />
 
                         <ApplicationSummary
                             selectedMaids={selectedMaids}
-                            availableCredits={availableCredits}
+                            availableCredits={agencyCredits}
                             job={jobPost}
                             onRemoveMaid={handleRemoveMaid}
                         />

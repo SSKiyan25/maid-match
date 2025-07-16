@@ -125,7 +125,6 @@ export default function JobPostSummary({ job }: { job: any }) {
                     </div>
                 </div>
 
-                {/* See Employer Profile Button at the bottom */}
                 <Button
                     variant="outline"
                     className="w-full"

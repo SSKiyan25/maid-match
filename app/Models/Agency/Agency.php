@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use App\Models\Agency\AgencyCredit;
 use App\Models\User;
 use App\Models\Maid\Maid;
 
@@ -95,6 +95,11 @@ class Agency extends Model
     public function inquiries(): HasMany
     {
         return $this->hasMany(AgencyInquiry::class);
+    }
+
+    public function credits(): HasMany
+    {
+        return $this->hasMany(AgencyCredit::class, 'agency_id');
     }
 
     /**

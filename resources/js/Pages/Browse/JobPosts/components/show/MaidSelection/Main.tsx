@@ -5,19 +5,23 @@ import { FilterOptions, SortOption } from "./types";
 import MaidSelectionHeader from "./Header";
 import MaidSelectionContent from "./Content";
 import MaidDetailsModal from "../MaidDetailsModal";
+import { toast } from "sonner";
 
 export default function MaidSelectionList({
     maids,
     selectedMaids,
-    onSelectMaid,
+    setSelectedMaids,
     availableCredits,
     jobPost,
+    agencyApplications,
 }: {
     maids: any[];
     selectedMaids: any[];
-    onSelectMaid: (maid: any) => void;
+    setSelectedMaids: (maids: any[] | ((prev: any[]) => any[])) => void;
+    onSelectMaid?: (maid: any) => void;
     availableCredits: number;
     jobPost: any;
+    agencyApplications: any[];
 }) {
     const [searchQuery, setSearchQuery] = useState("");
     const [modalMaid, setModalMaid] = useState<any | null>(null);
@@ -27,6 +31,7 @@ export default function MaidSelectionList({
         isTrained: null,
         matchQuality: null,
         sameLocation: null,
+        hideApplied: false,
     });
     const [sortOption, setSortOption] = useState<SortOption>("match_desc");
     const [showFilters, setShowFilters] = useState(false);
@@ -49,9 +54,44 @@ export default function MaidSelectionList({
             searchQuery,
             filterOptions,
             sortOption,
-            jobPost
+            jobPost,
+            agencyApplications
         );
-    }, [maidsWithMatchScores, searchQuery, filterOptions, sortOption, jobPost]);
+    }, [
+        maidsWithMatchScores,
+        searchQuery,
+        filterOptions,
+        sortOption,
+        jobPost,
+        agencyApplications,
+    ]);
+
+    const onSelectMaid = (maid: any) => {
+        const hasAlreadyApplied = agencyApplications.some(
+            (app) => app.maid_id === maid.id
+        );
+
+        if (hasAlreadyApplied) {
+            toast.error("This maid has already applied to this job.");
+            return;
+        }
+
+        // Existing selection logic
+        setSelectedMaids((prev: any[]) => {
+            const isSelected = prev.some((m) => m.id === maid.id);
+            if (isSelected) {
+                return prev.filter((m) => m.id !== maid.id);
+            } else {
+                if (prev.length >= availableCredits) {
+                    toast.error(
+                        `You can only select up to ${availableCredits} maids.`
+                    );
+                    return prev;
+                }
+                return [...prev, maid];
+            }
+        });
+    };
 
     // Get all unique statuses from the maid data
     const uniqueStatuses = Array.from(new Set(maids.map((m) => m.maid.status)));
@@ -81,6 +121,7 @@ export default function MaidSelectionList({
             isTrained: null,
             matchQuality: null,
             sameLocation: null,
+            hideApplied: false,
         });
         setSearchQuery("");
         setSortOption("match_desc");
@@ -120,6 +161,7 @@ export default function MaidSelectionList({
                     availableCredits={availableCredits}
                     jobPost={jobPost}
                     setModalMaid={setModalMaid}
+                    agencyApplications={agencyApplications}
                 />
             </Card>
 
@@ -133,13 +175,13 @@ export default function MaidSelectionList({
     );
 }
 
-// Helper function moved outside the component
 function filterAndSortMaids(
     maidsWithMatchScores: any[],
     searchQuery: string,
     filterOptions: FilterOptions,
     sortOption: SortOption,
-    jobPost: any
+    jobPost: any,
+    agencyApplications: any[] = []
 ) {
     return maidsWithMatchScores
         .filter((maidRecord) => {
@@ -173,6 +215,10 @@ function filterAndSortMaids(
                     maid.user.profile.city.toLowerCase() ===
                         jobPost.location.city.toLowerCase());
 
+            const matchesHideApplied =
+                !filterOptions.hideApplied ||
+                !agencyApplications.some((app) => app.maid_id === maid.id);
+
             let matchesQuality = true;
             if (filterOptions.matchQuality) {
                 const percentage = maidRecord.matchResult.percentage;
@@ -199,7 +245,8 @@ function filterAndSortMaids(
                 matchesPremium &&
                 matchesTrained &&
                 matchesQuality &&
-                matchesSameLocation
+                matchesSameLocation &&
+                matchesHideApplied
             );
         })
         .sort((a, b) => {

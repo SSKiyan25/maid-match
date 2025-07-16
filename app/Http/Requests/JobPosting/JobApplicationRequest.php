@@ -16,7 +16,8 @@ class JobApplicationRequest extends FormRequest
         return auth()->check() &&
             (auth()->user()->hasRole('maid') ||
                 auth()->user()->hasRole('employer') ||
-                auth()->user()->hasRole('admin'));
+                auth()->user()->hasRole('admin') ||
+                auth()->user()->hasRole('agency'));
     }
 
     /**

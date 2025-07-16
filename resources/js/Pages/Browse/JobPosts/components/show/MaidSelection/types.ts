@@ -2,8 +2,9 @@ export type FilterOptions = {
     status: string[];
     isPremium: boolean | null;
     isTrained: boolean | null;
-    matchQuality: string | null; // "excellent", "good", "fair", "poor"
+    matchQuality: string | null;
     sameLocation: boolean | null;
+    hideApplied: boolean;
 };
 
 export type SortOption =
@@ -13,4 +14,4 @@ export type SortOption =
     | "experience_desc"
     | "salary_asc"
     | "salary_desc"
-    | "match_desc"; // Sort by match percentage
+    | "match_desc";

@@ -1,13 +1,21 @@
 import { usePage } from "@inertiajs/react";
 import { Head } from "@inertiajs/react";
+import { useEffect } from "react";
 import AgencyLayout from "@/Layouts/AgencyLayout";
 import SearchBar from "./components/SearchBar";
 import NearYouSection from "./components/NearYouSection";
 import RecommendedSection from "./components/RecommendedSection";
 import AllJobsSection from "./components/AllJobsSection";
+import { toast } from "sonner";
 
 export default function JobPostsIndex() {
-    const jobPosts = (usePage().props as any).jobPosts ?? [];
+    const { jobPosts = [], flash } = usePage().props as any;
+
+    useEffect(() => {
+        if (flash?.success) {
+            toast.success(flash.success);
+        }
+    }, [flash?.success]);
 
     return (
         <AgencyLayout sidebarDefaultOpen={false}>

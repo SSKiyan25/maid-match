@@ -283,6 +283,25 @@ function FilterPanel({
                         Trained Only
                     </label>
                 </div>
+
+                <div className="flex items-center space-x-2">
+                    <Checkbox
+                        id="hideApplied"
+                        checked={filterOptions.hideApplied}
+                        onCheckedChange={(checked) =>
+                            setFilterOptions((prev) => ({
+                                ...prev,
+                                hideApplied: checked === true,
+                            }))
+                        }
+                    />
+                    <label
+                        htmlFor="hideApplied"
+                        className="text-sm font-medium"
+                    >
+                        Hide Already Applied
+                    </label>
+                </div>
             </div>
 
             <div className="flex justify-end">

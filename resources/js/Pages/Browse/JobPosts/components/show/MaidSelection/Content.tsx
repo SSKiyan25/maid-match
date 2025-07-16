@@ -9,6 +9,7 @@ export default function MaidSelectionContent({
     availableCredits,
     jobPost,
     setModalMaid,
+    agencyApplications,
 }: {
     processedMaids: any[];
     selectedMaids: any[];
@@ -17,6 +18,7 @@ export default function MaidSelectionContent({
     availableCredits: number;
     jobPost: any;
     setModalMaid: (maid: any) => void;
+    agencyApplications: any[];
 }) {
     return (
         <CardContent>
@@ -38,6 +40,7 @@ export default function MaidSelectionContent({
                             selectedMaidsCount={selectedMaids.length}
                             jobPost={jobPost}
                             setModalMaid={setModalMaid}
+                            agencyApplications={agencyApplications}
                         />
                     ))}
                 </div>

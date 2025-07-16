@@ -46,7 +46,6 @@ export default function MaidDetailsModal({
     if (!maid) return null;
     const profile = maid.user.profile;
     const avatar = maid.user.avatar;
-    const isAvailable = maid.status === "available";
     const hasMatchData = maid.matchResult && jobPost;
 
     // Match data visualization

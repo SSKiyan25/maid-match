@@ -19,6 +19,8 @@ import {
     DialogDescription,
 } from "@/Components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { router } from "@inertiajs/react";
+import { toast } from "sonner";
 
 export default function ApplicationSummary({
     selectedMaids,
@@ -34,10 +36,32 @@ export default function ApplicationSummary({
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleSubmit = () => {
+        console.log("Submitting application for maids:", selectedMaids);
         setIsSubmitting(true);
-        setTimeout(() => {
-            setIsSubmitting(false);
-        }, 1500);
+        router.post(
+            route("browse.job-applications.apply", { jobPost: job.id }),
+            {
+                maid_ids: selectedMaids.map((m) => m.id),
+                description: "",
+                job_posting_id: job.id,
+            },
+            {
+                onSuccess: (page) => {
+                    setIsSubmitting(false);
+                    toast.success("Application submitted successfully!");
+                    if (typeof page.props.redirect === "string") {
+                        router.visit(page.props.redirect);
+                    }
+                },
+                onError: (errors) => {
+                    setIsSubmitting(false);
+                    console.log("Error submitting application:", errors);
+                    toast.error(
+                        errors.message || "Failed to submit application"
+                    );
+                },
+            }
+        );
     };
 
     return (

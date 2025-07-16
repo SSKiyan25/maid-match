@@ -1,4 +1,4 @@
-import { MapPin, Plus, Check, Info, Percent } from "lucide-react";
+import { MapPin, Plus, Check, Info, Percent, AlertCircle } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import { Button } from "@/Components/ui/button";
 import { Badge } from "@/Components/ui/badge";
@@ -24,6 +24,7 @@ export default function MaidCard({
     selectedMaidsCount,
     jobPost,
     setModalMaid,
+    agencyApplications,
 }: {
     maidRecord: any;
     isSelected: boolean;
@@ -32,6 +33,7 @@ export default function MaidCard({
     selectedMaidsCount: number;
     jobPost: any;
     setModalMaid: (maid: any) => void;
+    agencyApplications: any[];
 }) {
     const maid = maidRecord.maid;
     const matchResult = maidRecord.matchResult;
@@ -39,16 +41,20 @@ export default function MaidCard({
     const avatar = maid.user.avatar;
     const isAvailable = maid.status === "available";
 
+    const existingApplication = agencyApplications?.find(
+        (app) => app.maid_id === maid.id
+    );
+    const hasApplied = !!existingApplication;
+    const applicationStatus = existingApplication?.status || null;
+
     const matchColor = getMatchColorClass(matchResult.percentage);
     const matchLabel = getMatchQualityLabel(matchResult.percentage);
 
     return (
         <div
             className={`flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 rounded-lg border ${
-                isSelected
-                    ? "border-primary border-2 bg-primary/5"
-                    : matchResult.percentage >= 80
-                    ? "border-green-300 bg-green-50 text-primary"
+                matchResult.percentage >= 80
+                    ? "border-green-300 bg-accent text-accent"
                     : "border-muted-foreground/20"
             } transition-colors ${!isAvailable ? "opacity-70" : ""}`}
         >
@@ -66,25 +72,39 @@ export default function MaidCard({
                 </Avatar>
                 <div className="flex-1">
                     <div className="flex items-center flex-wrap gap-2">
-                        <h4 className="font-medium">
+                        <h4
+                            className={`font-medium ${
+                                matchResult.percentage >= 80
+                                    ? "text-accent-foreground"
+                                    : ""
+                            }`}
+                        >
                             {profile.first_name} {profile.last_name}
                         </h4>
-                        <span
-                            className={`text-xs px-2 py-0.5 rounded-full capitalize ${getStatusColor(
-                                maid.status
-                            )}`}
-                        >
-                            {maid.status}
-                        </span>
+                        {hasApplied ? (
+                            <span className="text-xs px-2 py-0.5 rounded-full capitalize bg-blue-100 text-blue-800">
+                                Applied:{" "}
+                                {applicationStatus.charAt(0).toUpperCase() +
+                                    applicationStatus.slice(1)}
+                            </span>
+                        ) : (
+                            <span
+                                className={`text-xs px-2 py-0.5 rounded-full capitalize ${getStatusColor(
+                                    maid.status
+                                )}`}
+                            >
+                                {maid.status}
+                            </span>
+                        )}
 
                         {/* Match quality badge */}
                         <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <span
-                                        className={`text-xs px-2 py-0.5 rounded-full flex items-center bg-secondary/50 border ${
+                                        className={`text-xs px-2 py-0.5 rounded-full flex items-center border ${
                                             matchResult.percentage >= 80
-                                                ? "border-green-300 text-primary"
+                                                ? "bg-primary-foreground border-green-300 text-primary "
                                                 : matchResult.percentage >= 60
                                                 ? "border-blue-300 text-blue-700"
                                                 : matchResult.percentage >= 40
@@ -136,20 +156,38 @@ export default function MaidCard({
                                     : "bg-gray-200"
                             }`}
                         />
-                        <span className="text-xs text-muted-foreground">
+                        <span
+                            className={`text-xs ${
+                                matchResult.percentage >= 80
+                                    ? "text-accent-foreground"
+                                    : "text-muted-foreground"
+                            }`}
+                        >
                             {matchLabel}
                         </span>
                     </div>
 
                     {/* Experience, salary and location */}
-                    <div className="flex flex-wrap items-center text-xs text-muted-foreground mt-1">
+                    <div
+                        className={`flex flex-wrap items-center text-xs mt-1 ${
+                            matchResult.percentage >= 80
+                                ? "text-accent-foreground"
+                                : "text-muted-foreground"
+                        }`}
+                    >
                         <span className="mr-3">
                             {maid.years_experience} years exp.
                         </span>
 
                         {profile.address?.city && (
                             <span className="flex items-center">
-                                <MapPin className="h-3 w-3 mr-1 text-slate-400" />
+                                <MapPin
+                                    className={`h-3 w-3 mr-1 ${
+                                        matchResult.percentage >= 80
+                                            ? "text-accent-foreground"
+                                            : "text-slate-400"
+                                    }`}
+                                />
                                 <span>
                                     {profile.address.barangay &&
                                         `${profile.address.barangay}, `}
@@ -212,7 +250,13 @@ export default function MaidCard({
                                     </Badge>
                                 ))}
                         {maid.skills && maid.skills.length > 3 && (
-                            <span className="text-xs text-muted-foreground">
+                            <span
+                                className={`text-xs ${
+                                    matchResult.percentage >= 80
+                                        ? "text-accent-foreground"
+                                        : "text-muted-foreground"
+                                }`}
+                            >
                                 +{maid.skills.length - 3} more
                             </span>
                         )}
@@ -227,12 +271,17 @@ export default function MaidCard({
                     onClick={() => onSelectMaid(maid)}
                     disabled={
                         !isAvailable ||
+                        hasApplied ||
                         (!isSelected && selectedMaidsCount >= availableCredits)
                     }
                 >
                     {isSelected ? (
                         <>
                             <Check className="h-4 w-4 mr-1" /> Selected
+                        </>
+                    ) : hasApplied ? (
+                        <>
+                            <AlertCircle className="h-4 w-4 mr-1" /> Applied
                         </>
                     ) : (
                         <>

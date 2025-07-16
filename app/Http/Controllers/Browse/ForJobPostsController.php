@@ -21,7 +21,10 @@ class ForJobPostsController extends Controller
             ->get();
 
         return inertia('Browse/JobPosts/index', [
-            'jobPosts' => $jobPosts
+            'jobPosts' => $jobPosts,
+            'flash' => [
+                'success' => session('success'),
+            ],
         ]);
     }
 

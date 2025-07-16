@@ -142,7 +142,7 @@ Route::middleware(['auth', 'verified', 'role:employer'])->prefix('employer')->na
     });
 });
 
-Route::prefix('browse')->name('browse.')->group(function () {
+Route::middleware(['auth'])->prefix('browse')->name('browse.')->group(function () {
     Route::get('job-posts', [ForJobPostsController::class, 'index'])
         ->name('job-posts.index');
 
@@ -154,6 +154,8 @@ Route::prefix('browse')->name('browse.')->group(function () {
 
     Route::get('job-applications/{jobPost}', [AgencyJobApplicationController::class, 'show'])
         ->name('job-applications.show');
+    Route::post('job-applications/{jobPost}/apply', [AgencyJobApplicationController::class, 'apply'])
+        ->name('job-applications.apply');
 });
 
 require __DIR__ . '/auth.php';
