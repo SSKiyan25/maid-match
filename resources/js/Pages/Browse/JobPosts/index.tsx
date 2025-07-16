@@ -8,7 +8,6 @@ import AllJobsSection from "./components/AllJobsSection";
 
 export default function JobPostsIndex() {
     const jobPosts = (usePage().props as any).jobPosts ?? [];
-    console.log("JobPostsIndex", { jobPosts });
 
     return (
         <AgencyLayout sidebarDefaultOpen={false}>

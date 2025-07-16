@@ -24,6 +24,7 @@ use App\Http\Controllers\Agency\SettingUpdateController;
 
 // Browse Controllers
 use App\Http\Controllers\Browse\ForJobPostsController;
+use App\Http\Controllers\JobApplication\AgencyJobApplicationController;
 
 // General Controllers
 use App\Http\Controllers\UserController;
@@ -150,6 +151,9 @@ Route::prefix('browse')->name('browse.')->group(function () {
 
     Route::get('job-posts/recommended', [ForJobPostsController::class, 'recommended'])
         ->name('job-posts.recommended');
+
+    Route::get('job-applications/{jobPost}', [AgencyJobApplicationController::class, 'show'])
+        ->name('job-applications.show');
 });
 
 require __DIR__ . '/auth.php';

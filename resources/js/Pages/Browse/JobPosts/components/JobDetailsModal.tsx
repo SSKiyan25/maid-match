@@ -412,7 +412,15 @@ export default function JobDetailsModal({
                         >
                             Close
                         </Button>
-                        <Button className="w-full">Apply Now</Button>
+                        <Button asChild className="w-full">
+                            <Link
+                                href={route("browse.job-applications.show", {
+                                    jobPost: job.id,
+                                })}
+                            >
+                                Apply Now
+                            </Link>
+                        </Button>
                     </div>
                 </DialogFooter>
             </DialogContent>
