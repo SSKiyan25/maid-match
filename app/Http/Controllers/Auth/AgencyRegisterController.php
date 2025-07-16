@@ -60,6 +60,12 @@ class AgencyRegisterController extends Controller
                 'is_archived' => false,
             ]);
 
+            $agency->credits()->create([
+                'amount' => 25,
+                'type' => 'initial',
+                'description' => 'Initial signup credits',
+            ]);
+
             return $user;
         });
 
