@@ -21,14 +21,14 @@ class JobApplication extends Model
         'description',
         'proposed_salary',
         'applied_at',
-        'reviewed_at',
+        'hired_at',
         'is_archived',
     ];
 
     protected $casts = [
         'proposed_salary' => 'decimal:2',
         'applied_at' => 'datetime',
-        'reviewed_at' => 'datetime',
+        'hired_at' => 'datetime',
         'ranking_position' => 'integer',
         'is_archived' => 'boolean',
     ];
@@ -38,10 +38,9 @@ class JobApplication extends Model
      */
     const STATUSES = [
         'pending' => 'Pending Review',
-        'reviewed' => 'Reviewed',
         'shortlisted' => 'Shortlisted',
         'rejected' => 'Rejected',
-        'accepted' => 'Accepted',
+        'hired' => 'Hired',
         'withdrawn' => 'Withdrawn',
     ];
 

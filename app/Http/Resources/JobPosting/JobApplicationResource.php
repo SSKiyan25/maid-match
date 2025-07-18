@@ -25,7 +25,7 @@ class JobApplicationResource extends JsonResource
             'description' => $this->description,
             'proposed_salary' => $this->proposed_salary,
             'applied_at' => $this->applied_at?->toISOString(),
-            'reviewed_at' => $this->reviewed_at?->toISOString(),
+            'hired_at' => $this->reviewed_at?->toISOString(),
             'is_archived' => $this->is_archived,
 
             // Computed attributes from the model

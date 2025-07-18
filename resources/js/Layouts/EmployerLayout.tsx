@@ -41,7 +41,11 @@ interface EmployerLayoutProps extends PropsWithChildren {
 const employerMobileLinks: MobileNavLink[] = [
     { label: "Dashboard", icon: Home, href: "/employer/dashboard" },
     { label: "Jobs", icon: Briefcase, href: "/employer/job-postings" },
-    { label: "Profile", icon: UserIcon, href: "/employer/profile" },
+    {
+        label: "Applicants",
+        icon: UserRoundSearch,
+        href: "/employer/job-applications",
+    },
     { label: "Browse", icon: Search, href: "/employer/browse" },
 ];
 
@@ -85,7 +89,7 @@ const navMain = [
         items: [
             {
                 title: "All Applicants",
-                url: "#",
+                url: "/employer/job-applications",
                 icon: UserRoundSearch,
             },
             {
