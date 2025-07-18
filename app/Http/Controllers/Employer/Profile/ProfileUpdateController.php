@@ -7,6 +7,24 @@ use App\Http\Requests\ProfileUpdateRequest;
 
 class ProfileUpdateController extends Controller
 {
+
+    public function index()
+    {
+        $user = auth()->user()->load([
+            'profile',
+            'employer.children',
+            'employer.pets',
+        ]);
+
+        return inertia('Employer/Profile/index', [
+            'user' => $user,
+            'profile' => $user->profile,
+            'employer' => $user->employer,
+            'children' => $user->employer?->children ?? [],
+            'pets' => $user->employer?->pets ?? [],
+        ]);
+    }
+
     public function update(ProfileUpdateRequest $request)
     {
         $profile = auth()->user()->profile;

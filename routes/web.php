@@ -15,6 +15,7 @@ use App\Http\Controllers\Employer\Profile\ProfileUpdateController;
 use App\Http\Controllers\Employer\Profile\EmployerUpdateController;
 use App\Http\Controllers\Employer\Profile\EmployerChildUpdateController;
 use App\Http\Controllers\Employer\Profile\EmployerPetUpdateController;
+use App\Http\Controllers\Employer\JobApplicationController;
 
 // Agency Controllers
 use App\Http\Controllers\Agency\MaidController;
@@ -113,11 +114,15 @@ Route::middleware(['auth', 'verified', 'role:employer'])->prefix('employer')->na
     Route::patch('job-postings/{jobPosting}/archive', [JobPostingController::class, 'archive'])->name('job-postings.archive');
     Route::get('job-postings-archived', [JobPostingController::class, 'archived'])->name('job-postings.archived');
 
-    Route::get('/profile', [UserUpdateController::class, 'index'])->name('profile.index');
+    // Employer Job Applications Page
+    Route::get('job-applications', [JobApplicationController::class, 'index'])->name('job-applications.index');
+    Route::patch('job-applications/{application}/status', [JobApplicationController::class, 'updateStatus'])->name('job-applications.update-status');
+
+    Route::get('/profile', [ProfileUpdateController::class, 'index'])->name('profile.index');
 
     // Employer Profile Update routes
     Route::prefix('profile')->name('profile.')->group(function () {
-        Route::patch('/user', [UserUpdateController::class, 'update'])->name('user.update');
+        Route::patch('/user', [UserController::class, 'update'])->name('user.update');
         Route::patch('/profile', [ProfileUpdateController::class, 'update'])->name('profile.update');
         Route::patch('/employer', [EmployerUpdateController::class, 'update'])->name('employer.update');
 
