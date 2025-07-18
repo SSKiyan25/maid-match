@@ -30,7 +30,7 @@ import { formatCurrency } from "@/utils/useGeneralUtils";
 import {
     getMatchColorClass,
     getMatchQualityLabel,
-} from "../../utils/matchingUtils";
+} from "@/utils/matchingUtils";
 
 export default function MaidDetailsModal({
     maid,

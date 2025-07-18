@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { Card } from "@/Components/ui/card";
-import { calculateMaidJobMatch } from "../../../utils/matchingUtils";
+import { calculateMaidJobMatch } from "@/utils/matchingUtils";
 import { FilterOptions, SortOption } from "./types";
 import MaidSelectionHeader from "./Header";
 import MaidSelectionContent from "./Content";

@@ -14,7 +14,7 @@ import {
     getMatchColorClass,
     getMatchQualityLabel,
     getStatusColor,
-} from "../../../utils/matchingUtils";
+} from "@/utils/matchingUtils";
 
 export default function MaidCard({
     maidRecord,

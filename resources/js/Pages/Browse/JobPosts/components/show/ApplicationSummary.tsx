@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import { AlertCircle, X, SendIcon, Loader2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/Components/ui/alert";
 import { getInitials } from "@/utils/useGeneralUtils";
-import { calculateMaidJobMatch } from "../../utils/matchingUtils";
+import { calculateMaidJobMatch } from "@/utils/matchingUtils";
 import {
     Dialog,
     DialogContent,
