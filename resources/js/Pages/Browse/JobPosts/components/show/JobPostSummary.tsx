@@ -1,6 +1,7 @@
 import { MapPin, Calendar, Home, PhilippinePeso, User } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Badge } from "@/Components/ui/badge";
+import { Link } from "@inertiajs/react";
 import { formatCurrency } from "@/utils/useGeneralUtils";
 import { getAccommodationLabel, getDayOffLabel } from "../../utils/jobUtils";
 import { Button } from "@/Components/ui/button";
@@ -111,9 +112,7 @@ export default function JobPostSummary({ job }: { job: any }) {
                 <div>
                     <h4 className="text-sm font-medium mb-1">Employer:</h4>
                     <span className="font-medium text-sm block mb-2">
-                        {job.employer?.user?.profile
-                            ? `${job.employer.user.profile.first_name} ${job.employer.user.profile.last_name}`
-                            : "N/A"}
+                        {job.employer?.user?.full_name}
                     </span>
                     <div className="text-sm mb-2">
                         <p>Family Size: {job.employer?.family_size || "N/A"}</p>
@@ -127,11 +126,15 @@ export default function JobPostSummary({ job }: { job: any }) {
 
                 <Button
                     variant="outline"
-                    className="w-full"
-                    // onClick={() => ...}
+                    className="w-full flex flex-row items-center justify-center"
                 >
-                    <User className="h-4 w-4 mr-2" />
-                    See Employer Profile
+                    <Link
+                        href={route("browse.employers.show", job.employer?.id)}
+                        className="flex items-center gap-2"
+                    >
+                        <User className="h-4 w-4 mr-2" />
+                        See Employer Profile
+                    </Link>
                 </Button>
             </CardContent>
         </Card>

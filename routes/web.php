@@ -26,6 +26,7 @@ use App\Http\Controllers\Agency\ApplicationsController;
 // Browse Controllers
 use App\Http\Controllers\Browse\ForJobPostsController;
 use App\Http\Controllers\JobApplication\AgencyJobApplicationController;
+use App\Http\Controllers\Browse\EmployerPageController;
 
 // General Controllers
 use App\Http\Controllers\UserController;
@@ -156,19 +157,22 @@ Route::middleware(['auth', 'verified', 'role:employer'])->prefix('employer')->na
 });
 
 Route::middleware(['auth'])->prefix('browse')->name('browse.')->group(function () {
+
+    // Job Posts Routes
     Route::get('job-posts', [ForJobPostsController::class, 'index'])
         ->name('job-posts.index');
 
     Route::get('job-posts/near-you', [ForJobPostsController::class, 'nearYou'])
         ->name('job-posts.near-you');
-
     Route::get('job-posts/recommended', [ForJobPostsController::class, 'recommended'])
         ->name('job-posts.recommended');
-
     Route::get('job-applications/{jobPost}', [AgencyJobApplicationController::class, 'show'])
         ->name('job-applications.show');
     Route::post('job-applications/{jobPost}/apply', [AgencyJobApplicationController::class, 'apply'])
         ->name('job-applications.apply');
+
+    Route::get('/employers/{id}', [EmployerPageController::class, 'show'])
+        ->name('employers.show');
 });
 
 require __DIR__ . '/auth.php';
