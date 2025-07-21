@@ -14,7 +14,7 @@ interface InertiaFormData {
     email: string;
     password: string;
     password_confirmation: string;
-    
+
     // Agency info
     name: string;
     license_number: string;
@@ -22,16 +22,16 @@ interface InertiaFormData {
     established_at: string;
     business_email: string;
     business_phone: string;
-    
+
     // Contact person (JSON string)
     contact_person_data: string;
-    
+
     // Address (JSON string)
     address_data: string;
-    
+
     // Other info (JSON string)
     other_info_data: string;
-    
+
     [key: string]: any;
 }
 
@@ -47,11 +47,15 @@ export function useAgencyForm() {
     const [contactPerson, setContactPerson] = useState<AgencyContactPerson>({});
     const [address, setAddress] = useState<AgencyAddressStep>({});
     const [otherInfo, setOtherInfo] = useState<AgencyOtherInfoStep>({});
-    const [licensePhotoFront, setLicensePhotoFront] = useState<File | null>(null);
+    const [licensePhotoFront, setLicensePhotoFront] = useState<File | null>(
+        null
+    );
     const [licensePhotoBack, setLicensePhotoBack] = useState<File | null>(null);
     const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set());
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [submissionErrors, setSubmissionErrors] = useState<Record<string, string>>({});
+    const [submissionErrors, setSubmissionErrors] = useState<
+        Record<string, string>
+    >({});
     const isUpdatingRef = useRef(false);
 
     const { data, setData, processing, errors } = useForm<InertiaFormData>({
@@ -59,7 +63,7 @@ export function useAgencyForm() {
         email: "",
         password: "",
         password_confirmation: "",
-        
+
         // Agency info
         name: "",
         license_number: "",
@@ -67,7 +71,7 @@ export function useAgencyForm() {
         established_at: "",
         business_email: "",
         business_phone: "",
-        
+
         // JSON data
         contact_person_data: "",
         address_data: "",
@@ -83,7 +87,14 @@ export function useAgencyForm() {
             license_photo_front: licensePhotoFront,
             license_photo_back: licensePhotoBack,
         }),
-        [data, contactPerson, address, otherInfo, licensePhotoFront, licensePhotoBack]
+        [
+            data,
+            contactPerson,
+            address,
+            otherInfo,
+            licensePhotoFront,
+            licensePhotoBack,
+        ]
     );
 
     const updateFormData = useCallback(
@@ -97,19 +108,25 @@ export function useAgencyForm() {
                 // Handle contact person updates
                 if (updates.contact_person !== undefined) {
                     setContactPerson(updates.contact_person);
-                    inertiaUpdates.contact_person_data = JSON.stringify(updates.contact_person);
+                    inertiaUpdates.contact_person_data = JSON.stringify(
+                        updates.contact_person
+                    );
                 }
 
                 // Handle address updates
                 if (updates.address !== undefined) {
                     setAddress(updates.address);
-                    inertiaUpdates.address_data = JSON.stringify(updates.address);
+                    inertiaUpdates.address_data = JSON.stringify(
+                        updates.address
+                    );
                 }
 
                 // Handle other info updates
                 if (updates.other_info !== undefined) {
                     setOtherInfo(updates.other_info);
-                    inertiaUpdates.other_info_data = JSON.stringify(updates.other_info);
+                    inertiaUpdates.other_info_data = JSON.stringify(
+                        updates.other_info
+                    );
                 }
 
                 // Handle file uploads
@@ -133,7 +150,8 @@ export function useAgencyForm() {
                             "license_photo_back",
                         ].includes(key)
                     ) {
-                        inertiaUpdates[key as keyof InertiaFormData] = value as any;
+                        inertiaUpdates[key as keyof InertiaFormData] =
+                            value as any;
                         setTouchedFields((prev) => new Set([...prev, key]));
                     }
                 });
@@ -152,14 +170,18 @@ export function useAgencyForm() {
     );
 
     const validateStep = useCallback(
-        async (step: number, currentFormData: AgencyFormData): Promise<boolean> => {
+        async (
+            step: number,
+            currentFormData: AgencyFormData
+        ): Promise<boolean> => {
             switch (step) {
                 case 1: // Main Info + Credentials
                     return !!(
                         currentFormData.email &&
                         currentFormData.password &&
                         currentFormData.password_confirmation &&
-                        currentFormData.password === currentFormData.password_confirmation &&
+                        currentFormData.password ===
+                            currentFormData.password_confirmation &&
                         currentFormData.name &&
                         currentFormData.name.length >= 3
                     );
@@ -194,8 +216,8 @@ export function useAgencyForm() {
     const submitRegistration = useCallback(async () => {
         setIsSubmitting(true);
         setSubmissionErrors({});
-        console.log("Submitting agency registration...");
-        console.log("Form data:", formData);
+        // console.log("Submitting agency registration...");
+        // console.log("Form data:", formData);
         const formDataObj = new FormData();
 
         // Append base form data
@@ -206,7 +228,10 @@ export function useAgencyForm() {
         });
 
         // Append structured data
-        formDataObj.append("contact_person_data", JSON.stringify(contactPerson));
+        formDataObj.append(
+            "contact_person_data",
+            JSON.stringify(contactPerson)
+        );
         formDataObj.append("address", JSON.stringify(address));
         formDataObj.append("other_info_data", JSON.stringify(otherInfo));
 
@@ -236,7 +261,14 @@ export function useAgencyForm() {
                 });
             },
         });
-    }, [data, contactPerson, address, otherInfo, licensePhotoFront, licensePhotoBack]);
+    }, [
+        data,
+        contactPerson,
+        address,
+        otherInfo,
+        licensePhotoFront,
+        licensePhotoBack,
+    ]);
 
     const shouldShowValidationError = useCallback(
         (fieldName: string): boolean => {
@@ -250,27 +282,39 @@ export function useAgencyForm() {
     }, []);
 
     // Get step data helper functions
-    const getStep1Data = useCallback((): AgencyInfoStep & AgencyUserStep => ({
-        // User credentials
-        email: formData.email,
-        password: formData.password,
-        password_confirmation: formData.password_confirmation,
-        
-        // Agency info
-        name: formData.name,
-        license_number: formData.license_number,
-        description: formData.description,
-        established_at: formData.established_at,
-        business_email: formData.business_email,
-        business_phone: formData.business_phone,
-        license_photo_front: formData.license_photo_front,
-        license_photo_back: formData.license_photo_back,
-        contact_person: formData.contact_person,
-    }), [formData]);
+    const getStep1Data = useCallback(
+        (): AgencyInfoStep & AgencyUserStep => ({
+            // User credentials
+            email: formData.email,
+            password: formData.password,
+            password_confirmation: formData.password_confirmation,
 
-    const getStep2Data = useCallback((): AgencyContactPerson => formData.contact_person, [formData]);
-    const getStep3Data = useCallback((): AgencyAddressStep => formData.address, [formData]);
-    const getStep4Data = useCallback((): AgencyOtherInfoStep => formData.other_info, [formData]);
+            // Agency info
+            name: formData.name,
+            license_number: formData.license_number,
+            description: formData.description,
+            established_at: formData.established_at,
+            business_email: formData.business_email,
+            business_phone: formData.business_phone,
+            license_photo_front: formData.license_photo_front,
+            license_photo_back: formData.license_photo_back,
+            contact_person: formData.contact_person,
+        }),
+        [formData]
+    );
+
+    const getStep2Data = useCallback(
+        (): AgencyContactPerson => formData.contact_person,
+        [formData]
+    );
+    const getStep3Data = useCallback(
+        (): AgencyAddressStep => formData.address,
+        [formData]
+    );
+    const getStep4Data = useCallback(
+        (): AgencyOtherInfoStep => formData.other_info,
+        [formData]
+    );
 
     return {
         formData,
@@ -284,7 +328,7 @@ export function useAgencyForm() {
         shouldShowValidationError,
         markFieldTouched,
         submissionErrors,
-        
+
         // Step data getters
         getStep1Data,
         getStep2Data,

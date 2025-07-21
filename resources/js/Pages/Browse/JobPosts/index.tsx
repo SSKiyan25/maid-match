@@ -10,9 +10,10 @@ import { toast } from "sonner";
 
 export default function JobPostsIndex() {
     const { jobPosts = [], flash } = usePage().props as any;
+    const hasJobPosts = jobPosts && jobPosts.length > 0;
 
     useEffect(() => {
-        console.log("JobPostsIndex mounted", jobPosts);
+        // console.log("JobPostsIndex mounted", jobPosts);
         if (flash?.success) {
             toast.success(flash.success);
         }
@@ -36,8 +37,13 @@ export default function JobPostsIndex() {
 
                     <SearchBar />
 
-                    <NearYouSection jobPosts={jobPosts} />
-                    <RecommendedSection jobPosts={jobPosts} />
+                    {hasJobPosts && (
+                        <>
+                            <NearYouSection jobPosts={jobPosts} />
+                            <RecommendedSection jobPosts={jobPosts} />
+                        </>
+                    )}
+
                     <AllJobsSection jobPosts={jobPosts} />
                 </div>
             </div>
