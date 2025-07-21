@@ -1,7 +1,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import { Card } from "@/Components/ui/card";
 import { Badge } from "@/Components/ui/badge";
-import { CheckCircle2 } from "lucide-react";
+import { Button } from "@/Components/ui/button";
+import { CheckCircle2, MessageSquare } from "lucide-react";
 import { getInitials } from "@/utils/useGeneralUtils";
 
 interface ProfileHeaderProps {
@@ -96,6 +97,31 @@ export default function ProfileHeader({
 
                             {/* Additional Content */}
                             {additionalContent}
+                        </div>
+
+                        {/* Message Button */}
+                        <div className="mt-2 sm:mt-0 self-start sm:self-center flex flex-col sm:block items-stretch sm:items-auto">
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    variant="outline"
+                                    className="flex gap-2 items-center hover:bg-primary hover:text-primary-foreground transition-colors"
+                                    onClick={() => {
+                                        // Will implement message functionality later
+                                        alert(`Send message to ${name}`);
+                                    }}
+                                >
+                                    <MessageSquare className="h-4 w-4" />
+                                    <span>Message</span>
+                                </Button>
+                                {/* Show this text inline on mobile, below on desktop */}
+                                <span className="text-xs text-muted-foreground sm:hidden">
+                                    Start a conversation
+                                </span>
+                            </div>
+                            {/* Show this text below the button on desktop */}
+                            <div className="text-xs text-center mt-1 text-muted-foreground hidden sm:block">
+                                Start a conversation
+                            </div>
                         </div>
                     </div>
                 </Card>
