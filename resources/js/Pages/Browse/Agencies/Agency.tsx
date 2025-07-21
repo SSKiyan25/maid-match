@@ -1,14 +1,7 @@
 import { usePage } from "@inertiajs/react";
 import { Head } from "@inertiajs/react";
 import EmployerLayout from "@/Layouts/EmployerLayout";
-import {
-    Building2,
-    Users,
-    Award,
-    MapPin,
-    Calendar,
-    GraduationCap,
-} from "lucide-react";
+import { Building2, Users, Award } from "lucide-react";
 
 // Profile components
 import ProfileHeader from "@/Components/Profile/Header";
@@ -22,7 +15,7 @@ import ProfileLayout from "@/Layouts/ProfileLayout";
 import AgencyAbout from "./components/AgencyAbout";
 import AgencyMaids from "./components/AgencyMaids";
 import AgencyPhotos from "./components/AgencyPhotos";
-import { FacebookIcon, Instagram, Globe, Linkedin } from "lucide-react";
+import { FacebookIcon, Globe } from "lucide-react";
 
 type ProfileTab = {
     id: string;

@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Badge } from "@/Components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
-import { Briefcase, Globe, MapPin, Star, Calendar } from "lucide-react";
 import { Button } from "@/Components/ui/button";
 import { Link } from "@inertiajs/react";
 import { getInitials } from "@/utils/useGeneralUtils";

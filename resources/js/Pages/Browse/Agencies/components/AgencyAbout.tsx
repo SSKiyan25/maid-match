@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
-import { Badge } from "@/Components/ui/badge";
-import { Calendar, Award, Building2, IdCard } from "lucide-react";
+import { Calendar, IdCard } from "lucide-react";
 import { format } from "date-fns";
 
 export default function AgencyAbout({ agency }: any) {
