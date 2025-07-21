@@ -10,7 +10,6 @@ use App\Http\Controllers\Auth\EmployerRegisterController;
 
 // Employer Controllers
 use App\Http\Controllers\Employer\JobPostingController;
-use App\Http\Controllers\Employer\Profile\UserUpdateController;
 use App\Http\Controllers\Employer\Profile\ProfileUpdateController;
 use App\Http\Controllers\Employer\Profile\EmployerUpdateController;
 use App\Http\Controllers\Employer\Profile\EmployerChildUpdateController;
@@ -22,6 +21,7 @@ use App\Http\Controllers\Agency\MaidController;
 use App\Http\Controllers\Agency\Profile\UpdateController;
 use App\Http\Controllers\Agency\Profile\PhotoUpdateController;
 use App\Http\Controllers\Agency\SettingUpdateController;
+use App\Http\Controllers\Agency\ApplicationsController;
 
 // Browse Controllers
 use App\Http\Controllers\Browse\ForJobPostsController;
@@ -95,14 +95,22 @@ Route::middleware(['auth', 'verified', 'role:agency'])->prefix('agency')->name('
         Route::patch('/{agency}', [UpdateController::class, 'update'])->name('update');
 
         // Agency Photos under profile settings
-        Route::post('/photos', [PhotoUpdateController::class, 'store'])->name('photos.store');
-        Route::patch('/photos/{photo}', [PhotoUpdateController::class, 'update'])->name('photos.update');
-        Route::delete('/photos/{photo}', [PhotoUpdateController::class, 'destroy'])->name('photos.destroy');
+        Route::resource('photos', PhotoUpdateController::class)
+            ->only(['store', 'update', 'destroy'])
+            ->names([
+                'store' => 'photos.store',
+                'update' => 'photos.update',
+                'destroy' => 'photos.destroy',
+            ]);
     });
-
 
     // Agency Settings (configuration)
     Route::patch('settings/configuration/{setting}', [SettingUpdateController::class, 'update'])->name('settings.configuration.update');
+
+    // Agency Applications Page
+    Route::get('applications', [ApplicationsController::class, 'index'])->name('applications.index');
+    Route::post('applications/{application}/mark-as-hired', [ApplicationsController::class, 'markAsHired'])->name('applications.markAsHired');
+    Route::post('applications/{application}/cancel', [ApplicationsController::class, 'cancel'])->name('applications.cancel');
 });
 
 Route::middleware(['auth', 'verified', 'role:employer'])->prefix('employer')->name('employer.')->group(function () {

@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\Agency\AgencyResource;
+use App\Http\Resources\Maid\MaidDocumentResource;
+use App\Http\Resources\Maid\MaidCharacterReferenceResource;
+use Carbon\Carbon;
 
 class MaidResource extends JsonResource
 {
@@ -23,7 +26,9 @@ class MaidResource extends JsonResource
             'expected_salary' => $this->expected_salary,
             'is_willing_to_relocate' => $this->is_willing_to_relocate,
             'preferred_accommodation' => $this->preferred_accommodation,
-            'earliest_start_date' => $this->earliest_start_date?->toDateString(),
+            'earliest_start_date' => $this->earliest_start_date
+                ? Carbon::parse($this->earliest_start_date)->toDateString()
+                : null,
             'years_experience' => $this->years_experience,
             'status' => $this->status,
             'availability_schedule' => $this->availability_schedule,
@@ -35,7 +40,9 @@ class MaidResource extends JsonResource
 
             'agency_id' => $this->agency_id,
             'registration_type' => $this->registration_type,
-            'agency_assigned_at' => $this->agency_assigned_at?->toISOString(),
+            'agency_assigned_at' => $this->agency_assigned_at
+                ? Carbon::parse($this->agency_assigned_at)->toISOString()
+                : null,
 
             // Computed attributes
             'experience_level' => $this->experience_level,
@@ -52,8 +59,12 @@ class MaidResource extends JsonResource
             'character_references' => MaidCharacterReferenceResource::collection($this->whenLoaded('characterReferences')),
 
             // Timestamps
-            'created_at' => $this->created_at?->toISOString(),
-            'updated_at' => $this->updated_at?->toISOString(),
+            'created_at' => $this->created_at
+                ? Carbon::parse($this->created_at)->toISOString()
+                : null,
+            'updated_at' => $this->updated_at
+                ? Carbon::parse($this->updated_at)->toISOString()
+                : null,
         ];
     }
 }

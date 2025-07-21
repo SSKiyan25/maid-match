@@ -12,6 +12,7 @@ export default function JobPostsIndex() {
     const { jobPosts = [], flash } = usePage().props as any;
 
     useEffect(() => {
+        console.log("JobPostsIndex mounted", jobPosts);
         if (flash?.success) {
             toast.success(flash.success);
         }
@@ -21,7 +22,7 @@ export default function JobPostsIndex() {
         <AgencyLayout sidebarDefaultOpen={false}>
             <Head title="Browse for Jobs" />
             <div className="pt-4 pb-32 px-6 sm:px-24 sm:pt-12">
-                <div className="max-w-[350px] sm:max-w-screen-xl mx-auto py-6 space-y-6 overflow-x-hidden">
+                <div className="max-w-[350px] sm:max-w-screen-lg mx-auto py-6 space-y-6 overflow-x-hidden">
                     <div className="mb-6">
                         <h1 className="text-3xl font-bold tracking-tight">
                             Browse Job Posts

@@ -138,6 +138,11 @@ export default function JobDetailsModal({
                             <span>
                                 {job.location?.city}, {job.location?.brgy},{" "}
                                 {job.location?.province}
+                                {job.location?.landmark && (
+                                    <span className="block text-[11px] text-muted-foreground ">
+                                        Landmark: {job.location.landmark}
+                                    </span>
+                                )}
                             </span>
                         </div>
 

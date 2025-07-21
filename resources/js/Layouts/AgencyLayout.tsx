@@ -20,7 +20,7 @@ import {
     Settings,
     Building2,
     Star,
-    BadgeCheck,
+    UserRoundSearch,
     Eye,
     PhilippinePeso,
     Bolt,
@@ -80,24 +80,8 @@ const navMain = [
     },
     {
         title: "Applications",
+        url: "/agency/applications",
         icon: FileText,
-        items: [
-            {
-                title: "Shortlisted",
-                url: "/agency/applications/shortlisted",
-                icon: CheckCircle,
-            },
-            {
-                title: "Hired",
-                url: "/agency/applications/hired",
-                icon: UserCheck,
-            },
-            {
-                title: "Replaced",
-                url: "/agency/applications/replaced",
-                icon: Repeat,
-            },
-        ],
     },
     {
         title: "Employer Inquiries",

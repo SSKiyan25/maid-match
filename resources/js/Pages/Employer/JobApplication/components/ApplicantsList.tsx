@@ -27,10 +27,12 @@ export default function ApplicantsList({
                 <Fragment key={jobTitle}>
                     {/* Only show job titles if we have multiple jobs */}
                     {Object.keys(groupedApplicants).length > 1 && (
-                        <h3 className="text-sm font-medium mb-3">{jobTitle}</h3>
+                        <h3 className="text-sm font-medium mb-3 px-4">
+                            {jobTitle}
+                        </h3>
                     )}
 
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 px-4">
                         {(apps as any[]).map((applicant: any) => (
                             <ApplicantCard
                                 key={applicant.application.id}

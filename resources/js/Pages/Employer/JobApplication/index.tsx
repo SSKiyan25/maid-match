@@ -7,6 +7,7 @@ import StatsCards from "./components/StatsCards";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 import { Button } from "@/Components/ui/button";
 import { Filter } from "lucide-react";
+import { Separator } from "@/Components/ui/separator";
 
 export default function JobApplicationsPage({
     allApplicants = [],
@@ -30,15 +31,17 @@ export default function JobApplicationsPage({
     }, [allApplicants, selectedJobId]);
 
     return (
-        <EmployerLayout sidebarDefaultOpen={false}>
+        <EmployerLayout>
             <Head title="Job Applications | Employer Portal" />
-            <div className="p-4 pb-48 px-4 mx-auto py-8 max-w-sm sm:container sm:max-w-6xl sm:py-12">
-                <h1 className="text-xl font-bold mb-2 text-primary sm:text-4xl">
+            <div className="p-4 pb-48 px-4 mx-auto py-8 max-w-sm sm:container sm:max-w-full sm:py-12">
+                <h1 className="text-xl font-bold mb-2 text-secondary-foreground sm:text-4xl">
                     Job Applications
                 </h1>
                 <p className="text-sm text-muted-foreground mb-4">
                     View and manage all job applications received.
                 </p>
+
+                <Separator className="my-4" />
 
                 <StatsCards
                     applicants={allApplicants}
@@ -46,7 +49,7 @@ export default function JobApplicationsPage({
                 />
 
                 {/* Mobile filter button */}
-                <div className="flex justify-between items-center mb-4">
+                <div className="flex justify-between items-center mb-4 px-4">
                     <p className="text-sm">
                         {filteredApplicants.length} applicant
                         {filteredApplicants.length !== 1 ? "s" : ""}
@@ -64,7 +67,7 @@ export default function JobApplicationsPage({
 
                 {/* Job tabs - scrollable on mobile */}
                 <div className="w-full overflow-x-auto pb-2">
-                    <Tabs defaultValue="all" className="w-full min-w-max">
+                    <Tabs defaultValue="all" className="w-full min-w-max ">
                         <TabsList className="h-9">
                             <TabsTrigger
                                 value="all"

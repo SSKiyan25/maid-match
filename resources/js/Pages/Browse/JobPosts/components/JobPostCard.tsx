@@ -119,8 +119,8 @@ export default function JobPostCard({
                     <Avatar className="h-7 w-7 sm:h-8 sm:w-8">
                         <AvatarImage
                             src={
-                                job.employer?.user?.profile?.avatar
-                                    ? `/storage/${job.employer.user.profile.avatar}`
+                                job.employer?.user?.avatar
+                                    ? `/storage/${job.employer.user.avatar}`
                                     : undefined
                             }
                         />
