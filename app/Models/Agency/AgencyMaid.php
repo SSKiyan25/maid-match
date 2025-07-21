@@ -53,7 +53,7 @@ class AgencyMaid extends Model
 
     public function maid(): BelongsTo
     {
-        return $this->belongsTo(Maid::class);
+        return $this->belongsTo(Maid::class, 'maid_id');
     }
 
     /**

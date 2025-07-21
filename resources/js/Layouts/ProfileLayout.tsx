@@ -34,7 +34,7 @@ export default function ProfileLayout({
     const isReverse = layout === "reverse";
 
     return (
-        <div className="pb-36 pt-4 px-4 mx-auto max-w-7xl">
+        <div className="pb-36 pt-4 px-4 mx-auto w-full">
             {/* Profile Header - Avatar, Name, Verification, etc. */}
             {header}
 
@@ -58,51 +58,60 @@ export default function ProfileLayout({
                     )}
 
                     {/* Main Content Tabs */}
-                    <Tabs
-                        defaultValue={defaultTab || tabs[0]?.id}
-                        className="w-full"
-                    >
-                        <TabsList className="w-full">
+                    <div className="w-full pb-2">
+                        <Tabs
+                            defaultValue={defaultTab || tabs[0]?.id}
+                            className="w-full"
+                        >
+                            <div className="overflow-x-auto w-full">
+                                <TabsList
+                                    className="w-full flex-nowrap justify-around h-11 scrollbar-thin scrollbar-thumb-muted-foreground/30 scrollbar-track-transparent mpb-2"
+                                    style={{ WebkitOverflowScrolling: "touch" }}
+                                >
+                                    {tabs.map((tab) => (
+                                        <TabsTrigger
+                                            key={tab.id}
+                                            value={tab.id}
+                                            className={`text-xs h-8 px-3 sm:px-12 whitespace-nowrap ${
+                                                tab.mobileOnly
+                                                    ? "lg:hidden"
+                                                    : ""
+                                            }`}
+                                        >
+                                            {tab.label}
+                                            {tab.count !== undefined &&
+                                                ` (${tab.count})`}
+                                        </TabsTrigger>
+                                    ))}
+                                </TabsList>
+                            </div>
+
                             {tabs.map((tab) => (
-                                <TabsTrigger
+                                <TabsContent
                                     key={tab.id}
                                     value={tab.id}
-                                    className={`flex-1 ${
+                                    className={`mt-6 space-y-6 ${
                                         tab.mobileOnly ? "lg:hidden" : ""
                                     }`}
                                 >
-                                    {tab.label}
-                                    {tab.count !== undefined &&
-                                        ` (${tab.count})`}
-                                </TabsTrigger>
+                                    {tab.content}
+                                    {tab.mobileOnly &&
+                                        sidebarItems
+                                            .filter(
+                                                (item) =>
+                                                    item.mobileTabId === tab.id
+                                            )
+                                            .map((item, idx) => (
+                                                <div
+                                                    key={`mobile-sidebar-${idx}`}
+                                                >
+                                                    {item.content}
+                                                </div>
+                                            ))}
+                                </TabsContent>
                             ))}
-                        </TabsList>
-
-                        {tabs.map((tab) => (
-                            <TabsContent
-                                key={tab.id}
-                                value={tab.id}
-                                className={`mt-6 space-y-6 ${
-                                    tab.mobileOnly ? "lg:hidden" : ""
-                                }`}
-                            >
-                                {tab.content}
-
-                                {/* For mobile-only tabs, render relevant sidebar items */}
-                                {tab.mobileOnly &&
-                                    sidebarItems
-                                        .filter(
-                                            (item) =>
-                                                item.mobileTabId === tab.id
-                                        )
-                                        .map((item, idx) => (
-                                            <div key={`mobile-sidebar-${idx}`}>
-                                                {item.content}
-                                            </div>
-                                        ))}
-                            </TabsContent>
-                        ))}
-                    </Tabs>
+                        </Tabs>
+                    </div>
                 </div>
 
                 {/* Right sidebar if reverse layout */}

@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Agency;
 
 use Illuminate\Http\Request;
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class AgencyResource extends JsonResource
@@ -17,6 +18,7 @@ class AgencyResource extends JsonResource
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
+            'user' => new UserResource($this->whenLoaded('user')),
             'name' => $this->name,
             'license_number' => $this->license_number,
             'license_photo_front' => $this->license_photo_front,

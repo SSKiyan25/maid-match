@@ -27,6 +27,7 @@ use App\Http\Controllers\Agency\ApplicationsController;
 use App\Http\Controllers\Browse\ForJobPostsController;
 use App\Http\Controllers\JobApplication\AgencyJobApplicationController;
 use App\Http\Controllers\Browse\EmployerPageController;
+use App\Http\Controllers\Browse\AgencyPageController;
 
 // General Controllers
 use App\Http\Controllers\UserController;
@@ -173,6 +174,8 @@ Route::middleware(['auth'])->prefix('browse')->name('browse.')->group(function (
 
     Route::get('/employers/{id}', [EmployerPageController::class, 'show'])
         ->name('employers.show');
+    Route::get('/agencies/{id}', [AgencyPageController::class, 'show'])
+        ->name('agencies.show');
 });
 
 require __DIR__ . '/auth.php';

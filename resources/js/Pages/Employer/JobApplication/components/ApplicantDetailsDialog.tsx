@@ -23,6 +23,7 @@ import {
     CircleAlert,
 } from "lucide-react";
 import { getMatchColorClass } from "@/utils/matchingUtils";
+import { Link } from "@inertiajs/react";
 import ApplicantStatusActions from "./ApplicantStatusActions";
 
 export default function ApplicantDetailsDialog({
@@ -215,19 +216,21 @@ export default function ApplicantDetailsDialog({
                                 <Badge variant="secondary">
                                     {applicant.agency_name}
                                 </Badge>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
+                                <Link
+                                    href={route(
+                                        "browse.agencies.show",
+                                        applicant.agency_id
+                                    )}
                                     className="ml-2 sm:ml-0"
-                                    onClick={() =>
-                                        window.open(
-                                            `/agencies/${applicant.agency_id}`,
-                                            "_blank"
-                                        )
-                                    }
                                 >
-                                    View Agency
-                                </Button>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        type="button"
+                                    >
+                                        View Agency
+                                    </Button>
+                                </Link>
                             </div>
                         </div>
                     )}
