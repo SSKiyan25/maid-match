@@ -367,9 +367,15 @@ export default function ApplicantDetailsDialog({
                             by clicking the button "Learn More" below.
                         </AlertDescription>
                     </Alert>
-                    <Button variant="outline" size="sm" className="mt-2 w-full">
-                        Learn more about this Maid
-                    </Button>
+                    <Link href={route("browse.maids.show", maid.id)}>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="mt-2 w-full"
+                        >
+                            Learn more about this Maid
+                        </Button>
+                    </Link>
                 </div>
 
                 <DialogFooter className="sm:justify-between">

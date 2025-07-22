@@ -148,7 +148,14 @@ export default function AgencyMaids({ maids }: any) {
                                         className="w-full"
                                         asChild
                                     >
-                                        View Profile
+                                        <Link
+                                            href={route(
+                                                "browse.maids.show",
+                                                maid.id
+                                            )}
+                                        >
+                                            View Profile
+                                        </Link>
                                     </Button>
                                     {/* Click to View Notice */}
                                     <div className="mt-3 text-xs text-primary font-medium flex items-center gap-1 justify-center">

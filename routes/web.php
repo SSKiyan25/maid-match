@@ -28,6 +28,7 @@ use App\Http\Controllers\Browse\ForJobPostsController;
 use App\Http\Controllers\JobApplication\AgencyJobApplicationController;
 use App\Http\Controllers\Browse\EmployerPageController;
 use App\Http\Controllers\Browse\AgencyPageController;
+use App\Http\Controllers\Browse\MaidPageController;
 
 // General Controllers
 use App\Http\Controllers\UserController;
@@ -176,6 +177,8 @@ Route::middleware(['auth'])->prefix('browse')->name('browse.')->group(function (
         ->name('employers.show');
     Route::get('/agencies/{id}', [AgencyPageController::class, 'show'])
         ->name('agencies.show');
+    Route::get('/maids/{id}', [MaidPageController::class, 'show'])
+        ->name('maids.show');
 });
 
 require __DIR__ . '/auth.php';
