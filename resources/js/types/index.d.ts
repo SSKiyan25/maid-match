@@ -30,6 +30,7 @@ interface MaidData {
         bio: string;
         skills: string[];
         languages: string[];
+        banner_photo?: string;
         status: string;
         expected_salary: string;
         years_experience: number;
@@ -41,6 +42,7 @@ interface MaidData {
         earliest_start_date: string;
         assigned_at: string;
         documents: any[];
+        social_media_links?: Record<string, string>;
         emergency_contact_name: string;
         emergency_contact_phone: string;
         agency_notes: string;

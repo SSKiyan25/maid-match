@@ -20,7 +20,7 @@ import {
 import { MaidData } from "@/types";
 
 import MaidAvatarDialog from "./MaidAvatarDialog";
-import MaidViewModal from "./MaidViewModal";
+import MaidViewModal from "./MaidModal";
 import MaidMoreActions from "./MaidMoreActions";
 
 interface MaidCardProps {

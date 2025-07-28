@@ -87,6 +87,55 @@ function validatePhPhone(phone: string | null | undefined, field: string) {
     return { value: sanitizedValue };
 }
 
+function validateSocialMediaLinks(
+    value: Record<string, string> | string[] | null | undefined,
+    field: string
+) {
+    // Handle empty values
+    if (!value) return { value: {} };
+
+    // Handle case where it might be an array
+    if (Array.isArray(value) || typeof value !== "object") {
+        return {
+            error: `${field} must be an object with platform names as keys and URLs as values.`,
+        };
+    }
+
+    // Validate object structure
+    if (typeof value !== "object") {
+        return { error: `${field} must be a valid object.` };
+    }
+
+    const sanitizedLinks: Record<string, string> = {};
+
+    for (const [platform, url] of Object.entries(value)) {
+        // Validate platform name
+        if (platform.length > 50) {
+            return { error: `Platform name cannot exceed 50 characters.` };
+        }
+
+        // Validate URL
+        if (typeof url !== "string") {
+            return { error: `URL for ${platform} must be a string.` };
+        }
+
+        if (url.length > 255) {
+            return { error: `URL cannot exceed 255 characters.` };
+        }
+
+        // Basic URL validation
+        try {
+            // Check if it's a valid URL
+            new URL(url);
+            sanitizedLinks[platform] = url;
+        } catch (e) {
+            return { error: `URL for ${platform} is not valid.` };
+        }
+    }
+
+    return { value: sanitizedLinks };
+}
+
 // Main validation function
 export function validateStep2(data: CreateMaidFormData): Step2ValidationResult {
     const errors: Record<string, string> = {};
@@ -118,11 +167,16 @@ export function validateStep2(data: CreateMaidFormData): Step2ValidationResult {
     if (languagesResult.error) errors.languages = languagesResult.error;
     else sanitizedMaid.languages = languagesResult.value;
 
-    const socialMediaResult = validateArrayField(
-        data.maid.social_media_links,
-        "social media link",
-        255
+    // Social Media Links validation (replace the array validation)
+    const socialMediaResult = validateSocialMediaLinks(
+        data.maid.social_media_links &&
+            typeof data.maid.social_media_links === "object" &&
+            !Array.isArray(data.maid.social_media_links)
+            ? data.maid.social_media_links
+            : {},
+        "Social media links"
     );
+
     if (socialMediaResult.error)
         errors.social_media_links = socialMediaResult.error;
     else sanitizedMaid.social_media_links = socialMediaResult.value;

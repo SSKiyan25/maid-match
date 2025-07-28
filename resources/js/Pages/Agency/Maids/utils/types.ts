@@ -34,7 +34,7 @@ export interface MaidInput {
     skills?: string[];
     nationality?: string | null;
     languages?: string[];
-    social_media_links?: string[];
+    social_media_links?: Record<string, string>;
     marital_status?: "single" | "married" | "divorced" | "widowed" | null;
     has_children?: boolean;
     expected_salary?: number | null;

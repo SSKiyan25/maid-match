@@ -34,6 +34,7 @@ import {
     getMaidStatusLabel,
     getMaidStatusVariant,
 } from "@/utils/useGeneralUtils";
+import { Link } from "@inertiajs/react";
 
 interface ApplicationDetailsDialogProps {
     application: any;
@@ -210,9 +211,19 @@ export default function ApplicationDetailsDialog({
                                         variant="outline"
                                         size="sm"
                                         className="mt-2"
+                                        asChild
                                     >
-                                        <ExternalLink className="h-4 w-4 mr-1.5" />
-                                        More About Employer
+                                        <Link
+                                            href={route(
+                                                "browse.employers.show",
+                                                job_posting.employer.id
+                                            )}
+                                            target="_blank"
+                                            className="inline-flex items-center"
+                                        >
+                                            <ExternalLink className="h-4 w-4 mr-1.5" />
+                                            More About Employer
+                                        </Link>
                                     </Button>
                                 </div>
                             </div>
@@ -259,14 +270,18 @@ export default function ApplicationDetailsDialog({
                                             </span>
                                         </div>
                                     )}
-                                    <Button
-                                        size="sm"
-                                        variant="outline"
-                                        className="mt-2"
+
+                                    <Link
+                                        href={route(
+                                            "browse.job-applications.show",
+                                            job_posting.id
+                                        )}
+                                        target="_blank"
+                                        className="inline-flex items-center gap-2 px-3 py-2 rounded-md border bg-background hover:bg-accent text-sm mt-2"
                                     >
                                         <ExternalLink className="h-4 w-4 mr-1.5" />
                                         View Job Post
-                                    </Button>
+                                    </Link>
                                 </div>
                             </div>
                         </div>
@@ -309,19 +324,14 @@ export default function ApplicationDetailsDialog({
                 <Separator />
 
                 <div className="flex justify-between">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                            window.open(
-                                route("agency.maids.show", maid.id),
-                                "_blank"
-                            )
-                        }
+                    <Link
+                        href={route("browse.maids.show", maid.id)}
+                        target="_blank"
+                        className="inline-flex items-center gap-2 px-3 py-2 rounded-md border bg-background hover:bg-accent text-sm"
                     >
                         <User className="h-4 w-4 mr-1.5" />
                         View Maid Profile
-                    </Button>
+                    </Link>
                     <Button variant="outline" size="sm" onClick={onClose}>
                         Close
                     </Button>

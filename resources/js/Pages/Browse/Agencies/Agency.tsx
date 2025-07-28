@@ -126,7 +126,7 @@ export default function Agency() {
                 header={
                     <ProfileHeader
                         name={agencyData.name}
-                        avatar={agencyData.user.avatar} // Agencies don't have avatars in this system
+                        avatar={agencyData.user.avatar}
                         createdAt={agencyData.created_at}
                         isVerified={agencyData.is_verified}
                         status={agencyData.status}

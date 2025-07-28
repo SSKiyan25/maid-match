@@ -43,10 +43,6 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
 // Agency Registration Routes (Public)
 Route::prefix('agency')->name('agency.')->group(function () {
     Route::get('register', [AgencyRegisterController::class, 'create'])->name('register');

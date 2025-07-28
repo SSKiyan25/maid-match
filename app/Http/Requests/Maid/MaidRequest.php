@@ -91,7 +91,7 @@ class MaidRequest extends FormRequest
             'maid.languages' => ['nullable', 'array'],
             'maid.languages.*' => ['string', 'max:50'],
             'maid.social_media_links' => ['nullable', 'array'],
-            'maid.social_media_links.*' => ['string', 'max:255'],
+            'maid.social_media_links.*' => ['string', 'max:255', 'url'],
             'maid.marital_status' => ['nullable', 'string', Rule::in(['single', 'married', 'divorced', 'widowed'])],
             'maid.has_children' => ['nullable', 'boolean'],
             'maid.expected_salary' => ['nullable', 'numeric', 'min:0'],

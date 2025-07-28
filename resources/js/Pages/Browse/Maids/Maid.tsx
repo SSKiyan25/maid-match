@@ -17,9 +17,8 @@ import ProfileReviews from "@/Components/Profile/Reviews";
 import ProfileLayout from "@/Layouts/ProfileLayout";
 import { getInitials } from "@/utils/useGeneralUtils";
 
-// Maid-specific components (we'll create these next)
+// Maid-specific components
 import MaidAbout from "./components/MaidAbout";
-import MaidExperience from "./components/MaidExperience";
 import MaidDocuments from "./components/MaidDocuments";
 import MaidSkills from "./components/MaidSkills";
 

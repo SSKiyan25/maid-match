@@ -20,73 +20,127 @@ export function useMaidForm(initialData?: Partial<MaidFormData>) {
     const [submissionErrors, setSubmissionErrors] = useState<
         Record<string, string>
     >({});
+
     const isUpdatingRef = useRef(false);
+
+    const safeInitialData = useMemo(() => {
+        if (!initialData) return undefined;
+
+        let safeSocialMediaLinks: Record<string, string> = {};
+
+        if (
+            initialData.maid?.social_media_links &&
+            typeof initialData.maid.social_media_links === "object" &&
+            !Array.isArray(initialData.maid.social_media_links)
+        ) {
+            safeSocialMediaLinks = initialData.maid
+                .social_media_links as Record<string, string>;
+        }
+
+        return {
+            ...initialData,
+            maid: {
+                ...initialData.maid,
+                skills: Array.isArray(initialData.maid?.skills)
+                    ? initialData.maid?.skills
+                    : [],
+                languages: Array.isArray(initialData.maid?.languages)
+                    ? initialData.maid?.languages
+                    : [],
+                // Use the safely processed social_media_links
+                social_media_links: safeSocialMediaLinks,
+                availability_schedule: Array.isArray(
+                    initialData.maid?.availability_schedule
+                )
+                    ? initialData.maid?.availability_schedule
+                    : [],
+                verification_badges: Array.isArray(
+                    initialData.maid?.verification_badges
+                )
+                    ? initialData.maid?.verification_badges
+                    : [],
+            },
+            profile: {
+                ...initialData.profile,
+                preferred_contact_methods: Array.isArray(
+                    initialData.profile?.preferred_contact_methods
+                )
+                    ? initialData.profile?.preferred_contact_methods
+                    : ["email"],
+            },
+        };
+    }, [initialData]);
 
     // Main form state
     const { data, setData, errors } = useForm<CreateMaidFormData>({
         user: {
-            email: initialData?.user?.email || "",
+            email: safeInitialData?.user?.email || "",
             password: "",
             password_confirmation: "",
         },
         profile: {
-            first_name: initialData?.profile?.first_name || "",
-            last_name: initialData?.profile?.last_name || "",
-            phone_number: initialData?.profile?.phone_number ?? "",
-            birth_date: initialData?.profile?.birth_date ?? "",
-            address: initialData?.profile?.address ?? {
+            first_name: safeInitialData?.profile?.first_name || "",
+            last_name: safeInitialData?.profile?.last_name || "",
+            phone_number: safeInitialData?.profile?.phone_number ?? "",
+            birth_date: safeInitialData?.profile?.birth_date ?? "",
+            address: safeInitialData?.profile?.address ?? {
                 street: "",
                 barangay: "",
                 city: "",
                 province: "",
             },
-            is_phone_private: initialData?.profile?.is_phone_private ?? false,
+            is_phone_private:
+                safeInitialData?.profile?.is_phone_private ?? false,
             is_address_private:
-                initialData?.profile?.is_address_private ?? false,
-            is_archived: initialData?.profile?.is_archived ?? false,
-            preferred_contact_methods: initialData?.profile
+                safeInitialData?.profile?.is_address_private ?? false,
+            is_archived: safeInitialData?.profile?.is_archived ?? false,
+            preferred_contact_methods: safeInitialData?.profile
                 ?.preferred_contact_methods ?? ["email"],
             preferred_language:
-                initialData?.profile?.preferred_language ?? "en",
+                safeInitialData?.profile?.preferred_language ?? "en",
         },
         maid: {
-            bio: initialData?.maid?.bio ?? "",
-            skills: initialData?.maid?.skills ?? [],
-            nationality: initialData?.maid?.nationality ?? "",
-            languages: initialData?.maid?.languages ?? [],
-            social_media_links: initialData?.maid?.social_media_links ?? [],
-            marital_status: initialData?.maid?.marital_status ?? null,
-            has_children: initialData?.maid?.has_children ?? false,
-            expected_salary: initialData?.maid?.expected_salary ?? null,
+            bio: safeInitialData?.maid?.bio ?? "",
+            skills: safeInitialData?.maid?.skills ?? [],
+            nationality: safeInitialData?.maid?.nationality ?? "",
+            languages: safeInitialData?.maid?.languages ?? [],
+            // Use an empty object as default, not an array
+            social_media_links: safeInitialData?.maid?.social_media_links ?? {},
+            marital_status: safeInitialData?.maid?.marital_status ?? null,
+            has_children: safeInitialData?.maid?.has_children ?? false,
+            expected_salary: safeInitialData?.maid?.expected_salary ?? null,
             is_willing_to_relocate:
-                initialData?.maid?.is_willing_to_relocate ?? false,
+                safeInitialData?.maid?.is_willing_to_relocate ?? false,
             preferred_accommodation:
-                initialData?.maid?.preferred_accommodation ?? null,
-            earliest_start_date: initialData?.maid?.earliest_start_date ?? "",
-            years_experience: initialData?.maid?.years_experience ?? undefined,
-            status: initialData?.maid?.status ?? "available",
+                safeInitialData?.maid?.preferred_accommodation ?? null,
+            earliest_start_date:
+                safeInitialData?.maid?.earliest_start_date ?? "",
+            years_experience:
+                safeInitialData?.maid?.years_experience ?? undefined,
+            status: safeInitialData?.maid?.status ?? "available",
             availability_schedule:
-                initialData?.maid?.availability_schedule ?? [],
+                safeInitialData?.maid?.availability_schedule ?? [],
             emergency_contact_name:
-                initialData?.maid?.emergency_contact_name ?? "",
+                safeInitialData?.maid?.emergency_contact_name ?? "",
             emergency_contact_phone:
-                initialData?.maid?.emergency_contact_phone ?? "",
-            verification_badges: initialData?.maid?.verification_badges ?? [],
-            is_verified: initialData?.maid?.is_verified ?? false,
-            is_archived: initialData?.maid?.is_archived ?? false,
+                safeInitialData?.maid?.emergency_contact_phone ?? "",
+            verification_badges:
+                safeInitialData?.maid?.verification_badges ?? [],
+            is_verified: safeInitialData?.maid?.is_verified ?? false,
+            is_archived: safeInitialData?.maid?.is_archived ?? false,
         },
         agency_maid: {
-            status: initialData?.agency_maid?.status ?? "active",
-            is_premium: initialData?.agency_maid?.is_premium ?? false,
-            is_trained: initialData?.agency_maid?.is_trained ?? false,
-            agency_notes: initialData?.agency_maid?.agency_notes ?? "",
-            agency_fee: initialData?.agency_maid?.agency_fee ?? null,
-            assigned_at: initialData?.agency_maid?.assigned_at ?? undefined,
+            status: safeInitialData?.agency_maid?.status ?? "active",
+            is_premium: safeInitialData?.agency_maid?.is_premium ?? false,
+            is_trained: safeInitialData?.agency_maid?.is_trained ?? false,
+            agency_notes: safeInitialData?.agency_maid?.agency_notes ?? "",
+            agency_fee: safeInitialData?.agency_maid?.agency_fee ?? null,
+            assigned_at: safeInitialData?.agency_maid?.assigned_at ?? undefined,
             status_changed_at:
-                initialData?.agency_maid?.status_changed_at ?? undefined,
-            is_archived: initialData?.agency_maid?.is_archived ?? false,
+                safeInitialData?.agency_maid?.status_changed_at ?? undefined,
+            is_archived: safeInitialData?.agency_maid?.is_archived ?? false,
         },
-        documents: initialData?.documents || [],
+        documents: safeInitialData?.documents || [],
     });
 
     // Compose all form data
@@ -108,6 +162,22 @@ export function useMaidForm(initialData?: Partial<MaidFormData>) {
             try {
                 if (updates.documents !== undefined)
                     setDocuments(updates.documents);
+
+                // Special handling for maid.social_media_links to ensure it's always an object
+                if (updates.maid?.social_media_links) {
+                    const socialLinks = updates.maid.social_media_links;
+
+                    // If it's coming in as an array, convert to empty object
+                    if (Array.isArray(socialLinks)) {
+                        updates = {
+                            ...updates,
+                            maid: {
+                                ...updates.maid,
+                                social_media_links: {},
+                            },
+                        };
+                    }
+                }
 
                 setData((prev) => ({
                     ...prev,
@@ -184,7 +254,21 @@ export function useMaidForm(initialData?: Partial<MaidFormData>) {
 
         // Maid fields
         Object.entries(data.maid).forEach(([key, value]) => {
-            if (Array.isArray(value)) {
+            if (
+                key === "social_media_links" &&
+                typeof value === "object" &&
+                !Array.isArray(value)
+            ) {
+                // Handle social_media_links as a JSON object
+                Object.entries(value as Record<string, string>).forEach(
+                    ([platform, url]) => {
+                        formDataObj.append(
+                            `maid[social_media_links][${platform}]`,
+                            url
+                        );
+                    }
+                );
+            } else if (Array.isArray(value)) {
                 value.forEach((v) => {
                     formDataObj.append(`maid[${key}][]`, String(v));
                 });

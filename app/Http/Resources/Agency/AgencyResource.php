@@ -18,7 +18,9 @@ class AgencyResource extends JsonResource
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
-            'user' => new UserResource($this->whenLoaded('user')),
+            'user' => $this->whenLoaded('user', function () {
+                return new UserResource($this->user);
+            }),
             'name' => $this->name,
             'license_number' => $this->license_number,
             'license_photo_front' => $this->license_photo_front,

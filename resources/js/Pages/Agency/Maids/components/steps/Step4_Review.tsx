@@ -22,6 +22,7 @@ import {
     AlertCircle,
     Calendar,
     ShieldCheck,
+    ExternalLink,
 } from "lucide-react";
 import { CreateMaidFormData } from "../../utils/types";
 import { formatDate } from "@/utils/formFunctions";
@@ -545,6 +546,44 @@ export default function Step4_Review({
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+
+                            {/* Social Media Links */}
+                            <div className="p-4">
+                                <div className="text-sm font-medium text-secondary mt-3">
+                                    Social Media:
+                                </div>
+                                <div className="mt-1">
+                                    {maid.social_media_links &&
+                                    typeof maid.social_media_links ===
+                                        "object" &&
+                                    !Array.isArray(maid.social_media_links) &&
+                                    Object.keys(maid.social_media_links)
+                                        .length > 0 ? (
+                                        <div className="flex flex-wrap gap-2">
+                                            {Object.entries(
+                                                maid.social_media_links
+                                            ).map(([platform, url]) => (
+                                                <a
+                                                    key={platform}
+                                                    href={url as string}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="inline-flex items-center px-2 py-1 rounded-md bg-background border border-border/50 text-xs hover:bg-muted/50 transition-colors"
+                                                >
+                                                    <span className="capitalize mr-1">
+                                                        {platform}
+                                                    </span>
+                                                    <ExternalLink className="w-3 h-3" />
+                                                </a>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <span className="text-muted-foreground text-sm">
+                                            No social media links provided
+                                        </span>
+                                    )}
                                 </div>
                             </div>
 
