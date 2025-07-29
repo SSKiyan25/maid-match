@@ -20,6 +20,19 @@ export interface User {
     avatar?: string;
 }
 
+export interface UserPhoto {
+    id: number;
+    user_id: number;
+    url: string;
+    caption?: string;
+    type: "banner" | "gallery" | "other";
+    sort_order: number;
+    is_banner: boolean | number | string;
+    is_archived: boolean;
+    created_at: string;
+    updated_at: string;
+}
+
 export type Agency = Agency;
 export type AgencyPhoto = AgencyPhoto;
 
@@ -47,10 +60,12 @@ interface MaidData {
         emergency_contact_phone: string;
         agency_notes: string;
         is_willing_to_relocate: boolean;
+
         user: {
             id: number;
             email: string;
             avatar: string;
+            photos: UserPhoto[];
             profile: {
                 first_name: string;
                 last_name: string;

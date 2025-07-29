@@ -32,6 +32,7 @@ use App\Http\Controllers\Browse\MaidPageController;
 
 // General Controllers
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserPhotoController;
 
 
 Route::get('/', function () {
@@ -175,6 +176,18 @@ Route::middleware(['auth'])->prefix('browse')->name('browse.')->group(function (
         ->name('agencies.show');
     Route::get('/maids/{id}', [MaidPageController::class, 'show'])
         ->name('maids.show');
+});
+
+// User Photos Routes
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::resource('user-photos', UserPhotoController::class)
+        ->only(['index','store', 'update', 'destroy'])
+        ->names([
+            'index' => 'user-photos.index',
+            'store' => 'user-photos.store',
+            'update' => 'user-photos.update',
+            'destroy' => 'user-photos.destroy',
+        ]);
 });
 
 require __DIR__ . '/auth.php';

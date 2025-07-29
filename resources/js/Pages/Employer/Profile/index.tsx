@@ -7,18 +7,20 @@ import ProfileComponent from "./components/Profile";
 import EmployerComponent from "./components/Employer";
 import ChildComponent from "./components/Child";
 import PetComponent from "./components/Pet";
+import PhotosComponent from "./components/Photos";
 import { User, Profile, Employer } from "./utils/types";
-import { PageProps } from "@/types";
+import { PageProps, UserPhoto } from "@/types";
 
 type ProfilePageProps = PageProps<{
     user: User;
     profile: Profile;
     employer: Employer;
+    photos: UserPhoto[];
     flash?: { success?: string };
 }>;
 
 export default function EmployerProfilePage() {
-    const { user, profile, employer, flash } =
+    const { user, profile, employer, photos, flash } =
         usePage<ProfilePageProps>().props;
 
     useEffect(() => {
@@ -44,6 +46,7 @@ export default function EmployerProfilePage() {
                 <div className="space-y-6">
                     <UserComponent user={user} />
                     <ProfileComponent profile={profile} />
+                    <PhotosComponent photos={photos} userId={user.id} />
                     <EmployerComponent employer={employer} />
                     <ChildComponent children={employer.children ?? []} />
                     <PetComponent pets={employer.pets ?? []} />

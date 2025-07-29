@@ -26,6 +26,7 @@ class MaidController extends Controller
 
         $maids = AgencyMaid::with([
             'maid.user.profile',
+            'maid.user.photos',
             'maid.documents',
             'maid.characterReferences'
         ])

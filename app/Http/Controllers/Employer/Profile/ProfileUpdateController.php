@@ -11,6 +11,7 @@ class ProfileUpdateController extends Controller
     public function index()
     {
         $user = auth()->user()->load([
+            'photos',
             'profile',
             'employer.children',
             'employer.pets',
@@ -18,6 +19,7 @@ class ProfileUpdateController extends Controller
 
         return inertia('Employer/Profile/index', [
             'user' => $user,
+            'photos' => $user->photos,
             'profile' => $user->profile,
             'employer' => $user->employer,
             'children' => $user->employer?->children ?? [],

@@ -5,11 +5,13 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Maid\Maid;
 use App\Models\Employer\Employer;
 use App\Models\Agency\Agency;
+use App\Models\UserPhoto;
 
 class User extends Authenticatable
 {
@@ -74,6 +76,11 @@ class User extends Authenticatable
     public function agency(): HasOne
     {
         return $this->hasOne(Agency::class);
+    }
+
+    public function photos(): HasMany
+    {
+        return $this->hasMany(UserPhoto::class);
     }
 
     /**
