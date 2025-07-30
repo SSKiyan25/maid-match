@@ -21,6 +21,7 @@ class MaidPageController extends Controller
         // Find the maid with related data
         $maid = Maid::with([
             'user.profile',
+            'user.photos',
             'agency',
             'documents',
             'characterReferences',

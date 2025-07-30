@@ -2,7 +2,14 @@ import { usePage } from "@inertiajs/react";
 import { Head } from "@inertiajs/react";
 import AgencyLayout from "@/Layouts/AgencyLayout";
 import EmployerLayout from "@/Layouts/EmployerLayout";
-import { Award, Calendar, Languages, Briefcase, User } from "lucide-react";
+import {
+    Award,
+    Calendar,
+    Languages,
+    Briefcase,
+    User,
+    Image,
+} from "lucide-react";
 import { Badge } from "@/Components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
@@ -21,6 +28,7 @@ import { getInitials } from "@/utils/useGeneralUtils";
 import MaidAbout from "./components/MaidAbout";
 import MaidDocuments from "./components/MaidDocuments";
 import MaidSkills from "./components/MaidSkills";
+import MaidPhotos from "./components/MaidPhotos";
 
 type ProfileTab = {
     id: string;
@@ -77,6 +85,9 @@ export default function Maid() {
         );
     }
 
+    // Check if maid has photos
+    const hasPhotos = maidData.user?.photos && maidData.user.photos.length > 0;
+
     const tabs: (ProfileTab | null)[] = [
         {
             id: "about",
@@ -88,6 +99,13 @@ export default function Maid() {
             label: "Skills",
             count: maidData.skills?.length || 0,
             content: <MaidSkills skills={maidData.skills} />,
+        },
+        // Add photos tab
+        {
+            id: "photos",
+            label: "Photos",
+            count: hasPhotos ? maidData.user.photos.length : 0,
+            content: <MaidPhotos photos={maidData.user?.photos || []} />,
         },
         documentsData.length > 0
             ? {
@@ -161,6 +179,7 @@ export default function Maid() {
                         }
                         bio={maidData.bio}
                         badges={badges}
+                        photos={maidData.user?.photos || []}
                     />
                 }
                 sidebarItems={[

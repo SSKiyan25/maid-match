@@ -1,7 +1,7 @@
 import { usePage } from "@inertiajs/react";
 import { Head } from "@inertiajs/react";
 import AgencyLayout from "@/Layouts/AgencyLayout";
-import { Briefcase, Users, Calendar, Home, Baby, Cat, Dog } from "lucide-react";
+import { Briefcase, Users, Calendar } from "lucide-react";
 
 // Profile components
 import ProfileHeader from "@/Components/Profile/Header";
@@ -14,12 +14,15 @@ import ProfileLayout from "@/Layouts/ProfileLayout";
 // Employer-specific components
 import HouseholdDetails from "./components/HouseholdDetails";
 import JobPostingsSection from "./components/JobPostingsSection";
+import EmployerPhotos from "./components/EmployerPhotos";
 import { FacebookIcon, InstagramIcon, LinkedinIcon } from "lucide-react";
 
 export default function Employer() {
     const { employer, jobPostings } = usePage().props as any;
     const employerData = employer.data || employer;
     const jobPostingData = jobPostings.data || jobPostings;
+
+    console.log("Employer data: ", employerData);
 
     // Stats for the profile
     const stats = [
@@ -39,6 +42,10 @@ export default function Employer() {
             value: employer.stats?.family_size || 0,
         },
     ];
+
+    // Check if employer has photos
+    const hasPhotos =
+        employerData.user?.photos && employerData.user.photos.length > 0;
 
     // Sample social links
     const socialLinks = [
@@ -80,6 +87,7 @@ export default function Employer() {
                                 : "Not Looking"
                         }
                         bio={employerData.user.profile?.bio}
+                        photos={employerData.user?.photos || []}
                     />
                 }
                 sidebarItems={[
@@ -133,6 +141,16 @@ export default function Employer() {
                         count: jobPostingData.length,
                         content: (
                             <JobPostingsSection jobPostings={jobPostingData} />
+                        ),
+                    },
+                    {
+                        id: "photos",
+                        label: "Photos",
+                        count: hasPhotos ? employerData.user.photos.length : 0,
+                        content: (
+                            <EmployerPhotos
+                                photos={employerData.user?.photos || []}
+                            />
                         ),
                     },
                     {

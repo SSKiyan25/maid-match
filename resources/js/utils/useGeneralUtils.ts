@@ -65,3 +65,10 @@ export const getMaidStatusLabel = (status: string) => {
                 .replace(/\b\w/g, (l) => l.toUpperCase());
     }
 };
+
+// Helper to get photo URL
+export const getPhotoUrl = (photoUrl: string) => {
+    if (!photoUrl) return "";
+    if (photoUrl.startsWith("blob:")) return photoUrl;
+    return `/storage/${photoUrl}`;
+};

@@ -21,6 +21,7 @@ class EmployerPageController extends Controller
         // Find the employer with related data
         $employer = Employer::with([
             'user.profile',
+            'user.photos',
             'children',
             'pets',
             'jobPostings' => function ($query) {

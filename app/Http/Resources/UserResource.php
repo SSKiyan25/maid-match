@@ -5,6 +5,8 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Log;
+use App\Http\Resources\UserPhotoResource;
+use App\Http\Resources\ProfileResource;
 
 class UserResource extends JsonResource
 {
@@ -28,9 +30,11 @@ class UserResource extends JsonResource
             'employer' => $this->whenLoaded('employer'),
             'maid' => $this->whenLoaded('maid'),
             'full_name' => $this->full_name,
-            'name' => $this->profile?->full_name ?? '', // This will be "First Last"
-            'profile' => $this->profile ? new \App\Http\Resources\ProfileResource($this->profile) : null,
-            'test_field' => 'test_value',
-        ];
+            'name' => $this->profile?->full_name ?? '',
+            'profile' => $this->profile ? new ProfileResource($this->profile) : null,
+           'photos' => $this->relationLoaded('photos') 
+                ? UserPhotoResource::collection($this->photos)
+                : [],
+            ];
     }
 }

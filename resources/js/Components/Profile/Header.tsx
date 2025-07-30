@@ -3,7 +3,8 @@ import { Card } from "@/Components/ui/card";
 import { Badge } from "@/Components/ui/badge";
 import { Button } from "@/Components/ui/button";
 import { CheckCircle2, MessageSquare } from "lucide-react";
-import { getInitials } from "@/utils/useGeneralUtils";
+import { getInitials, getPhotoUrl } from "@/utils/useGeneralUtils";
+import { UserPhoto } from "@/types";
 
 interface ProfileHeaderProps {
     name: string;
@@ -15,6 +16,7 @@ interface ProfileHeaderProps {
     bio?: string;
     badges?: React.ReactNode;
     additionalContent?: React.ReactNode;
+    photos?: UserPhoto[];
 }
 
 export default function ProfileHeader({
@@ -27,11 +29,40 @@ export default function ProfileHeader({
     bio,
     badges,
     additionalContent,
+    photos = [],
 }: ProfileHeaderProps) {
+    // Find banner photo if it exists
+    const bannerPhoto = photos?.find(
+        (photo) =>
+            photo.is_banner === true ||
+            photo.is_banner === 1 ||
+            photo.is_banner === "1"
+    );
+
     return (
         <div className="relative">
-            {/* Cover Photo - Placeholder gradient */}
-            <div className="h-32 sm:h-48 lg:h-64 bg-gradient-to-r from-indigo-500/80 via-purple-500/80 to-pink-500/80 rounded-lg" />
+            {/* Cover Photo - Use banner if available, otherwise gradient */}
+            {bannerPhoto ? (
+                <div className="h-32 sm:h-48 lg:h-64 rounded-lg overflow-hidden">
+                    <img
+                        src={getPhotoUrl(bannerPhoto.url)}
+                        alt="Profile Banner"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                            // Fallback to gradient if image fails to load
+                            e.currentTarget.parentElement?.classList.add(
+                                "bg-gradient-to-r",
+                                "from-indigo-500/80",
+                                "via-purple-500/80",
+                                "to-pink-500/80"
+                            );
+                            e.currentTarget.style.display = "none";
+                        }}
+                    />
+                </div>
+            ) : (
+                <div className="h-32 sm:h-48 lg:h-64 bg-gradient-to-r from-indigo-500/80 via-purple-500/80 to-pink-500/80 rounded-lg" />
+            )}
 
             <div className="px-4 -mt-12 sm:-mt-16 lg:-mt-20 relative z-10 max-w-5xl mx-auto">
                 <Card className="p-4 sm:p-6 shadow">
@@ -87,13 +118,6 @@ export default function ProfileHeader({
                                     {new Date(createdAt).toLocaleDateString()}
                                 </span>
                             </div>
-
-                            {/* Bio */}
-                            {bio && (
-                                <p className="text-sm lg:text-base text-muted-foreground mt-2">
-                                    {bio}
-                                </p>
-                            )}
 
                             {/* Additional Content */}
                             {additionalContent}
