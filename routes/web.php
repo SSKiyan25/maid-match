@@ -15,6 +15,7 @@ use App\Http\Controllers\Employer\Profile\EmployerUpdateController;
 use App\Http\Controllers\Employer\Profile\EmployerChildUpdateController;
 use App\Http\Controllers\Employer\Profile\EmployerPetUpdateController;
 use App\Http\Controllers\Employer\JobApplicationController;
+use \App\Http\Controllers\Employer\ShortlistRankingController;
 
 // Agency Controllers
 use App\Http\Controllers\Agency\MaidController;
@@ -126,6 +127,12 @@ Route::middleware(['auth', 'verified', 'role:employer'])->prefix('employer')->na
     Route::get('job-applications', [JobApplicationController::class, 'index'])->name('job-applications.index');
     Route::patch('job-applications/{application}/status', [JobApplicationController::class, 'updateStatus'])->name('job-applications.update-status');
 
+    // Shortlist Ranking Page
+    Route::get('shortlist-ranking', [ShortlistRankingController::class, 'index'])
+        ->name('shortlist-ranking.index');
+    Route::post('shortlist-ranking/update', [ShortlistRankingController::class, 'updateRankings'])
+        ->name('shortlist-ranking.update');
+
     Route::get('/profile', [ProfileUpdateController::class, 'index'])->name('profile.index');
 
     // Employer Profile Update routes
@@ -181,7 +188,7 @@ Route::middleware(['auth'])->prefix('browse')->name('browse.')->group(function (
 // User Photos Routes
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('user-photos', UserPhotoController::class)
-        ->only(['index','store', 'update', 'destroy'])
+        ->only(['index', 'store', 'update', 'destroy'])
         ->names([
             'index' => 'user-photos.index',
             'store' => 'user-photos.store',

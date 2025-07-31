@@ -1,5 +1,24 @@
 import type { Agency, AgencyPhoto } from "./Agency";
 
+export type {
+    JobPostingStatus,
+    AccommodationType,
+    DayOffType,
+    JobBonusStatus,
+    JobBonusType,
+    JobBonusFrequency,
+    JobBonus,
+    JobPhotoType,
+    JobPhoto,
+    JobLocation,
+    JobApplicationStatus,
+    JobApplication,
+    JobInterviewStatus,
+    JobInterviewType,
+    JobInterviewSchedule,
+    JobPosting,
+} from "./JobPosting";
+
 export interface Role {
     id: number;
     name: string;

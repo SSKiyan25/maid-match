@@ -58,6 +58,8 @@ class Maid extends Model
         'is_archived' => 'boolean',
     ];
 
+    protected $appends = ['experience_level', 'is_available', 'full_name', 'verification_level', 'is_managed_by_agency', 'agency_name'];
+
     /**
      * Relationships
      */

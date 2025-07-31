@@ -94,11 +94,11 @@ const navMain = [
             },
             {
                 title: "Shortlisted Candidates",
-                url: "#",
+                url: "/employer/shortlist-ranking",
                 icon: UserCheck,
             },
             {
-                title: "Rejected",
+                title: "Hired",
                 url: "#",
                 icon: UserX,
             },
