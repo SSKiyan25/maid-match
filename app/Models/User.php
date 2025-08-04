@@ -12,6 +12,7 @@ use App\Models\Maid\Maid;
 use App\Models\Employer\Employer;
 use App\Models\Agency\Agency;
 use App\Models\UserPhoto;
+use App\Models\UserReport;
 
 class User extends Authenticatable
 {
@@ -81,6 +82,21 @@ class User extends Authenticatable
     public function photos(): HasMany
     {
         return $this->hasMany(UserPhoto::class);
+    }
+
+    public function reportsFiled(): HasMany
+    {
+        return $this->hasMany(UserReport::class, 'reporter_id');
+    }
+
+    public function reportsReceived(): HasMany
+    {
+        return $this->hasMany(UserReport::class, 'reported_user_id');
+    }
+
+    public function reportsHandled(): HasMany
+    {
+        return $this->hasMany(UserReport::class, 'handled_by');
     }
 
     /**

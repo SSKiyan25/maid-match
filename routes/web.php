@@ -16,6 +16,7 @@ use App\Http\Controllers\Employer\Profile\EmployerChildUpdateController;
 use App\Http\Controllers\Employer\Profile\EmployerPetUpdateController;
 use App\Http\Controllers\Employer\JobApplicationController;
 use \App\Http\Controllers\Employer\ShortlistRankingController;
+use App\Http\Controllers\Employer\HiredApplicantsController;
 
 // Agency Controllers
 use App\Http\Controllers\Agency\MaidController;
@@ -34,6 +35,9 @@ use App\Http\Controllers\Browse\MaidPageController;
 // General Controllers
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserPhotoController;
+
+// Report Controller
+use App\Http\Controllers\UserReportController;
 
 
 Route::get('/', function () {
@@ -133,6 +137,10 @@ Route::middleware(['auth', 'verified', 'role:employer'])->prefix('employer')->na
     Route::post('shortlist-ranking/update', [ShortlistRankingController::class, 'updateRankings'])
         ->name('shortlist-ranking.update');
 
+    // Hired Applicants Page
+    Route::get('hired-applicants', [HiredApplicantsController::class, 'index'])
+        ->name('hired-applicants.index');
+
     Route::get('/profile', [ProfileUpdateController::class, 'index'])->name('profile.index');
 
     // Employer Profile Update routes
@@ -196,5 +204,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'destroy' => 'user-photos.destroy',
         ]);
 });
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/report/user/{user}', [UserReportController::class, 'create'])
+        ->name('report.user.create');
+    Route::post('/report/user', [UserReportController::class, 'store'])
+        ->name('report.user.store');
+});
+
 
 require __DIR__ . '/auth.php';
