@@ -67,4 +67,32 @@ class Profile extends Model
 
         return implode(', ', $parts);
     }
+
+    /**
+     * Helper to safely get address component
+     */
+    public function getAddressComponent($key, $default = null)
+    {
+        if (!$this->address || !is_array($this->address)) {
+            return $default;
+        }
+
+        return $this->address[$key] ?? $default;
+    }
+
+    /**
+     * Magic method to handle calls to undefined methods
+     * This will catch attempts to call address() as a method and provide helpful error
+     */
+    public function __call($method, $parameters)
+    {
+        // Special case for common error
+        if ($method === 'address') {
+            throw new \BadMethodCallException(
+                "Method 'address()' does not exist. 'address' is an attribute, use \$profile->address instead."
+            );
+        }
+
+        return parent::__call($method, $parameters);
+    }
 }

@@ -189,8 +189,13 @@ Route::middleware(['auth'])->prefix('browse')->name('browse.')->group(function (
         ->name('employers.show');
     Route::get('/agencies/{id}', [AgencyPageController::class, 'show'])
         ->name('agencies.show');
+
+    Route::get('/maids', [MaidPageController::class, 'index'])
+        ->name('maids.index');
     Route::get('/maids/{id}', [MaidPageController::class, 'show'])
         ->name('maids.show');
+    Route::get('/maids/{maidId}/match/{jobId}', [MaidPageController::class, 'showMatchDetails'])
+        ->name('maids.match-details');
 });
 
 // User Photos Routes

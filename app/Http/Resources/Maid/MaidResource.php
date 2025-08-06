@@ -14,6 +14,43 @@ class MaidResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        // Get the user relationship with photos
+        $user = $this->whenLoaded('user');
+        $userPhotos = $user ? $user->photos : collect([]);
+
+        // Get primary photo
+        $primaryPhoto = $userPhotos->where('is_primary', true)->first();
+        if (!$primaryPhoto && $userPhotos->count() > 0) {
+            $primaryPhoto = $userPhotos->first();
+        }
+
+        // Format location information
+        $location = null;
+        $formattedLocation = 'Location not specified';
+
+        if ($user && $user->profile && $user->profile->address) {
+            $address = $user->profile->address;
+
+            // Handle both array and object formats
+            $city = is_array($address) ? ($address['city'] ?? null) : ($address->city ?? null);
+            $province = is_array($address) ? ($address['province'] ?? null) : ($address->province ?? null);
+            $barangay = is_array($address) ? ($address['barangay'] ?? null) : ($address->barangay ?? null);
+
+            $location = [
+                'city' => $city,
+                'province' => $province,
+                'barangay' => $barangay,
+            ];
+
+            $locationParts = [];
+            if ($city) $locationParts[] = $city;
+            if ($province) $locationParts[] = $province;
+
+            if (!empty($locationParts)) {
+                $formattedLocation = implode(', ', $locationParts);
+            }
+        }
+
         return [
             'id' => $this->id,
             'bio' => $this->bio,
@@ -51,6 +88,21 @@ class MaidResource extends JsonResource
             'full_name' => $this->full_name,
             'is_managed_by_agency' => $this->is_managed_by_agency,
             'agency_name' => $this->agency_name,
+
+            // Photo information
+            'photos' => $userPhotos->map(function ($photo) {
+                return [
+                    'id' => $photo->id,
+                    'path' => $photo->path,
+                    'url' => $photo->path ? asset('storage/' . $photo->path) : null,
+                    'is_primary' => $photo->is_primary,
+                ];
+            }),
+            'primary_photo' => $primaryPhoto ? asset('storage/' . $primaryPhoto->path) : null,
+
+            // Location information
+            'location' => $location,
+            'formatted_location' => $formattedLocation,
 
             // Relationships
             'user' => new UserResource($this->whenLoaded('user')),
