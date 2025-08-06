@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/Components/ui/button";
-import MaidCard from "./MaidCard";
+import MaidCard from "./MaidCard/index";
 import { cn } from "@/lib/utils";
 
 interface MaidFeaturedSectionProps {

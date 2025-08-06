@@ -1,5 +1,5 @@
 import { Loader2 } from "lucide-react";
-import MaidCard from "./MaidCard";
+import MaidCard from "./MaidCard/index";
 
 interface MaidGridProps {
     maids: any[];
@@ -8,6 +8,9 @@ interface MaidGridProps {
     useComputedMatch?: boolean;
     selectedJobId?: string | null;
     isLoading?: boolean;
+    showMatchBadge?: boolean;
+    showLocationBadge?: boolean;
+    showBookmarked?: boolean;
 }
 
 export default function MaidGrid({
@@ -17,6 +20,9 @@ export default function MaidGrid({
     useComputedMatch = true,
     selectedJobId = null,
     isLoading = false,
+    showMatchBadge = false,
+    showLocationBadge = false,
+    showBookmarked = false,
 }: MaidGridProps) {
     if (isLoading) {
         return (
@@ -44,9 +50,11 @@ export default function MaidGrid({
                     key={maid.id}
                     maid={maid}
                     compact={compact}
-                    showMatchBadge={!!selectedJobId} // Show match badge when job is selected
+                    showMatchBadge={showMatchBadge || !!selectedJobId}
+                    showLocationBadge={showLocationBadge}
+                    showBookmarked={showBookmarked}
                     useComputedMatch={useComputedMatch}
-                    selectedJobId={selectedJobId} // Pass the selected job ID to each card
+                    selectedJobId={selectedJobId}
                 />
             ))}
         </div>

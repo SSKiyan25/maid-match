@@ -31,6 +31,8 @@ use App\Http\Controllers\JobApplication\AgencyJobApplicationController;
 use App\Http\Controllers\Browse\EmployerPageController;
 use App\Http\Controllers\Browse\AgencyPageController;
 use App\Http\Controllers\Browse\MaidPageController;
+use App\Http\Controllers\Browse\BookmarkController;
+use App\Http\Controllers\Browse\ViewAllController;
 
 // General Controllers
 use App\Http\Controllers\UserController;
@@ -196,6 +198,17 @@ Route::middleware(['auth'])->prefix('browse')->name('browse.')->group(function (
         ->name('maids.show');
     Route::get('/maids/{maidId}/match/{jobId}', [MaidPageController::class, 'showMatchDetails'])
         ->name('maids.match-details');
+    Route::prefix('bookmarks')->name('bookmarks.')->group(function () {
+        Route::post('/{maidId}/toggle', [BookmarkController::class, 'toggle'])->name('toggle');
+        Route::get('/{maidId}/check', [BookmarkController::class, 'check'])->name('check');
+    });
+    Route::get('bookmarked-maids', [BookmarkController::class, 'list'])->name('bookmarked-maids.index');
+    Route::get('/maids/all/best-matches', [ViewAllController::class, 'bestMatches'])
+        ->name('maids.all.best-matches');
+    Route::get('/maids/all/nearby', [ViewAllController::class, 'nearby'])
+        ->name('maids.all.nearby');
+    Route::get('/maids/all/bookmarked', [BookmarkController::class, 'list'])
+        ->name('maids.all.bookmarked');
 });
 
 // User Photos Routes

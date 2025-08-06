@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Maid\Maid;
 use App\Models\JobPosting\JobPosting;
 use Illuminate\Support\Collection;
+use App\Models\Employer\Employer;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -15,6 +16,33 @@ class MaidQueryService
     public function __construct(MaidMatchingService $matchingService)
     {
         $this->matchingService = $matchingService;
+    }
+
+    /**
+     * Get bookmarked maids for an employer
+     */
+    public function getBookmarkedMaids(Employer $employer, $limit = 8)
+    {
+        if (!$employer) {
+            return collect([]);
+        }
+
+        $bookmarkedMaids = $employer->bookmarkedMaids()
+            ->with(['user.profile', 'user.photos', 'agency'])
+            ->wherePivot('is_archived', false)
+            ->take($limit)
+            ->get();
+
+        return $bookmarkedMaids->map(function ($maid) {
+            $maidArray = $maid->toArray();
+
+            // Add agency name for easier access
+            if ($maid->agency) {
+                $maidArray['agency_name'] = $maid->agency->name;
+            }
+
+            return $maidArray;
+        })->values()->all();
     }
 
     /**
@@ -162,7 +190,7 @@ class MaidQueryService
     /**
      * Get nearby maids based on location
      */
-    public function getNearbyMaids(array $location)
+    public function getNearbyMaids(array $location, $limit = 8)
     {
         if (empty($location)) {
             return collect([]);
@@ -185,7 +213,7 @@ class MaidQueryService
                     $query->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT(address, '$.province')) = ?", [$provinceToMatch]);
                 }
             })
-            ->take(8)
+            ->take($limit)
             ->get();
 
         return $maids->map(function ($maid) {
@@ -257,5 +285,50 @@ class MaidQueryService
             ->all();
 
         return $languages;
+    }
+
+    /**
+     * Get all maids with match percentages for all or a specific job posting
+     */
+    public function getAllMatchedMaids(Collection $jobPostings, ?JobPosting $selectedJob = null, $limit = 50)
+    {
+        $maids = Maid::with(['user.profile', 'user.photos', 'agency'])
+            ->whereHas('user', function ($query) {
+                $query->where('status', 'active');
+            })
+            ->take($limit)
+            ->get();
+
+        return $maids->map(function ($maid) use ($jobPostings, $selectedJob) {
+            $maidArray = $maid->toArray();
+
+            // Add agency name for easier access
+            if ($maid->agency) {
+                $maidArray['agency_name'] = $maid->agency->name;
+            }
+
+            if ($selectedJob) {
+                // Calculate match for specific job posting
+                $matchScore = $this->matchingService->calculateMatchScore($maid, $selectedJob);
+                $maidArray['computed_match'] = [
+                    'job_id' => $selectedJob->id,
+                    'job_title' => $selectedJob->title,
+                    'match_percentage' => $matchScore
+                ];
+            } else {
+                // Find best match across all job postings
+                $bestMatch = $this->matchingService->findBestMatch($maid, $jobPostings);
+                $maidArray['best_match'] = $bestMatch;
+            }
+
+            return $maidArray;
+        })->sortByDesc(function ($maid) use ($selectedJob) {
+            // Sort by the appropriate match percentage
+            if ($selectedJob) {
+                return $maid['computed_match']['match_percentage'] ?? 0;
+            } else {
+                return $maid['best_match']['match_percentage'] ?? 0;
+            }
+        })->values()->all();
     }
 }

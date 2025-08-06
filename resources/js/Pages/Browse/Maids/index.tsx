@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Head, router } from "@inertiajs/react";
+import { Head, router, Link } from "@inertiajs/react";
 import EmployerLayout from "@/Layouts/EmployerLayout";
 import MaidHeader from "./components/ForIndex/MaidHeader";
 import MaidFilters from "./components/ForIndex/MaidFilters";
@@ -7,6 +7,7 @@ import MaidFeaturedSection from "./components/ForIndex/MaidFeaturedSection";
 import MaidGrid from "./components/ForIndex/MaidGrid";
 import { Separator } from "@/Components/ui/separator";
 import PaginationComponent from "@/Components/PaginationComponent";
+import { BookmarkIcon, MapPin, Sparkles } from "lucide-react";
 
 interface MaidPageProps {
     maids: any[];
@@ -22,6 +23,7 @@ interface MaidPageProps {
         nearbyMaids?: any[];
         recentMaids?: any[];
         jobSpecificMatches?: any[];
+        bookmarkedMaids?: any[];
     };
     filterOptions: {
         skills: string[];
@@ -67,6 +69,7 @@ export default function MaidsIndexPage({
         nearbyMaids = [],
         recentMaids = [],
         jobSpecificMatches = [],
+        bookmarkedMaids = [],
     } = featuredSections;
 
     // Handler for filter changes - send to server
@@ -132,17 +135,49 @@ export default function MaidsIndexPage({
             <div className="container mx-auto px-4 py-6 mb-36 sm:px-12 space-y-8 max-w-sm sm:max-w-full overflow-x-hidden">
                 <MaidHeader />
 
+                {/* Bookmarked Maids Section */}
+                {bookmarkedMaids.length > 0 && (
+                    <section className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-2xl font-bold flex items-center">
+                                <BookmarkIcon className="h-6 w-6 mr-2 text-rose-500" />
+                                Your Bookmarked Maids
+                            </h2>
+                            <Link
+                                href={route("browse.maids.all.bookmarked")}
+                                className="text-primary text-sm hover:underline"
+                            >
+                                View all
+                            </Link>
+                        </div>
+                        <MaidFeaturedSection maids={bookmarkedMaids} />
+                    </section>
+                )}
+
                 {/* Best Matches Section */}
                 {bestMatches.length > 0 && (
                     <section className="space-y-4">
                         <div className="flex items-center justify-between">
-                            <h2 className="text-2xl font-bold">Best Matches</h2>
-                            <a
-                                href="#all-maids"
+                            <h2 className="text-2xl font-bold flex items-center">
+                                <Sparkles className="h-6 w-6 mr-2 text-yellow-500" />
+                                Best Matches
+                            </h2>
+                            <Link
+                                href={
+                                    selectedJobPosting
+                                        ? route(
+                                              "browse.maids.all.best-matches",
+                                              {
+                                                  job_posting_id:
+                                                      selectedJobPosting,
+                                              }
+                                          )
+                                        : route("browse.maids.all.best-matches")
+                                }
                                 className="text-primary text-sm hover:underline"
                             >
                                 View all
-                            </a>
+                            </Link>
                         </div>
                         <MaidFeaturedSection
                             maids={bestMatches}
@@ -151,50 +186,20 @@ export default function MaidsIndexPage({
                     </section>
                 )}
 
-                {/* Job-Specific Matches Section */}
-                {/* {selectedJobPosting && jobSpecificMatches.length > 0 && (
-                    <section className="space-y-4">
-                        <div className="flex items-center justify-between">
-                            <h2 className="text-2xl font-bold">
-                                Best Matches for "
-                                {
-                                    job_postings.find(
-                                        (j) =>
-                                            j.id.toString() ===
-                                            selectedJobPosting
-                                    )?.title
-                                }
-                                "
-                            </h2>
-                            <a
-                                href="#all-maids"
-                                className="text-primary text-sm hover:underline"
-                            >
-                                View all
-                            </a>
-                        </div>
-                        <MaidFeaturedSection
-                            maids={jobSpecificMatches}
-                            highlightMatch={true}
-                            useComputedMatch={false}
-                            selectedJobId={selectedJobPosting}
-                        />
-                    </section>
-                )} */}
-
                 {/* Nearby Maids Section */}
                 {nearbyMaids.length > 0 && (
                     <section className="space-y-4">
                         <div className="flex items-center justify-between">
-                            <h2 className="text-2xl font-bold">
+                            <h2 className="text-2xl font-bold flex items-center">
+                                <MapPin className="h-6 w-6 mr-2 text-blue-500" />
                                 Maids Near You
                             </h2>
-                            <a
-                                href="#all-maids"
+                            <Link
+                                href={route("browse.maids.all.nearby")}
                                 className="text-primary text-sm hover:underline"
                             >
                                 View all
-                            </a>
+                            </Link>
                         </div>
                         <MaidFeaturedSection
                             maids={nearbyMaids}
@@ -210,12 +215,6 @@ export default function MaidsIndexPage({
                             <h2 className="text-2xl font-bold">
                                 Recently Added
                             </h2>
-                            <a
-                                href="#all-maids"
-                                className="text-primary text-sm hover:underline"
-                            >
-                                View all
-                            </a>
                         </div>
                         <MaidFeaturedSection
                             maids={recentMaids}

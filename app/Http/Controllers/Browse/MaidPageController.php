@@ -89,6 +89,7 @@ class MaidPageController extends Controller
                 ? $this->queryService->getNearbyMaids($jobPostings[0]->location->toArray())
                 : collect([]),
             'recentMaids' => $this->queryService->getRecentMaids(),
+            'bookmarkedMaids' => $employer ? $this->queryService->getBookmarkedMaids($employer) : [],
         ];
 
         // Get filter options
