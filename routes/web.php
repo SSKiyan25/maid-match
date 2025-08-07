@@ -189,9 +189,21 @@ Route::middleware(['auth'])->prefix('browse')->name('browse.')->group(function (
 
     Route::get('/employers/{id}', [EmployerPageController::class, 'show'])
         ->name('employers.show');
+    // Agency routes
+    Route::get('/agencies', [AgencyPageController::class, 'index'])
+        ->name('agencies.index');
     Route::get('/agencies/{id}', [AgencyPageController::class, 'show'])
         ->name('agencies.show');
+    Route::get('/agencies/all/featured', [AgencyPageController::class, 'allFeatured'])
+        ->name('agencies.all.featured');
+    Route::get('/agencies/all/verified', [AgencyPageController::class, 'allVerified'])
+        ->name('agencies.all.verified');
+    Route::get('/agencies/all/popular', [AgencyPageController::class, 'allPopular'])
+        ->name('agencies.all.popular');
+    Route::get('/agencies/all/recent', [AgencyPageController::class, 'allRecent'])
+        ->name('agencies.all.recent');
 
+    // Maid routes
     Route::get('/maids', [MaidPageController::class, 'index'])
         ->name('maids.index');
     Route::get('/maids/{id}', [MaidPageController::class, 'show'])

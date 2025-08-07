@@ -31,9 +31,16 @@ class AgencyResource extends JsonResource
             'business_phone' => $this->business_phone,
             'contact_person' => $this->contact_person,
             'address' => $this->address,
+            'formatted_address' => $this->when($this->address, function () {
+                $parts = [];
+                if (!empty($this->address['barangay'])) $parts[] = $this->address['barangay'];
+                if (!empty($this->address['city'])) $parts[] = $this->address['city'];
+                if (!empty($this->address['province'])) $parts[] = $this->address['province'];
+                return implode(', ', $parts);
+            }),
             'website' => $this->website,
             'facebook_page' => $this->facebook_page,
-            'placement_fee' => $this->placement_fee,
+            'placement_fee' => $this->when($this->show_fee_publicly, $this->placement_fee),
             'show_fee_publicly' => $this->show_fee_publicly,
             'status' => $this->status,
             'is_premium' => $this->is_premium,
@@ -44,6 +51,19 @@ class AgencyResource extends JsonResource
             'is_archived' => $this->is_archived,
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
+
+            // Include the main photo when photos are loaded
+            'main_photo' => $this->whenLoaded('photos', function () {
+                $primaryPhoto = $this->photos->firstWhere('is_primary', true)
+                    ?? $this->photos->first();
+
+                return $primaryPhoto ? "/storage/{$primaryPhoto->url}" : null;
+            }),
+
+            // Statistics when available
+            'maids_count' => $this->when(isset($this->maids_count), function () {
+                return $this->maids_count ?? 0;
+            }),
         ];
     }
 }

@@ -156,7 +156,7 @@ const navMain = [
 
 const browseItems = [
     { name: "Browse for Maids", url: "/browse/maids", icon: Users },
-    { name: "Browse for Agency", url: "/agencies/browse", icon: Building2 },
+    { name: "Browse for Agency", url: "/browse/agencies", icon: Building2 },
 ];
 
 export default function EmployerLayout({
