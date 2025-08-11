@@ -39,13 +39,13 @@ import { Link } from "@inertiajs/react";
 interface ApplicationDetailsDialogProps {
     application: any;
     open: boolean;
-    onClose: () => void;
+    onOpenChange: (open: boolean) => void;
 }
 
 export default function ApplicationDetailsDialog({
     application,
     open,
-    onClose,
+    onOpenChange,
 }: ApplicationDetailsDialogProps) {
     const { maid, job_posting, status, status_label, applied_at, description } =
         application;
@@ -53,7 +53,7 @@ export default function ApplicationDetailsDialog({
     const profile = user?.profile || {};
 
     return (
-        <Dialog open={open} onOpenChange={onClose}>
+        <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Application Details</DialogTitle>
@@ -332,7 +332,11 @@ export default function ApplicationDetailsDialog({
                         <User className="h-4 w-4 mr-1.5" />
                         View Maid Profile
                     </Link>
-                    <Button variant="outline" size="sm" onClick={onClose}>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onOpenChange(false)}
+                    >
                         Close
                     </Button>
                 </div>

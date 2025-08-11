@@ -1,34 +1,65 @@
-import { Info } from "lucide-react";
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from "@/Components/ui/tooltip";
+import { Badge } from "@/Components/ui/badge";
+import { cn } from "@/lib/utils";
 
-export default function StatusInfo() {
+interface StatusInfoProps {
+    status: string;
+    type?: "application" | "maid";
+    size?: "sm" | "default";
+}
+
+export default function StatusInfo({
+    status,
+    type = "application",
+    size = "default",
+}: StatusInfoProps) {
+    const getStatusConfig = () => {
+        if (type === "maid") {
+            switch (status) {
+                case "available":
+                    return { label: "Available", variant: "success" };
+                case "employed":
+                    return { label: "Employed", variant: "info" };
+                case "pending":
+                    return { label: "Pending", variant: "warning" };
+                default:
+                    return {
+                        label: status.replace(/_/g, " "),
+                        variant: "secondary",
+                    };
+            }
+        }
+
+        // Application status
+        switch (status) {
+            case "pending_review":
+                return { label: "Pending Review", variant: "warning" };
+            case "shortlisted":
+                return { label: "Shortlisted", variant: "success" };
+            case "interviewed":
+                return { label: "Interviewed", variant: "info" };
+            case "rejected":
+                return { label: "Rejected", variant: "destructive" };
+            case "hired":
+                return { label: "Hired", variant: "primary" };
+            default:
+                return {
+                    label: status.replace(/_/g, " "),
+                    variant: "secondary",
+                };
+        }
+    };
+
+    const { label, variant } = getStatusConfig();
+
     return (
-        <TooltipProvider>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <span>
-                        <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
-                    </span>
-                </TooltipTrigger>
-                <TooltipContent className="max-w-[300px]">
-                    <div className="space-y-2 p-1">
-                        <p className="font-semibold">Status Information</p>
-                        <p>
-                            <strong>Application Status:</strong> Shows the
-                            status of this specific job application.
-                        </p>
-                        <p>
-                            <strong>Maid Status:</strong> Shows the overall
-                            employment status of the maid in the system.
-                        </p>
-                    </div>
-                </TooltipContent>
-            </Tooltip>
-        </TooltipProvider>
+        <Badge
+            variant={variant as any}
+            className={cn(
+                "capitalize font-medium",
+                size === "sm" ? "text-[10px] px-1.5 py-0" : ""
+            )}
+        >
+            {label}
+        </Badge>
     );
 }

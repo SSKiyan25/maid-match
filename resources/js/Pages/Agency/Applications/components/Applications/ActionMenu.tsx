@@ -28,12 +28,22 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 interface ActionMenuProps {
     applicationId: number;
     maidName: string;
+    application?: any;
 }
 
 export default function ActionMenu({
     applicationId,
     maidName,
+    application,
 }: ActionMenuProps) {
+    // If applicationId is not provided directly but via application object
+    const id = applicationId || application?.id;
+    const name =
+        maidName ||
+        application?.maid?.user?.profile?.first_name +
+            " " +
+            application?.maid?.user?.profile?.last_name;
+
     const [showActions, setShowActions] = useState(false);
     const [showHireConfirmation, setShowHireConfirmation] = useState(false);
     const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
@@ -43,7 +53,7 @@ export default function ActionMenu({
     const handleMarkAsHired = () => {
         setIsLoading(true);
         router.post(
-            route("agency.applications.markAsHired", applicationId),
+            route("agency.applications.markAsHired", id),
             {},
             {
                 onSuccess: () => {
@@ -60,7 +70,7 @@ export default function ActionMenu({
     const handleCancelApplication = () => {
         setIsLoading(true);
         router.post(
-            route("agency.applications.cancel", applicationId),
+            route("agency.applications.cancel", id),
             {},
             {
                 onSuccess: () => {
@@ -157,8 +167,8 @@ export default function ActionMenu({
                     <AlertDialogHeader>
                         <AlertDialogTitle>Mark as Hired</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to mark {maidName} as hired?
-                            This will change the maid's status to "employed".
+                            Are you sure you want to mark {name} as hired? This
+                            will change the maid's status to "employed".
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -183,7 +193,7 @@ export default function ActionMenu({
                         <AlertDialogTitle>Cancel Application</AlertDialogTitle>
                         <AlertDialogDescription>
                             Are you sure you want to cancel this application?
-                            This will remove the application and set {maidName}
+                            This will remove the application and set {name}
                             's status back to "available".
                         </AlertDialogDescription>
                     </AlertDialogHeader>
