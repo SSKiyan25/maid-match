@@ -25,6 +25,7 @@ use App\Http\Controllers\Agency\Profile\PhotoUpdateController;
 use App\Http\Controllers\Agency\SettingUpdateController;
 use App\Http\Controllers\Agency\ApplicationsController;
 use App\Http\Controllers\Agency\AgencyCreditController;
+use App\Http\Controllers\Agency\AgencyDashboardController;
 
 // Browse Controllers
 use App\Http\Controllers\Browse\ForJobPostsController;
@@ -85,9 +86,7 @@ Route::middleware(['auth', 'verified', 'role:maid'])->group(function () {
 });
 
 Route::middleware(['auth', 'verified', 'role:agency'])->prefix('agency')->name('agency.')->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Agency/Dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [AgencyDashboardController::class, 'index'])->name('dashboard');
 
     // Maid CRUD for agency, except show
     Route::resource('maids', MaidController::class)

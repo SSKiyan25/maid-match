@@ -106,7 +106,7 @@ class BookmarkController extends Controller
                     'success' => false,
                     'message' => 'Employer profile not found',
                     'bookmarked' => false,
-                ], 200); // Return 200 with bookmarked false for non-employers
+                ], 200);
             }
 
             $isBookmarked = $employer->bookmarkedMaids()
@@ -128,7 +128,7 @@ class BookmarkController extends Controller
                 'success' => false,
                 'message' => 'Failed to check bookmark status',
                 'bookmarked' => false,
-            ], 200); // Return 200 with bookmarked false on error
+            ], 200);
         }
     }
 
@@ -154,12 +154,12 @@ class BookmarkController extends Controller
         $transformedMaids = $bookmarkedMaids->map(function ($maid) {
             $maidArray = $maid->toArray();
 
-            // Add agency name for easier access
+            // Agency name for easier access
             if ($maid->agency) {
                 $maidArray['agency_name'] = $maid->agency->name;
             }
 
-            // Add bookmark pivot data
+            // Bookmark pivot data
             $maidArray['bookmark_data'] = [
                 'description' => $maid->pivot->description,
                 'created_at' => $maid->pivot->created_at,
@@ -168,7 +168,7 @@ class BookmarkController extends Controller
             return $maidArray;
         });
 
-        // Create pagination metadata
+        // Pagination metadata
         $pagination = [
             'current_page' => $bookmarkedMaids->currentPage(),
             'last_page' => $bookmarkedMaids->lastPage(),

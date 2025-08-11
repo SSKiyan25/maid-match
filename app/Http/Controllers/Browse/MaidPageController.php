@@ -41,7 +41,6 @@ class MaidPageController extends Controller
             'characterReferences',
         ])->findOrFail($id);
 
-        // Return Inertia view with data
         return Inertia::render('Browse/Maids/Maid', [
             'maid' => new MaidResource($maid),
             'documents' => MaidDocumentResource::collection($maid->documents),
@@ -82,7 +81,7 @@ class MaidPageController extends Controller
         // Get filtered maids (main grid)
         $filteredMaids = $this->queryService->getFilteredMaids($filters, $selectedJob);
 
-        // ALWAYS get all featured sections regardless of job selection
+        // Get all featured sections regardless of job selection
         $featuredSections = [
             'bestMatches' => $this->queryService->getBestMatchedMaids($jobPostings),
             'nearbyMaids' => $jobPostings->isNotEmpty()
@@ -98,7 +97,6 @@ class MaidPageController extends Controller
             'languages' => $this->queryService->getAllLanguages(),
         ];
 
-        // Return Inertia view with data
         return Inertia::render('Browse/Maids/index', [
             'maids' => $filteredMaids['data'],
             'pagination' => $filteredMaids['meta'],
@@ -120,7 +118,6 @@ class MaidPageController extends Controller
         $jobPosting = JobPosting::with(['location'])
             ->findOrFail($jobId);
 
-        // Add location data in the right format for the client
         $jobPostingArray = $jobPosting->toArray();
         if ($jobPosting->location) {
             $jobPostingArray['location'] = [

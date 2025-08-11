@@ -63,7 +63,7 @@ class ViewAllController extends Controller
         $total = count($maids);
         $lastPage = ceil($total / $perPage);
 
-        // Simple manual pagination
+        // Manual pagination
         $paginatedMaids = array_slice($maids, ($page - 1) * $perPage, $perPage);
 
         $pagination = [

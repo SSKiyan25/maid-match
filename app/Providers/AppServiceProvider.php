@@ -13,6 +13,12 @@ use App\Http\Resources\UserResource;
 use App\Http\Resources\Agency\AgencyResource;
 use App\Http\Resources\Agency\AgencyCreditResource;
 
+// Add Agency Dashboard Services
+use App\Services\Agency\CreditService;
+use App\Services\Agency\MaidService;
+use App\Services\Agency\ApplicationService;
+use App\Services\Agency\DashboardService;
+
 class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
@@ -32,6 +38,20 @@ class AppServiceProvider extends ServiceProvider
         // Register AgencyQueryService
         $this->app->singleton(AgencyQueryService::class, function () {
             return new AgencyQueryService();
+        });
+
+        // Register Agency Dashboard Services
+        $this->app->singleton(CreditService::class);
+        $this->app->singleton(MaidService::class);
+        $this->app->singleton(ApplicationService::class);
+
+        // Register DashboardService with its dependencies
+        $this->app->singleton(DashboardService::class, function ($app) {
+            return new DashboardService(
+                $app->make(CreditService::class),
+                $app->make(MaidService::class),
+                $app->make(ApplicationService::class)
+            );
         });
     }
 

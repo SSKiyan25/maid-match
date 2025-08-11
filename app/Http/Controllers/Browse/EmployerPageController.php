@@ -39,7 +39,6 @@ class EmployerPageController extends Controller
             'family_size' => $employer->family_size,
         ];
 
-        // Return Inertia view with data
         return Inertia::render('Browse/Employers/Employer', [
             'employer' => (new EmployerResource($employer))->additional([
                 'stats' => $stats

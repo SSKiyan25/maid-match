@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Head } from "@inertiajs/react";
+import { Head, usePage } from "@inertiajs/react";
 import AgencyLayout from "@/Layouts/AgencyLayout";
 import ApplicationsHeader from "./components/Applications/Header";
 import ApplicationsFilters from "./components/Applications/Filters";
@@ -11,6 +11,8 @@ export default function AgencyApplicationsPage({ applications }: any) {
     const [filteredApplications, setFilteredApplications] = useState(
         applications.data || []
     );
+    const { props } = usePage();
+    console.log("Application Props", props);
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
     const [jobPostingFilter, setJobPostingFilter] = useState("all");

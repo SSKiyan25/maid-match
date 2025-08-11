@@ -115,7 +115,7 @@ class EmployerRegisterRequest extends FormRequest
                 $children[] = [
                     'name' => $child['name'] ?? null,
                     'birth_date' => $child['birth_date'] ?? null,
-                    'photo_url' => $childPhotoUrls[$index] ?? null, // Use uploaded photo URL
+                    'photo_url' => $childPhotoUrls[$index] ?? null,
                     'is_archived' => false,
                 ];
             }
@@ -129,7 +129,7 @@ class EmployerRegisterRequest extends FormRequest
                 $pets[] = [
                     'type' => $pet['type'] ?? null,
                     'name' => $pet['name'] ?? null,
-                    'photo_url' => $petPhotoUrls[$index] ?? null, // Use uploaded photo URL
+                    'photo_url' => $petPhotoUrls[$index] ?? null,
                     'is_archived' => false,
                 ];
             }

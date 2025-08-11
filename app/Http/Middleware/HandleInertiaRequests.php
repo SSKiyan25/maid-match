@@ -4,6 +4,8 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use App\Http\Resources\UserResource;
+use App\Models\User;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -33,8 +35,8 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'auth' => [
                 'user' => $request->user()
-                    ? (new \App\Http\Resources\UserResource(
-                        \App\Models\User::with('profile')->find($request->user()->id)
+                    ? (new UserResource(
+                        User::with('profile')->find($request->user()->id)
                     ))->toArray(request())
                     : null,
             ],
