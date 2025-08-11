@@ -38,7 +38,7 @@ export default function AgencyLayout({
         agency?: Agency | null;
     };
     // console.log("AgencyLayout auth:", auth);
-    console.log("AgencyLayout agency:", agency);
+    // console.log("AgencyLayout agency:", agency);
     const user = auth.user;
 
     const navMain = [

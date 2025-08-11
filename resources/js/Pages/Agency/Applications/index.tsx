@@ -12,7 +12,7 @@ export default function AgencyApplicationsPage({ applications }: any) {
         applications.data || []
     );
     const { props } = usePage();
-    console.log("Application Props", props);
+    // console.log("Application Props", props);
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
     const [jobPostingFilter, setJobPostingFilter] = useState("all");
@@ -20,7 +20,7 @@ export default function AgencyApplicationsPage({ applications }: any) {
 
     // Apply filters when search or status filter changes
     useEffect(() => {
-        console.log("Props", applications);
+        // console.log("Props", applications);
         setIsLoading(true);
 
         const filtered = (applications.data || []).filter((app: any) => {
