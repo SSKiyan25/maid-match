@@ -10,20 +10,21 @@ import {
 import { Button } from "@/Components/ui/button";
 import { router } from "@inertiajs/react";
 import { Inbox } from "lucide-react";
-import { MaidData } from "@/types";
+// import { MaidData } from "@/types";
 
 interface MaidsListProps {
-    maids: MaidData[];
+    maids: any[];
     filters: {
         search: string;
         status: string;
         sortBy: string;
     };
+    agency?: any;
 }
 
-export default function MaidsList({ maids, filters }: MaidsListProps) {
+export default function MaidsList({ maids, filters, agency }: MaidsListProps) {
     const [displayMode, setDisplayMode] = useState<"grid" | "list">("grid");
-    const [filteredMaids, setFilteredMaids] = useState<MaidData[]>(maids);
+    const [filteredMaids, setFilteredMaids] = useState<any[]>(maids);
     const [maidToArchive, setMaidToArchive] = useState<number | null>(null);
 
     // Apply filters when they change

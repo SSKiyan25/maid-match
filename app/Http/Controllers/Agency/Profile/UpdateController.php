@@ -22,7 +22,7 @@ class UpdateController extends Controller
 
         return inertia('Agency/Settings/Profile/index', [
             'user' => $user,
-            'agency' => $agency,
+            'agencyData' => $agency,
             'photos' => $photos,
         ]);
     }

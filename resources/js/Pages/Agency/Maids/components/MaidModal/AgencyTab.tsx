@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/Components/ui/card";
 import { Badge } from "@/Components/ui/badge";
-import { MaidData } from "@/types";
+// import { MaidData } from "@/types";
 import {
     Calendar,
     Clock,
@@ -12,10 +12,11 @@ import { formatDate } from "@/utils/formFunctions";
 import { formatCurrency } from "./helpers";
 
 interface AgencyTabProps {
-    maid: MaidData;
+    maid: any;
 }
 
 export default function AgencyTab({ maid }: AgencyTabProps) {
+    // console.log("AgencyTab maid:", maid);
     return (
         <div className="p-6 pt-5 space-y-6">
             <Card>
@@ -73,9 +74,9 @@ export default function AgencyTab({ maid }: AgencyTabProps) {
                 </h3>
                 <Card>
                     <CardContent className="p-4">
-                        {maid.maid.agency_notes ? (
+                        {maid.agency_notes ? (
                             <div className="text-sm whitespace-pre-line">
-                                {maid.maid.agency_notes}
+                                {maid.agency_notes}
                             </div>
                         ) : (
                             <div className="text-sm text-muted-foreground italic">

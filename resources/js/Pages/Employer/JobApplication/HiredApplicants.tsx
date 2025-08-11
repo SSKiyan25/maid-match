@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
-import { Head } from "@inertiajs/react";
+import { Head, Link } from "@inertiajs/react";
 import EmployerLayout from "@/Layouts/EmployerLayout";
 import HiredApplicantCard from "./components/Hired/Card";
 import HiredApplicantDetailsModal from "./components/Hired/DetailsModal";
 import EmptyState from "./components/Hired/EmptyState";
 import SearchAndFilters from "./components/Hired/SearchAndFilters";
+import { Button } from "@/Components/ui/button";
+import { Inbox, ClipboardList } from "lucide-react";
+import { Separator } from "@/Components/ui/separator";
 
 interface HiredApplicantsProps {
     hiredApplicants: any[];
@@ -60,16 +63,96 @@ export default function HiredApplicants({
         <EmployerLayout>
             <Head title="Hired Applicants" />
             <div className="container mx-auto p-4 mb-20 lg:p-6">
-                {/* Header Section */}
-                <div className="mb-6">
-                    <h1 className="text-2xl font-bold">Hired Applicants</h1>
-                    <p className="text-muted-foreground mt-1">
-                        {hiredApplicants.length} applicant
-                        {hiredApplicants.length !== 1 ? "s" : ""} hired across{" "}
-                        {jobPostings.length} job
-                        {jobPostings.length !== 1 ? "s" : ""}
-                    </p>
+                {/* Header with navigation links */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                    <div>
+                        <h1 className="text-2xl font-bold">Hired Applicants</h1>
+                        <p className="text-muted-foreground mt-1">
+                            {hiredApplicants.length} applicant
+                            {hiredApplicants.length !== 1 ? "s" : ""} hired
+                            across {jobPostings.length} job
+                            {jobPostings.length !== 1 ? "s" : ""}
+                        </p>
+                    </div>
+
+                    {/* Navigation shortcuts - Desktop */}
+                    <div className="hidden sm:flex items-start gap-3">
+                        <div className="flex flex-col items-center">
+                            <Button variant="outline" size="sm" asChild>
+                                <Link
+                                    href={route(
+                                        "employer.job-applications.index"
+                                    )}
+                                >
+                                    <Inbox className="h-4 w-4 mr-2" />
+                                    Applications
+                                </Link>
+                            </Button>
+                            <span className="text-xs text-muted-foreground mt-1">
+                                View all job applicants
+                            </span>
+                        </div>
+
+                        <div className="flex flex-col items-center">
+                            <Button variant="outline" size="sm" asChild>
+                                <Link
+                                    href={route(
+                                        "employer.shortlist-ranking.index"
+                                    )}
+                                >
+                                    <ClipboardList className="h-4 w-4 mr-2" />
+                                    Shortlisted
+                                </Link>
+                            </Button>
+                            <span className="text-xs text-muted-foreground mt-1">
+                                Manage candidates you've shortlisted
+                            </span>
+                        </div>
+                    </div>
                 </div>
+
+                {/* Navigation shortcuts - Mobile */}
+                <div className="flex sm:hidden gap-2 mb-6">
+                    <div className="flex-1 flex flex-col items-center">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full h-9 text-xs"
+                            asChild
+                        >
+                            <Link
+                                href={route("employer.job-applications.index")}
+                            >
+                                <Inbox className="h-3.5 w-3.5 mr-1.5" />
+                                Applications
+                            </Link>
+                        </Button>
+                        <span className="text-[10px] text-muted-foreground mt-1">
+                            View all applicants
+                        </span>
+                    </div>
+
+                    <div className="flex-1 flex flex-col items-center">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full h-9 text-xs"
+                            asChild
+                        >
+                            <Link
+                                href={route("employer.shortlist-ranking.index")}
+                            >
+                                <ClipboardList className="h-3.5 w-3.5 mr-1.5" />
+                                Shortlisted
+                            </Link>
+                        </Button>
+                        <span className="text-[10px] text-muted-foreground mt-1">
+                            Manage shortlisted candidates
+                        </span>
+                    </div>
+                </div>
+
+                <Separator className="my-4" />
 
                 {/* Search and Filters */}
                 <SearchAndFilters

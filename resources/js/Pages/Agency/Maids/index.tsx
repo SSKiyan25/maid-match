@@ -9,7 +9,7 @@ import MaidsList from "./components/MaidsList";
 
 interface MaidsIndexProps extends PageProps {
     maids: any[];
-    agency: any;
+    agencyData: any;
     stats: any;
     flash: {
         success?: string;
@@ -18,6 +18,8 @@ interface MaidsIndexProps extends PageProps {
 }
 
 export default function MaidsIndexPage(props: MaidsIndexProps) {
+    const { maids, agencyData, stats, flash } = props; // Destructure props including agencyData
+
     const [filters, setFilters] = useState({
         search: "",
         status: "all",
@@ -25,13 +27,14 @@ export default function MaidsIndexPage(props: MaidsIndexProps) {
     });
 
     useEffect(() => {
-        if (props.flash?.success) {
-            toast.success(props.flash.success);
+        // console.log("MaidsIndexPage props:", props);
+        if (flash?.success) {
+            toast.success(flash.success);
         }
-        if (props.flash?.error) {
-            toast.error(props.flash.error);
+        if (flash?.error) {
+            toast.error(flash.error);
         }
-    }, [props.flash]);
+    }, [flash]);
 
     const handleFilterChange = (newFilters: {
         search: string;
@@ -45,9 +48,13 @@ export default function MaidsIndexPage(props: MaidsIndexProps) {
         <AgencyLayout>
             <Head title="Agency Maids" />
             <div className="container px-10 py-8 pb-36 sm:py-16 sm:px-24">
-                <MaidsHeader stats={props.stats} />
+                <MaidsHeader stats={stats} />
                 <MaidsFilter onFilterChange={handleFilterChange} />
-                <MaidsList maids={props.maids} filters={filters} />
+                <MaidsList
+                    maids={maids}
+                    filters={filters}
+                    agency={agencyData} // Pass agencyData as agency prop if needed by MaidsList
+                />
             </div>
         </AgencyLayout>
     );

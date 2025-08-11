@@ -17,7 +17,7 @@ import {
     TooltipTrigger,
 } from "@/Components/ui/tooltip";
 import { Eye, Edit, X, Star, CheckCircle } from "lucide-react";
-import { MaidData } from "@/types";
+// import { MaidData } from "@/types";
 import { router } from "@inertiajs/react";
 import { getStatusColor } from "./helpers";
 import OverviewTab from "./OverviewTab";
@@ -26,7 +26,7 @@ import AgencyTab from "./AgencyTab";
 import PhotosTab from "./PhotosTab";
 
 interface MaidViewModalProps {
-    maid: MaidData;
+    maid: any;
 }
 
 export default function MaidViewModal({ maid }: MaidViewModalProps) {

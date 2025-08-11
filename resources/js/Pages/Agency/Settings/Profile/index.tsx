@@ -7,13 +7,13 @@ import AgencyPhotos from "./components/AgencyPhotos";
 
 interface ProfileProps extends PageProps {
     user: User;
-    agency: Agency;
+    agencyData: Agency;
     photos: AgencyPhoto[];
 }
 
 export default function ProfileSettings({
     user,
-    agency,
+    agencyData,
     photos,
 }: ProfileProps) {
     // console.log("ProfileSettings", { user, agency, photos });
@@ -32,9 +32,9 @@ export default function ProfileSettings({
                 </div>
 
                 <div className="space-y-6">
-                    <UserProfile user={user} agency={agency} />
-                    <AgencyInformation user={user} agency={agency} />
-                    <AgencyPhotos photos={photos} agencyId={agency.id} />
+                    <UserProfile user={user} agency={agencyData} />
+                    <AgencyInformation user={user} agency={agencyData} />
+                    <AgencyPhotos photos={photos} agencyId={agencyData.id} />
                 </div>
             </div>
         </AgencyLayout>

@@ -72,3 +72,14 @@ export const getPhotoUrl = (photoUrl: string) => {
     if (photoUrl.startsWith("blob:")) return photoUrl;
     return `/storage/${photoUrl}`;
 };
+
+export function formatDate(dateString: string): string {
+    const date = new Date(dateString);
+
+    // Format: July 18, 2025
+    return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+    });
+}

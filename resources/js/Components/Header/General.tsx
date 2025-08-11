@@ -11,8 +11,9 @@ import {
 } from "@/Components/ui/dropdown-menu";
 import { router, Link } from "@inertiajs/react";
 import { NotificationsButton } from "./partials/notifications";
-import { Home, MessageCircle } from "lucide-react";
+import { Home, MessageCircle, Coins } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Button } from "@/Components/ui/button";
 
 interface GeneralHeaderProps {
     user: {
@@ -20,14 +21,21 @@ interface GeneralHeaderProps {
         email: string;
         avatar: string;
         role: string;
+        credits?: {
+            available: number;
+            recent_transactions: any[];
+        };
+        isAgency?: boolean;
     };
 }
 
 export default function GeneralHeader({ user }: GeneralHeaderProps) {
     const isMobile = useIsMobile();
+    const isAgency = user.isAgency === true;
+    const credits = user.credits?.available ?? 0;
 
     return (
-        <header className="flex h-16 shrink-0 items-center bg-secondary border-b justify-between px-4 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+        <header className="flex sticky top-0 z-50 h-16 shrink-0 items-center bg-secondary border-b justify-between px-4 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
             {/* Left: Sidebar Trigger and Logo/App Name on Mobile */}
             <div className="flex items-center gap-2">
                 <SidebarTrigger className="text-secondary-foreground bg-primary/20 h-10 w-10" />
@@ -40,6 +48,20 @@ export default function GeneralHeader({ user }: GeneralHeaderProps) {
             </div>
             {/* Right: Chat, Notifications, Avatar Dropdown */}
             <div className="flex items-center gap-2">
+                {/* Show credits for agencies */}
+                {isAgency && !isMobile && (
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        asChild
+                        className="mr-2"
+                    >
+                        <Link href="/agency/credits">
+                            <Coins className="w-4 h-4 mr-1" />
+                            {credits} Credits
+                        </Link>
+                    </Button>
+                )}
                 {/* Only show ModeToggle inline on desktop */}
                 {!isMobile && <ModeToggle />}
                 <NotificationsButton />
@@ -69,6 +91,21 @@ export default function GeneralHeader({ user }: GeneralHeaderProps) {
                     <DropdownMenuContent align="end" className="min-w-40">
                         <DropdownMenuLabel>Account</DropdownMenuLabel>
                         <DropdownMenuSeparator />
+                        {/* Show credits in dropdown */}
+                        {isAgency && (
+                            <>
+                                <DropdownMenuItem asChild>
+                                    <Link
+                                        href="/agency/credits"
+                                        className="flex items-center gap-2"
+                                    >
+                                        <Coins className="w-4 h-4" />
+                                        <span>{credits} Credits</span>
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                            </>
+                        )}
                         {/* Show ModeToggle in dropdown on mobile */}
                         {isMobile && (
                             <>

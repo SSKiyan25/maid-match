@@ -39,13 +39,13 @@ class AuthenticatedSessionController extends Controller
         } elseif ($user->isAgency()) {
             return redirect()->intended(route('agency.dashboard', absolute: false));
         } elseif ($user->isEmployer()) {
-            return redirect()->intended(route('employer.dashboard', absolute: false));
+            return redirect()->intended(route('browse.maids.index', absolute: false));
         } elseif ($user->isMaid()) {
             return redirect()->intended(route('maid.dashboard', absolute: false));
         }
 
         // Fallback
-        return redirect()->intended(route('dashboard', absolute: false));
+        return redirect()->intended('/');
     }
 
     /**

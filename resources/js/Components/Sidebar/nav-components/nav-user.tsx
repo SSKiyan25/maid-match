@@ -7,6 +7,7 @@ import {
     CreditCard,
     LogOut,
     Sparkles,
+    Coins,
 } from "lucide-react";
 import { router } from "@inertiajs/react";
 
@@ -26,16 +27,20 @@ import {
     SidebarMenuItem,
     useSidebar,
 } from "@/Components/ui/sidebar";
+import { Badge } from "@/Components/ui/badge";
 
-export function NavUser({
-    user,
-}: {
-    user: {
-        name: string;
-        email: string;
-        avatar: string;
+export interface UserProps {
+    name: string;
+    email: string;
+    avatar: string;
+    credits?: {
+        available: number;
+        recent_transactions?: any[];
     };
-}) {
+    isAgency?: boolean;
+}
+
+export function NavUser({ user }: { user: UserProps }) {
     const { isMobile } = useSidebar();
 
     return (
@@ -113,20 +118,57 @@ export function NavUser({
                             </div>
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
+
+                        {/* Show credits for agency users */}
+                        {user.credits && (
+                            <>
+                                <DropdownMenuGroup>
+                                    <DropdownMenuItem asChild>
+                                        <a
+                                            href={route("agency.credits.index")}
+                                            className="flex justify-between items-center"
+                                        >
+                                            <span className="flex items-center">
+                                                <Coins className="mr-2 h-4 w-4" />
+                                                Credits
+                                            </span>
+                                            <Badge
+                                                variant="outline"
+                                                className="ml-auto"
+                                            >
+                                                {user.credits.available}
+                                            </Badge>
+                                        </a>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <a
+                                            href={route(
+                                                "agency.credits.purchase"
+                                            )}
+                                        >
+                                            <CreditCard className="mr-2 h-4 w-4" />
+                                            Buy Credits
+                                        </a>
+                                    </DropdownMenuItem>
+                                </DropdownMenuGroup>
+                                <DropdownMenuSeparator />
+                            </>
+                        )}
+
                         <DropdownMenuGroup>
                             <DropdownMenuItem>
-                                <Sparkles />
+                                <Sparkles className="mr-2 h-4 w-4" />
                                 Upgrade to Pro
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
                             <DropdownMenuItem>
-                                <BadgeCheck />
+                                <BadgeCheck className="mr-2 h-4 w-4" />
                                 Account
                             </DropdownMenuItem>
                             <DropdownMenuItem>
-                                <Bell />
+                                <Bell className="mr-2 h-4 w-4" />
                                 Notifications
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
@@ -135,7 +177,7 @@ export function NavUser({
                             onClick={() => router.post(route("logout"))}
                             className="cursor-pointer"
                         >
-                            <LogOut />
+                            <LogOut className="mr-2 h-4 w-4" />
                             Log out
                         </DropdownMenuItem>
                     </DropdownMenuContent>

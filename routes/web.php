@@ -24,6 +24,7 @@ use App\Http\Controllers\Agency\Profile\UpdateController;
 use App\Http\Controllers\Agency\Profile\PhotoUpdateController;
 use App\Http\Controllers\Agency\SettingUpdateController;
 use App\Http\Controllers\Agency\ApplicationsController;
+use App\Http\Controllers\Agency\AgencyCreditController;
 
 // Browse Controllers
 use App\Http\Controllers\Browse\ForJobPostsController;
@@ -118,6 +119,12 @@ Route::middleware(['auth', 'verified', 'role:agency'])->prefix('agency')->name('
     Route::get('applications', [ApplicationsController::class, 'index'])->name('applications.index');
     Route::post('applications/{application}/mark-as-hired', [ApplicationsController::class, 'markAsHired'])->name('applications.markAsHired');
     Route::post('applications/{application}/cancel', [ApplicationsController::class, 'cancel'])->name('applications.cancel');
+
+    // Credit Management Routes
+    Route::get('/credits', [AgencyCreditController::class, 'index'])->name('credits.index');
+    Route::get('/credits/purchase', [AgencyCreditController::class, 'showPurchaseForm'])->name('credits.purchase');
+    Route::post('/credits/add', [AgencyCreditController::class, 'addCredits'])->name('credits.add');
+    Route::post('/credits/use', [AgencyCreditController::class, 'useCredits'])->name('credits.use');
 });
 
 Route::middleware(['auth', 'verified', 'role:employer'])->prefix('employer')->name('employer.')->group(function () {

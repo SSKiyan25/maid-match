@@ -58,7 +58,7 @@ class MaidController extends Controller
 
         return inertia('Agency/Maids/index', [
             'maids' => $maids,
-            'agency' => new AgencyResource($agency),
+            'agencyData' => new AgencyResource($agency),
             'stats' => $stats,
             'flash' => [
                 'success' => session('success'),

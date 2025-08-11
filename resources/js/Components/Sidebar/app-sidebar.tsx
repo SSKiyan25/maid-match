@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { NavMain } from "./nav-components/nav-main";
-import { NavUser } from "./nav-components/nav-user";
+import { NavUser, UserProps } from "./nav-components/nav-user";
 import { NavBrowse } from "./nav-components/nav-browse";
 import { NavHeader } from "./nav-components/nav-header";
 import {
@@ -19,6 +19,7 @@ interface SidebarNavItem {
     url?: string;
     icon?: LucideIcon;
     isActive?: boolean;
+    badge?: number | string;
     items?: {
         title: string;
         url: string;
@@ -33,11 +34,7 @@ interface BrowseItem {
 }
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-    user: {
-        name: string;
-        email: string;
-        avatar: string;
-    };
+    user: UserProps;
     navMain: SidebarNavItem[];
     browseItems?: BrowseItem[];
     defaultOpen?: boolean;

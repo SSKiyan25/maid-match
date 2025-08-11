@@ -1,4 +1,4 @@
-import { usePage, Head } from "@inertiajs/react";
+import { usePage, Head, Link } from "@inertiajs/react";
 import EmployerLayout from "@/Layouts/EmployerLayout";
 import { useState } from "react";
 import ShortlistHeader from "./components/Shortlist/Header";
@@ -7,7 +7,9 @@ import ShortlistTable from "./components/Shortlist/Table";
 import MaidDetailsModal from "./components/Shortlist/MaidDetailsModal";
 import { JobPosting, JobApplication, PageProps } from "@/types";
 import { Alert, AlertDescription } from "@/Components/ui/alert";
-import { Info } from "lucide-react";
+import { Info, Inbox, Check } from "lucide-react";
+import { Button } from "@/Components/ui/button";
+import { Separator } from "@/Components/ui/separator";
 
 interface ShortlistRankingPageProps extends PageProps {
     jobPostings: JobPosting[];
@@ -18,8 +20,6 @@ export default function ShortlistRanking() {
     const { jobPostings, shortlistedApplicants } =
         usePage<ShortlistRankingPageProps>().props;
 
-    console.log("Shortlisted Applicants:", shortlistedApplicants);
-    console.log("Job Postings:", jobPostings);
     // State for filters
     const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
@@ -67,10 +67,96 @@ export default function ShortlistRanking() {
             <Head title="Shortlisted Candidates" />
 
             <div className="container mx-auto p-4 mb-48 lg:p-6">
-                <ShortlistHeader
-                    totalShortlisted={shortlistedApplicants.length}
-                    totalJobs={jobPostings.length}
-                />
+                {/* Header with navigation links */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                    <div>
+                        <h1 className="text-2xl font-bold">
+                            Shortlisted Candidates
+                        </h1>
+                        <p className="text-muted-foreground mt-1">
+                            {shortlistedApplicants.length} candidate
+                            {shortlistedApplicants.length !== 1 ? "s" : ""}{" "}
+                            shortlisted across {jobPostings.length} job
+                            {jobPostings.length !== 1 ? "s" : ""}
+                        </p>
+                    </div>
+
+                    {/* Navigation shortcuts - Desktop */}
+                    <div className="hidden sm:flex items-start gap-3">
+                        <div className="flex flex-col items-center">
+                            <Button variant="outline" size="sm" asChild>
+                                <Link
+                                    href={route(
+                                        "employer.job-applications.index"
+                                    )}
+                                >
+                                    <Inbox className="h-4 w-4 mr-2" />
+                                    Applications
+                                </Link>
+                            </Button>
+                            <span className="text-xs text-muted-foreground mt-1">
+                                View and manage all job applications
+                            </span>
+                        </div>
+                        <div className="flex flex-col items-center">
+                            <Button variant="outline" size="sm" asChild>
+                                <Link
+                                    href={route(
+                                        "employer.hired-applicants.index"
+                                    )}
+                                >
+                                    <Check className="h-4 w-4 mr-2" />
+                                    Hired
+                                </Link>
+                            </Button>
+                            <span className="text-xs text-muted-foreground mt-1">
+                                See all candidates you've hired
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Navigation shortcuts - Mobile */}
+                <div className="flex sm:hidden gap-2 mb-4">
+                    <div className="flex-1 flex flex-col items-center">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full h-9 text-xs"
+                            asChild
+                        >
+                            <Link
+                                href={route("employer.job-applications.index")}
+                            >
+                                <Inbox className="h-3.5 w-3.5 mr-1.5" />
+                                Applications
+                            </Link>
+                        </Button>
+                        <span className="text-[10px] text-muted-foreground mt-1">
+                            View and manage all job applications
+                        </span>
+                    </div>
+                    <div className="flex-1 flex flex-col items-center">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full h-9 text-xs"
+                            asChild
+                        >
+                            <Link
+                                href={route("employer.hired-applicants.index")}
+                            >
+                                <Check className="h-3.5 w-3.5 mr-1.5" />
+                                Hired
+                            </Link>
+                        </Button>
+                        <span className="text-[10px] text-muted-foreground mt-1">
+                            See all candidates you've hired
+                        </span>
+                    </div>
+                </div>
+
+                <Separator className="my-4" />
 
                 <ShortlistFilters
                     jobPostings={jobPostings}

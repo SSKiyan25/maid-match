@@ -39,21 +39,21 @@ interface EmployerLayoutProps extends PropsWithChildren {
 }
 
 const employerMobileLinks: MobileNavLink[] = [
-    { label: "Dashboard", icon: Home, href: "/employer/dashboard" },
+    { label: "Home", icon: Home, href: "/browse/maids" },
     { label: "Jobs", icon: Briefcase, href: "/employer/job-postings" },
     {
         label: "Applicants",
         icon: UserRoundSearch,
         href: "/employer/job-applications",
     },
-    { label: "Browse", icon: Search, href: "/employer/browse" },
+    { label: "Profile", icon: UserIcon, href: "/employer/profile" },
 ];
 
 // Sidebar navMain and browseItems (from app-employer.tsx)
 const navMain = [
     {
-        title: "Dashboard",
-        url: "/employer/dashboard",
+        title: "Home",
+        url: "/browse/maids",
         icon: LayoutDashboard,
         isActive: true,
     },
@@ -117,17 +117,6 @@ const navMain = [
                 title: "Propose Time Slots",
                 url: "#",
                 icon: Hourglass,
-            },
-        ],
-    },
-    {
-        title: "Bookmarks",
-        icon: Bookmark,
-        items: [
-            {
-                title: "Saved Maids",
-                url: "#",
-                icon: BookUser,
             },
         ],
     },

@@ -40,4 +40,8 @@ export interface Agency {
     created_at: string;
     updated_at: string;
     photos?: AgencyPhoto[];
+    credits?: {
+        available: number;
+        recent_transactions: any[];
+    };
 }
