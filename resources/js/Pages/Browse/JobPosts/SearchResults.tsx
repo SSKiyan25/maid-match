@@ -29,10 +29,8 @@ export default function SearchResults({
     const totalPages = jobs.meta?.last_page ?? 1;
     const totalResults = jobs.meta?.total ?? 0;
 
-    // Check if we have valid job data
+    // Check if valid job data
     const hasResults = Array.isArray(jobs.data) && jobs.data.length > 0;
-
-    // Check if we have pagination data
     const hasPagination = jobs.meta !== undefined && totalPages > 1;
 
     const handlePageChange = (page: number) => {
