@@ -7,17 +7,70 @@ import {
     getMatchColorClass,
     getMatchQualityLabel,
 } from "@/utils/matchingUtils";
-import { Percent, ThumbsUp, ThumbsDown } from "lucide-react";
+import {
+    Percent,
+    ThumbsUp,
+    ThumbsDown,
+    ChevronLeft,
+    User,
+    MapPin,
+    Languages,
+    Briefcase,
+    Home,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import EmployerLayout from "@/Layouts/EmployerLayout";
+import { Button } from "@/Components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
+import { router } from "@inertiajs/react";
+import { getInitials } from "@/utils/useGeneralUtils";
 
 export default function MatchDetails({ maid, jobPosting }: any) {
     // Unwrap the maid data if it's wrapped in a data property
     const maidData = maid.data || maid;
 
-    // Calculate match details - ensure we're passing the correct data structure
-    // console.log("Calculating match details for:", maid, jobPosting);
-    const matchResult = calculateMaidJobMatch(maidData, jobPosting);
+    // Ensure data has the right format for the matching algorithm
+    const preparedMaidData = {
+        ...maidData,
+        // For location matching, try multiple sources
+        location: maidData.location || maidData.address || null,
+        formatted_location: maidData.formatted_location || null,
+        user: {
+            ...maidData.user,
+            profile: {
+                ...maidData.user?.profile,
+                // Need to preserve the privacy flag to correctly handle address privacy
+                is_address_private:
+                    maidData.user?.profile?.is_address_private || false,
+                address: maidData.user?.profile?.address || {},
+            },
+        },
+        skills: Array.isArray(maidData.skills) ? maidData.skills : [],
+        languages: Array.isArray(maidData.languages) ? maidData.languages : [],
+        // Ensure proper experience value
+        years_experience: maidData.years_experience || 0,
+    };
+
+    const preparedJobData = {
+        ...jobPosting,
+        work_types: Array.isArray(jobPosting.work_types)
+            ? jobPosting.work_types
+            : typeof jobPosting.work_types === "string"
+            ? JSON.parse(jobPosting.work_types)
+            : [],
+        language_preferences: Array.isArray(jobPosting.language_preferences)
+            ? jobPosting.language_preferences
+            : typeof jobPosting.language_preferences === "string"
+            ? JSON.parse(jobPosting.language_preferences)
+            : [],
+    };
+
+    // Calculate match details with prepared data
+    const matchResult = calculateMaidJobMatch(
+        preparedMaidData,
+        preparedJobData
+    );
+
     const matchColorClass = getMatchColorClass(matchResult.percentage);
     const matchQuality = getMatchQualityLabel(matchResult.percentage);
 
@@ -25,25 +78,66 @@ export default function MatchDetails({ maid, jobPosting }: any) {
     const maidName = maidData.full_name || "Maid";
     const jobTitle = jobPosting.title || "Job";
 
+    // Handle back button click
+    const handleBack = () => {
+        router.visit(route("browse.maids.index"));
+    };
+
+    // Handle view profile button click
+    const handleViewProfile = () => {
+        router.visit(route("browse.maids.show", maidData.id));
+    };
+
     return (
         <EmployerLayout>
             <Head title={`Match Details - ${maidName}`} />
 
-            <div className="container mx-auto p-4 py-8 mb-28">
-                <div className="mb-6">
-                    <h1 className="text-2xl font-bold">Match Details</h1>
-                    <p className="text-muted-foreground">
-                        Analyzing compatibility between {maidName} and{" "}
-                        {jobTitle}
-                    </p>
-                </div>
+            <div className="container mx-auto p-4 py-6 mb-28">
+                {/* Back button */}
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    className="mb-4"
+                    onClick={handleBack}
+                >
+                    <ChevronLeft className="h-4 w-4 mr-1" />
+                    Back to Home
+                </Button>
 
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {/* Match Score Card */}
-                    <Card className="md:col-span-2 lg:col-span-3">
-                        <CardHeader>
-                            <div className="flex items-center justify-between">
-                                <CardTitle>Overall Match Score</CardTitle>
+                {/* Profile Header Section */}
+                <div className="bg-card rounded-xl shadow-sm border p-4 mb-6">
+                    <div className="flex items-center gap-4">
+                        <Avatar className="h-16 w-16 border-2 border-primary/20">
+                            <AvatarImage
+                                src={
+                                    maidData.user?.avatar
+                                        ? `/storage/${maidData.user.avatar}`
+                                        : undefined
+                                }
+                                alt={maidName}
+                            />
+                            <AvatarFallback className="text-lg bg-primary/10">
+                                {getInitials(maidName)}
+                            </AvatarFallback>
+                        </Avatar>
+
+                        <div className="flex-1">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:justify-between">
+                                <div>
+                                    <h1 className="text-xl font-bold">
+                                        {maidName}
+                                    </h1>
+                                    <p className="text-muted-foreground text-sm">
+                                        {maidData.nationality ||
+                                            "Not specified"}{" "}
+                                        •
+                                        <span className="ml-1 capitalize">
+                                            {maidData.experience_level ||
+                                                "Beginner"}
+                                        </span>
+                                    </p>
+                                </div>
+
                                 <Badge
                                     variant="outline"
                                     className={cn(
@@ -55,22 +149,183 @@ export default function MatchDetails({ maid, jobPosting }: any) {
                                     {matchResult.percentage}% Match
                                 </Badge>
                             </div>
-                        </CardHeader>
-                        <CardContent>
-                            <Progress
-                                value={matchResult.percentage}
-                                className="h-3 mb-3"
-                            />
-                            <p className="text-lg font-medium text-center mt-2">
-                                {matchQuality} match for this position
-                            </p>
-                        </CardContent>
-                    </Card>
 
+                            <div className="flex flex-wrap gap-2 mt-3">
+                                {maidData.is_verified && (
+                                    <Badge variant="secondary">Verified</Badge>
+                                )}
+                                {maidData.is_managed_by_agency && (
+                                    <Badge variant="secondary">
+                                        Agency Managed
+                                    </Badge>
+                                )}
+                                <Badge
+                                    variant={
+                                        maidData.status === "available"
+                                            ? "default"
+                                            : "outline"
+                                    }
+                                >
+                                    {maidData.status === "available"
+                                        ? "Available"
+                                        : "Employed"}
+                                </Badge>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Quick info cards */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
+                        <div className="p-3 rounded-lg bg-muted flex items-center gap-2">
+                            <User className="h-4 w-4 text-muted-foreground" />
+                            <div className="text-sm">
+                                <p className="text-xs text-muted-foreground">
+                                    Experience
+                                </p>
+                                <p className="font-medium">
+                                    {maidData.years_experience || 0} years
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="p-3 rounded-lg bg-muted flex items-center gap-2">
+                            <MapPin className="h-4 w-4 text-muted-foreground" />
+                            <div className="text-sm">
+                                <p className="text-xs text-muted-foreground">
+                                    Location
+                                </p>
+                                <p className="font-medium line-clamp-1">
+                                    {maidData.location?.city ||
+                                        maidData.formatted_location ||
+                                        "Private"}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="p-3 rounded-lg bg-muted flex items-center gap-2">
+                            <Languages className="h-4 w-4 text-muted-foreground" />
+                            <div className="text-sm">
+                                <p className="text-xs text-muted-foreground">
+                                    Languages
+                                </p>
+                                <p className="font-medium line-clamp-1">
+                                    {maidData.languages?.slice(0, 2).join(", ")}
+                                    {maidData.languages?.length > 2 &&
+                                        ` +${maidData.languages.length - 2}`}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="p-3 rounded-lg bg-muted flex items-center gap-2">
+                            <Home className="h-4 w-4 text-muted-foreground" />
+                            <div className="text-sm">
+                                <p className="text-xs text-muted-foreground">
+                                    Accommodation
+                                </p>
+                                <p className="font-medium capitalize">
+                                    {maidData.preferred_accommodation
+                                        ? maidData.preferred_accommodation.replace(
+                                              "_",
+                                              " "
+                                          )
+                                        : "Flexible"}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Match Overview */}
+                <Card className="mb-6">
+                    <CardHeader className="pb-2">
+                        <CardTitle>Match Overview: {jobTitle}</CardTitle>
+                        <p className="text-sm text-muted-foreground">
+                            {matchQuality} match for this position
+                        </p>
+                    </CardHeader>
+                    <CardContent>
+                        <Progress
+                            value={matchResult.percentage}
+                            className="h-3 mb-4"
+                        />
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mt-4">
+                            <div>
+                                <p className="text-sm text-muted-foreground mb-1">
+                                    Skills
+                                </p>
+                                <Progress
+                                    value={matchResult.factors.skillMatch}
+                                    className="h-2 mb-1"
+                                />
+                                <p className="text-right text-xs font-medium">
+                                    {matchResult.factors.skillMatch}%
+                                </p>
+                            </div>
+
+                            <div>
+                                <p className="text-sm text-muted-foreground mb-1">
+                                    Languages
+                                </p>
+                                <Progress
+                                    value={matchResult.factors.languageMatch}
+                                    className="h-2 mb-1"
+                                />
+                                <p className="text-right text-xs font-medium">
+                                    {matchResult.factors.languageMatch}%
+                                </p>
+                            </div>
+
+                            <div>
+                                <p className="text-sm text-muted-foreground mb-1">
+                                    Location
+                                </p>
+                                <Progress
+                                    value={matchResult.factors.locationMatch}
+                                    className="h-2 mb-1"
+                                />
+                                <p className="text-right text-xs font-medium">
+                                    {matchResult.factors.locationMatch}%
+                                </p>
+                            </div>
+
+                            <div>
+                                <p className="text-sm text-muted-foreground mb-1">
+                                    Salary
+                                </p>
+                                <Progress
+                                    value={matchResult.factors.salaryMatch}
+                                    className="h-2 mb-1"
+                                />
+                                <p className="text-right text-xs font-medium">
+                                    {matchResult.factors.salaryMatch}%
+                                </p>
+                            </div>
+
+                            <div>
+                                <p className="text-sm text-muted-foreground mb-1">
+                                    Accommodation
+                                </p>
+                                <Progress
+                                    value={
+                                        matchResult.factors.accommodationMatch
+                                    }
+                                    className="h-2 mb-1"
+                                />
+                                <p className="text-right text-xs font-medium">
+                                    {matchResult.factors.accommodationMatch}%
+                                </p>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Match Strengths & Weaknesses */}
+                <div className="grid gap-6 md:grid-cols-2">
                     {/* Match Strengths */}
                     <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center text-green-600">
+                        <CardHeader className="pb-2">
+                            <CardTitle className="flex items-center text-primary">
                                 <ThumbsUp className="h-5 w-5 mr-2" />
                                 Match Strengths
                             </CardTitle>
@@ -82,9 +337,9 @@ export default function MatchDetails({ maid, jobPosting }: any) {
                                         (strength, i) => (
                                             <li
                                                 key={i}
-                                                className="flex items-start"
+                                                className="flex items-start bg-primary/5 p-2 rounded-md"
                                             >
-                                                <span className="text-green-500 mr-2">
+                                                <span className="text-primary mr-2 mt-0.5">
                                                     ✓
                                                 </span>
                                                 {strength}
@@ -102,8 +357,8 @@ export default function MatchDetails({ maid, jobPosting }: any) {
 
                     {/* Match Weaknesses */}
                     <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center text-amber-600">
+                        <CardHeader className="pb-2">
+                            <CardTitle className="flex items-center text-secondary-foreground">
                                 <ThumbsDown className="h-5 w-5 mr-2" />
                                 Areas of Concern
                             </CardTitle>
@@ -115,9 +370,9 @@ export default function MatchDetails({ maid, jobPosting }: any) {
                                         (weakness, i) => (
                                             <li
                                                 key={i}
-                                                className="flex items-start"
+                                                className="flex items-start bg-accent/10 p-2 rounded-md"
                                             >
-                                                <span className="text-amber-500 mr-2">
+                                                <span className="text-accent-foreground mr-2 mt-0.5">
                                                     !
                                                 </span>
                                                 {weakness}
@@ -132,89 +387,114 @@ export default function MatchDetails({ maid, jobPosting }: any) {
                             )}
                         </CardContent>
                     </Card>
+                </div>
 
-                    {/* Match Details */}
+                {/* Skills & Languages */}
+                <div className="grid gap-6 md:grid-cols-2 mt-6">
+                    {/* Skills */}
                     <Card>
-                        <CardHeader>
-                            <CardTitle>Match Factors</CardTitle>
+                        <CardHeader className="pb-2">
+                            <CardTitle className="text-base">Skills</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="space-y-4">
-                                <div>
-                                    <p className="text-sm text-muted-foreground mb-1">
-                                        Skills Matching
+                            <div className="flex flex-wrap gap-2">
+                                {maidData.skills &&
+                                maidData.skills.length > 0 ? (
+                                    maidData.skills.map(
+                                        (skill: string, index: number) => (
+                                            <Badge
+                                                key={index}
+                                                variant="outline"
+                                                className={
+                                                    jobPosting.work_types?.some(
+                                                        (workType: string) =>
+                                                            workType
+                                                                .toLowerCase()
+                                                                .includes(
+                                                                    skill.toLowerCase()
+                                                                ) ||
+                                                            skill
+                                                                .toLowerCase()
+                                                                .includes(
+                                                                    workType
+                                                                        .replace(
+                                                                            "_",
+                                                                            " "
+                                                                        )
+                                                                        .toLowerCase()
+                                                                )
+                                                    )
+                                                        ? "bg-primary/10 text-primary"
+                                                        : ""
+                                                }
+                                            >
+                                                {skill}
+                                            </Badge>
+                                        )
+                                    )
+                                ) : (
+                                    <p className="text-sm text-muted-foreground">
+                                        No skills specified
                                     </p>
-                                    <Progress
-                                        value={matchResult.factors.skillMatch}
-                                        className="h-2"
-                                    />
-                                    <p className="text-right text-xs mt-1">
-                                        {matchResult.factors.skillMatch}%
-                                    </p>
-                                </div>
-
-                                <div>
-                                    <p className="text-sm text-muted-foreground mb-1">
-                                        Language Matching
-                                    </p>
-                                    <Progress
-                                        value={
-                                            matchResult.factors.languageMatch
-                                        }
-                                        className="h-2"
-                                    />
-                                    <p className="text-right text-xs mt-1">
-                                        {matchResult.factors.languageMatch}%
-                                    </p>
-                                </div>
-
-                                <div>
-                                    <p className="text-sm text-muted-foreground mb-1">
-                                        Location Proximity
-                                    </p>
-                                    <Progress
-                                        value={
-                                            matchResult.factors.locationMatch
-                                        }
-                                        className="h-2"
-                                    />
-                                    <p className="text-right text-xs mt-1">
-                                        {matchResult.factors.locationMatch}%
-                                    </p>
-                                </div>
-
-                                <div>
-                                    <p className="text-sm text-muted-foreground mb-1">
-                                        Salary Compatibility
-                                    </p>
-                                    <Progress
-                                        value={matchResult.factors.salaryMatch}
-                                        className="h-2"
-                                    />
-                                    <p className="text-right text-xs mt-1">
-                                        {matchResult.factors.salaryMatch}%
-                                    </p>
-                                </div>
-
-                                <div>
-                                    <p className="text-sm text-muted-foreground mb-1">
-                                        Accommodation
-                                    </p>
-                                    <Progress
-                                        value={
-                                            matchResult.factors
-                                                .accommodationMatch
-                                        }
-                                        className="h-2"
-                                    />
-                                    <p className="text-right text-xs mt-1">
-                                        {matchResult.factors.accommodationMatch}
-                                        %
-                                    </p>
-                                </div>
+                                )}
                             </div>
                         </CardContent>
                     </Card>
+
+                    {/* Languages */}
+                    <Card>
+                        <CardHeader className="pb-2">
+                            <CardTitle className="text-base">
+                                Languages
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex flex-wrap gap-2">
+                                {maidData.languages &&
+                                maidData.languages.length > 0 ? (
+                                    maidData.languages.map(
+                                        (language: string, index: number) => (
+                                            <Badge
+                                                key={index}
+                                                variant="secondary"
+                                                className={
+                                                    jobPosting.language_preferences?.some(
+                                                        (lang: string) =>
+                                                            lang.toLowerCase() ===
+                                                            language.toLowerCase()
+                                                    )
+                                                        ? "bg-primary/10 text-primary"
+                                                        : ""
+                                                }
+                                            >
+                                                {language}
+                                            </Badge>
+                                        )
+                                    )
+                                ) : (
+                                    <p className="text-sm text-muted-foreground">
+                                        No languages specified
+                                    </p>
+                                )}
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Action buttons */}
+                <div className="fixed bottom-0 left-0 right-0 bg-card border-t p-4 flex justify-center shadow-lg md:static md:bg-transparent md:border-0 md:shadow-none md:p-0 md:mt-6">
+                    <div className="flex gap-3 max-w-md w-full">
+                        <Button
+                            variant="outline"
+                            className="flex-1"
+                            onClick={handleBack}
+                        >
+                            Back
+                        </Button>
+                        <Button className="flex-1" onClick={handleViewProfile}>
+                            View Full Profile
+                        </Button>
+                    </div>
                 </div>
             </div>
         </EmployerLayout>

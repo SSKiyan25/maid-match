@@ -55,12 +55,14 @@ class MaidMatchingService
             'job_work_types' => $jobPosting->work_types,
         ]);
 
-        // Initialize factors
+        // Initialize factors and match information
         $skillMatch = 0;
         $languageMatch = 0;
         $accommodationMatch = 0;
         $salaryMatch = 0;
         $locationMatch = 0;
+        $strengths = [];
+        $weaknesses = [];
 
         // 1. Skills matching
         $maidSkills = $maid->skills ?? [];
@@ -83,9 +85,22 @@ class MaidMatchingService
                 return false;
             });
 
+            $matchingSkillsCount = count($matchingSkills);
             $skillMatch = !empty($jobSkills)
-                ? min(100, (count($matchingSkills) / count($jobSkills)) * 100)
+                ? min(100, ($matchingSkillsCount / count($jobSkills)) * 100)
                 : 0;
+
+            if ($matchingSkillsCount > 0) {
+                $strengths[] = "Matches {$matchingSkillsCount} required skills";
+
+                // Add weakness if skill match is low despite having some matches
+                if ($skillMatch < 50 && count($jobSkills) > $matchingSkillsCount) {
+                    $missingCount = count($jobSkills) - $matchingSkillsCount;
+                    $weaknesses[] = "Missing {$missingCount} required skills";
+                }
+            } else {
+                $weaknesses[] = "No matching skills found";
+            }
         }
 
         // 2. Language matching
@@ -105,6 +120,18 @@ class MaidMatchingService
             $languageMatch = !empty($jobLanguages)
                 ? min(100, ($matchingLanguagesCount / count($jobLanguages)) * 100)
                 : 0;
+
+            if ($matchingLanguagesCount > 0) {
+                $strengths[] = "Speaks {$matchingLanguagesCount} preferred languages";
+
+                // Add weakness if some languages are missing
+                if ($languageMatch < 100) {
+                    $missingCount = count($jobLanguages) - $matchingLanguagesCount;
+                    $weaknesses[] = "Missing {$missingCount} preferred " . ($missingCount > 1 ? 'languages' : 'language');
+                }
+            } else if (count($jobLanguages) > 0) {
+                $weaknesses[] = "Doesn't speak any preferred languages";
+            }
         }
 
         // 3. Accommodation matching
@@ -114,7 +141,15 @@ class MaidMatchingService
                 $maid->preferred_accommodation === 'either'
             ) {
                 $accommodationMatch = 100;
+                $strengths[] = "Accommodation preference matches";
+            } else {
+                $accommodationMatch = 0;
+                $weaknesses[] = "Accommodation preference doesn't match";
             }
+        } else if ($jobPosting->accommodation_type && !$maid->preferred_accommodation) {
+            // If job specifies accommodation but maid doesn't have a preference
+            $weaknesses[] = "No accommodation preference specified";
+            $accommodationMatch = 50; // Partial match - matches TypeScript implementation
         }
 
         // 4. Salary matching
@@ -125,46 +160,63 @@ class MaidMatchingService
 
             if ($expectedSalary <= $maxSalary && $expectedSalary >= $minSalary) {
                 $salaryMatch = 100;
+                $strengths[] = "Salary expectation is within budget";
             } elseif ($expectedSalary < $minSalary) {
-                $salaryMatch = 90; // Below minimum, still good for employer
+                // Below minimum, still a good match for employer
+                $salaryMatch = 90;
+                $strengths[] = "Salary expectation is below budget (good for employer)";
             } else {
                 // Above maximum
                 $overBudgetPercent = (($expectedSalary - $maxSalary) / $maxSalary) * 100;
                 $salaryMatch = max(0, 100 - $overBudgetPercent);
+                $weaknesses[] = "Salary expectation is " . round($overBudgetPercent) . "% over budget";
             }
+        } else if (($jobPosting->min_salary || $jobPosting->max_salary) && !$maid->expected_salary) {
+            // If job specifies salary but maid doesn't have an expectation
+            $weaknesses[] = "No salary expectation specified";
+            $salaryMatch = 50; // Partial match since it's unknown
         }
 
-        // 5. Location matching
+        // 5. Experience check - not a direct match factor but influences overall score
+        $experienceBonus = 0;
+        if ($maid->years_experience) {
+            if ($maid->years_experience >= 5) {
+                $experienceBonus = 10;
+                $strengths[] = "Has 5+ years of experience";
+            } else if ($maid->years_experience >= 3) {
+                $experienceBonus = 5;
+                $strengths[] = "Has 3+ years of experience";
+            } else if ($maid->years_experience < 2) {
+                $weaknesses[] = "Limited work experience (less than 2 years)";
+            }
+        } else {
+            $weaknesses[] = "No experience information provided";
+        }
+
+        // 6. Location Matching
         // Get maid profile with address
         $profile = null;
         $profileAddress = null;
 
         if ($maid->user && $maid->user->profile) {
             $profile = $maid->user->profile;
-            $profileAddress = $profile->address; // Use the attribute, not a method
+            $profileAddress = $profile->address;
         }
 
-        // Get job location (from relation or direct property)
+        // Get job location
         $jobLocationData = null;
 
-        // First check if the location relation is loaded
         if ($jobPosting->relationLoaded('location') && $jobPosting->location) {
             $jobLocationData = [
                 'barangay' => $jobPosting->location->brgy,
                 'city' => $jobPosting->location->city,
                 'province' => $jobPosting->location->province,
             ];
-        }
-        // Then check if it's a direct property
-        else if (is_string($jobPosting->location)) {
+        } else if (is_string($jobPosting->location)) {
             $jobLocationData = json_decode($jobPosting->location, true);
-        }
-        // Or already an array
-        else if (is_array($jobPosting->location)) {
+        } else if (is_array($jobPosting->location)) {
             $jobLocationData = $jobPosting->location;
-        }
-        // Otherwise try to load the relation
-        else {
+        } else {
             try {
                 $locationModel = $jobPosting->location()->first();
                 if ($locationModel) {
@@ -181,14 +233,6 @@ class MaidMatchingService
                 ]);
             }
         }
-
-        // Log location data for debugging
-        Log::debug('Location data for matching', [
-            'maid_id' => $maid->id,
-            'job_id' => $jobPosting->id,
-            'profile_address' => $profileAddress,
-            'job_location_data' => $jobLocationData
-        ]);
 
         if ($profileAddress && $jobLocationData) {
             // Extract maid location fields
@@ -217,13 +261,23 @@ class MaidMatchingService
                 $maidCity && $jobCity && $maidCity === $jobCity
             ) {
                 $locationMatch = 100;
+                $strengths[] = "Maid is located in the same barangay and city as the job";
             } elseif ($maidCity && $jobCity && $maidCity === $jobCity) {
                 $locationMatch = 90;
+                $strengths[] = "Maid is located in the same city as the job";
             } elseif ($maidProvince && $jobProvince && $maidProvince === $jobProvince) {
                 $locationMatch = 75;
+                $strengths[] = "Maid is located in the same province as the job";
             } else {
                 $locationMatch = 0;
+                $weaknesses[] = "Maid is located in a different province";
             }
+        } else if ($jobLocationData && (!$profileAddress ||
+            (is_object($profileAddress) && !$profileAddress->city) ||
+            (is_array($profileAddress) && !isset($profileAddress['city'])))) {
+            // If job specifies location but maid doesn't have an address
+            $weaknesses[] = "No location information provided";
+            $locationMatch = 0;
         }
 
         // Calculate weighted score
@@ -243,18 +297,17 @@ class MaidMatchingService
             $locationMatch * $weights['locationMatch'];
 
         // Add experience bonus (up to 10%)
-        $experienceBonus = 0;
-        if ($maid->years_experience >= 5) {
-            $experienceBonus = 10;
-        } elseif ($maid->years_experience >= 3) {
-            $experienceBonus = 5;
-        }
-
         $overallPercentage = min(100, $overallPercentage + $experienceBonus);
 
         // Special case - if no skills match, cap at 60%
         if ($skillMatch === 0) {
             $overallPercentage = min($overallPercentage, 60);
+        }
+
+        // If the overall score is below 70% but don't have any weaknesses,
+        // Ggeneric weakness message to explain the lower score
+        if ($overallPercentage < 70 && empty($weaknesses)) {
+            $weaknesses[] = "Some qualifications don't fully match job requirements";
         }
 
         // Log all factors for debugging
@@ -269,6 +322,8 @@ class MaidMatchingService
                 'locationMatch' => $locationMatch,
             ],
             'experienceBonus' => $experienceBonus,
+            'strengths' => $strengths,
+            'weaknesses' => $weaknesses,
             'rawScore' => $overallPercentage,
             'finalScore' => round($overallPercentage)
         ]);

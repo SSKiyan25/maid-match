@@ -78,7 +78,6 @@ export default function AgencyApplicationsPage({ applications }: any) {
 
         setFilteredApplications(filtered);
 
-        // Simulate loading for better UX
         setTimeout(() => setIsLoading(false), 300);
     }, [applications, searchTerm, statusFilter, jobPostingFilter]);
 

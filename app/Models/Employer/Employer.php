@@ -56,12 +56,27 @@ class Employer extends Model
         return $this->hasMany(EmployerPet::class);
     }
 
+    /**
+     * Relationship for bookmarked maids that are active (not archived)
+     * Used for display purposes
+     */
     public function bookmarkedMaids(): BelongsToMany
     {
         return $this->belongsToMany(Maid::class, 'employer_bookmarked_maids')
             ->withPivot(['description'])
             ->withTimestamps()
             ->wherePivot('is_archived', false);
+    }
+
+    /**
+     * Relationship for ALL bookmarked maids (including archived ones)
+     * Used for bookmark toggle functionality
+     */
+    public function allBookmarkedMaids(): BelongsToMany
+    {
+        return $this->belongsToMany(Maid::class, 'employer_bookmarked_maids')
+            ->withPivot(['description', 'is_archived'])
+            ->withTimestamps();
     }
 
     public function jobPostings(): HasMany

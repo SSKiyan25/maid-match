@@ -67,6 +67,7 @@ class MaidPageController extends Controller
             'skills' => $request->input('skills', []),
             'languages' => $request->input('languages', []),
             'sort_by' => $request->input('sort_by', 'match'),
+            'page' => $request->input('page', 1),
         ];
 
         // Get job posting if selected
@@ -130,6 +131,67 @@ class MaidPageController extends Controller
         return Inertia::render('Browse/Maids/MatchDetails', [
             'maid' => new MaidResource($maid),
             'jobPosting' => $jobPostingArray
+        ]);
+    }
+
+    /**
+     * Display search results for maids
+     */
+    public function search(Request $request)
+    {
+        // Get the authenticated employer
+        $employer = Auth::user()->employer;
+
+        // Get the employer's active job postings
+        $jobPostings = JobPosting::where('employer_id', $employer->id)
+            ->where('status', 'active')
+            ->with('location')
+            ->get();
+
+        // Get search parameters
+        $query = $request->input('query', '');
+        $sortBy = $request->input('sort_by', 'match');
+        $selectedJobId = $request->input('job_posting_id');
+        $skills = $request->input('skills', []);
+        $languages = $request->input('languages', []);
+        $page = $request->input('page', 1);
+
+        // Set up filters for the query service
+        $filters = [
+            'search' => $query,
+            'sort_by' => $sortBy,
+            'skills' => $skills,
+            'languages' => $languages,
+            'page' => $page
+        ];
+
+        if ($selectedJobId) {
+            $filters['job_posting_id'] = $selectedJobId;
+        }
+
+        // Get a selected job if provided
+        $selectedJob = null;
+        if ($selectedJobId) {
+            $selectedJob = $jobPostings->firstWhere('id', $selectedJobId);
+        }
+
+        // Get search results
+        $searchResults = $this->queryService->getFilteredMaids($filters, $selectedJob);
+
+        // Get filter options
+        $filterOptions = [
+            'skills' => $this->queryService->getAllSkills(),
+            'languages' => $this->queryService->getAllLanguages(),
+        ];
+
+        return Inertia::render('Browse/Maids/SearchResults', [
+            'maids' => $searchResults['data'],
+            'pagination' => $searchResults['meta'],
+            'query' => $query,
+            'sortOrder' => $sortBy,
+            'job_postings' => $jobPostings,
+            'selectedJobPosting' => $selectedJobId,
+            'filterOptions' => $filterOptions,
         ]);
     }
 }

@@ -188,6 +188,13 @@ Route::middleware(['auth'])->prefix('browse')->name('browse.')->group(function (
         ->name('job-posts.near-you');
     Route::get('job-posts/recommended', [ForJobPostsController::class, 'recommended'])
         ->name('job-posts.recommended');
+    Route::get('job-posts/featured', [ForJobPostsController::class, 'featured'])
+        ->name('job-posts.featured');
+
+    // Add the search route
+    Route::get('job-posts/search', [ForJobPostsController::class, 'search'])
+        ->name('job-posts.search');
+
     Route::get('job-applications/{jobPost}', [AgencyJobApplicationController::class, 'show'])
         ->name('job-applications.show');
     Route::post('job-applications/{jobPost}/apply', [AgencyJobApplicationController::class, 'apply'])
@@ -195,6 +202,7 @@ Route::middleware(['auth'])->prefix('browse')->name('browse.')->group(function (
 
     Route::get('/employers/{id}', [EmployerPageController::class, 'show'])
         ->name('employers.show');
+
     // Agency routes
     Route::get('/agencies', [AgencyPageController::class, 'index'])
         ->name('agencies.index');
@@ -210,6 +218,8 @@ Route::middleware(['auth'])->prefix('browse')->name('browse.')->group(function (
         ->name('agencies.all.recent');
 
     // Maid routes
+    Route::get('/maids/search', [MaidPageController::class, 'search'])
+        ->name('maids.search');
     Route::get('/maids', [MaidPageController::class, 'index'])
         ->name('maids.index');
     Route::get('/maids/{id}', [MaidPageController::class, 'show'])

@@ -1,21 +1,35 @@
 import React, { useState } from "react";
-import { Search, MapPin, Sliders } from "lucide-react";
+import { Search, MapPin } from "lucide-react";
 import { Input } from "@/Components/ui/input";
 import { Button } from "@/Components/ui/button";
-import {
-    Sheet,
-    SheetContent,
-    SheetDescription,
-    SheetHeader,
-    SheetTitle,
-    SheetTrigger,
-} from "@/Components/ui/sheet";
+import { router } from "@inertiajs/react";
 
-export default function SearchBar() {
-    const [searchTerm, setSearchTerm] = useState("");
+interface SearchBarProps {
+    initialSearchTerm?: string;
+}
+
+export default function SearchBar({ initialSearchTerm = "" }: SearchBarProps) {
+    const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (searchTerm.trim()) {
+            router.get(route("browse.job-posts.search"), {
+                search: searchTerm,
+            });
+        }
+    };
+
+    const handleNearMe = () => {
+        router.get(route("browse.job-posts.near-you"));
+    };
 
     return (
-        <div className="rounded-xl bg-card p-4 shadow-sm space-y-4">
+        <form
+            onSubmit={handleSearch}
+            className="rounded-xl bg-card p-4 shadow-sm space-y-4"
+        >
             <div className="relative">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -28,36 +42,27 @@ export default function SearchBar() {
 
             <div className="flex gap-2">
                 <Button
+                    type="button"
                     variant="outline"
                     size="sm"
                     className="flex-1 text-xs justify-start"
+                    onClick={handleNearMe}
                 >
                     <MapPin className="mr-2 h-3.5 w-3.5" />
                     Near Me
                 </Button>
 
-                <Sheet>
-                    <SheetTrigger asChild>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            className="flex-1 text-xs justify-start"
-                        >
-                            <Sliders className="mr-2 h-3.5 w-3.5" />
-                            Filters
-                        </Button>
-                    </SheetTrigger>
-                    <SheetContent>
-                        <SheetHeader>
-                            <SheetTitle>Filter Jobs</SheetTitle>
-                            <SheetDescription>
-                                Narrow down your job search
-                            </SheetDescription>
-                        </SheetHeader>
-                        {/* Filter options will go here */}
-                    </SheetContent>
-                </Sheet>
+                <Button
+                    type="submit"
+                    variant="default"
+                    size="sm"
+                    className="flex-1 text-xs"
+                    disabled={searchTerm.trim() === ""}
+                >
+                    <Search className="mr-2 h-3.5 w-3.5" />
+                    Search Jobs
+                </Button>
             </div>
-        </div>
+        </form>
     );
 }

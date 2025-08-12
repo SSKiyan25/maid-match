@@ -1,16 +1,12 @@
 import JobPostsList from "./JobPostsList";
 
 interface RecommendedSectionProps {
-    jobPosts: any[];
+    jobs: any[];
 }
 
-export default function RecommendedSection({
-    jobPosts,
-}: RecommendedSectionProps) {
-    // For now just put example logic to filter recommended jobs
-    const recommendedJobs = jobPosts
-        .filter((_, index) => index % 2 === 0)
-        .slice(0, 5);
+export default function RecommendedSection({ jobs }: RecommendedSectionProps) {
+    // Only display up to 5 recommended jobs on the main page
+    const recommendedJobs = jobs.slice(0, 5);
 
     return (
         <section>

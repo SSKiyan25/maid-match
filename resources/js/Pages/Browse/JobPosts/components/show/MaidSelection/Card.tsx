@@ -310,6 +310,7 @@ function MatchDetails({
     matchResult: any;
     matchLabel: string;
 }) {
+    console.log("Match result:", matchResult);
     return (
         <div className="space-y-2">
             <p className="font-medium">{matchLabel}</p>
@@ -329,20 +330,21 @@ function MatchDetails({
                 </div>
             )}
 
-            {matchResult.matchWeaknesses.length > 0 && (
-                <div>
-                    <p className="text-amber-600 text-xs font-medium">
-                        Areas of concern:
-                    </p>
-                    <ul className="text-xs pl-4 list-disc">
-                        {matchResult.matchWeaknesses.map(
-                            (weakness: any, i: number) => (
-                                <li key={i}>{weakness}</li>
-                            )
-                        )}
-                    </ul>
-                </div>
-            )}
+            {matchResult.matchWeaknesses &&
+                matchResult.matchWeaknesses.length > 0 && (
+                    <div>
+                        <p className="text-amber-600 text-xs font-medium">
+                            Areas of concern:
+                        </p>
+                        <ul className="text-xs pl-4 list-disc">
+                            {matchResult.matchWeaknesses.map(
+                                (weakness: any, i: number) => (
+                                    <li key={i}>{weakness}</li>
+                                )
+                            )}
+                        </ul>
+                    </div>
+                )}
         </div>
     );
 }

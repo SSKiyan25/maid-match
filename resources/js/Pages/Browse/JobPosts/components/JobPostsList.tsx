@@ -15,6 +15,7 @@ import JobPostCard from "./JobPostCard";
 interface JobPostsListProps {
     jobs: any[];
     title?: string;
+    subtitle?: React.ReactNode;
     emptyMessage?: string;
     horizontal?: boolean;
     featured?: boolean;
@@ -26,6 +27,7 @@ interface JobPostsListProps {
 export default function JobPostsList({
     jobs,
     title,
+    subtitle,
     emptyMessage = "No job posts found",
     horizontal = false,
     featured = false,
@@ -177,25 +179,34 @@ export default function JobPostsList({
 
     return (
         <div className="w-full space-y-4 overflow-hidden">
-            <div className="flex justify-between items-center">
-                {title && (
-                    <div className="flex items-center">
-                        {getTitleIcon()}
-                        <h2 className="text-xl font-semibold">{title}</h2>
+            {(title || viewAllRoute) && (
+                <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                            {getTitleIcon()}
+                            <h2 className="text-xl font-semibold">{title}</h2>
+                        </div>
+
+                        {viewAllRoute && jobs.length > 4 && (
+                            <Link href={viewAllRoute}>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-primary"
+                                >
+                                    View All{" "}
+                                    <ChevronRight className="ml-1 h-4 w-4" />
+                                </Button>
+                            </Link>
+                        )}
                     </div>
-                )}
-                {viewAllRoute && jobs.length > 4 && (
-                    <Link href={viewAllRoute}>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-primary"
-                        >
-                            View All <ChevronRight className="ml-1 h-4 w-4" />
-                        </Button>
-                    </Link>
-                )}
-            </div>
+                    {subtitle && (
+                        <div className="text-muted-foreground text-sm">
+                            {subtitle}
+                        </div>
+                    )}
+                </div>
+            )}
             {horizontal ? (
                 <div className="w-full overflow-hidden">
                     {/* Arrow controls and scrollable cards */}
@@ -265,11 +276,11 @@ export default function JobPostsList({
 
                     {/* Custom scrollbar */}
                     <div
-                        className="h-1 bg-muted rounded-full mt-2 cursor-pointer relative"
+                        className="h-0.5 bg-muted rounded-full mt-2 cursor-pointer relative"
                         onClick={handleTrackClick}
                     >
                         <div
-                            className="absolute h-1 bg-primary rounded-full"
+                            className="absolute h-0.5 bg-primary rounded-full"
                             style={{
                                 width: `${thumbWidth}px`,
                                 left: `${thumbPosition}px`,
@@ -279,7 +290,7 @@ export default function JobPostsList({
                     </div>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     {displayJobs.map((job) => (
                         <JobPostCard
                             key={job.id}

@@ -1,14 +1,13 @@
-import React from "react";
-import { usePage, Head } from "@inertiajs/react";
+import { Head } from "@inertiajs/react";
 import AgencyLayout from "@/Layouts/AgencyLayout";
 import { Button } from "@/Components/ui/button";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Search } from "lucide-react";
 import JobPostCard from "./components/JobPostCard";
 import SearchBar from "./components/SearchBar";
 import JobPostsPagination from "./components/JobPostsPagination";
+import { Alert, AlertDescription, AlertTitle } from "@/Components/ui/alert";
 
-interface CategoryViewProps {
-    category: string;
+interface SearchResultsProps {
     jobs: {
         data: any[];
         meta?: {
@@ -17,54 +16,36 @@ interface CategoryViewProps {
             total: number;
         };
     };
-    title: string;
-    description?: string;
+    searchTerm: string;
     filters: any;
 }
 
-export default function CategoryView({
-    category,
+export default function SearchResults({
     jobs,
-    title,
-    description,
+    searchTerm,
     filters,
-}: CategoryViewProps) {
-    // Check if jobs has pagination metadata
-    const isPaginated =
-        jobs?.meta !== undefined && typeof jobs.meta === "object";
+}: SearchResultsProps) {
+    const currentPage = jobs.meta?.current_page ?? 1;
+    const totalPages = jobs.meta?.last_page ?? 1;
+    const totalResults = jobs.meta?.total ?? 0;
 
-    const currentPage = jobs?.meta?.current_page ?? 1;
-    const totalPages = jobs?.meta?.last_page ?? 1;
-    const hasData = Array.isArray(jobs?.data) && jobs.data.length > 0;
+    // Check if we have valid job data
+    const hasResults = Array.isArray(jobs.data) && jobs.data.length > 0;
+
+    // Check if we have pagination data
+    const hasPagination = jobs.meta !== undefined && totalPages > 1;
 
     const handlePageChange = (page: number) => {
-        // Create URL with current filters plus new page
+        // Update current page via Inertia
         const currentFilters = { ...filters, page };
-        let url = "";
-
-        switch (category) {
-            case "near-you":
-                url = "/browse/job-posts/near-you";
-                break;
-            case "recommended":
-                url = "/browse/job-posts/recommended";
-                break;
-            case "featured":
-                url = "/browse/job-posts/featured";
-                break;
-            default:
-                url = "/browse/job-posts";
-        }
-
-        // Navigate with filters as query params
-        window.location.href = `${url}?${new URLSearchParams(
+        window.location.href = `/browse/job-posts/search?${new URLSearchParams(
             currentFilters as Record<string, string>
         ).toString()}`;
     };
 
     return (
         <AgencyLayout sidebarDefaultOpen={false}>
-            <Head title={`${title} | Browse Jobs`} />
+            <Head title={`Search Results for "${searchTerm}" | Browse Jobs`} />
 
             <div className="pt-4 pb-32 px-4 sm:px-24 sm:pt-12">
                 <div className="container mx-auto py-6 space-y-6">
@@ -82,23 +63,29 @@ export default function CategoryView({
 
                     <div className="mb-6">
                         <h1 className="text-3xl font-bold tracking-tight">
-                            {title}
+                            Search Results
                         </h1>
-                        {description && (
-                            <p className="mt-2 text-muted-foreground text-base max-w-xl">
-                                {description}
-                            </p>
-                        )}
+                        <p className="mt-2 text-muted-foreground text-base max-w-xl">
+                            {hasResults
+                                ? `Found ${jobs.data.length} ${
+                                      jobs.data.length === 1 ? "job" : "jobs"
+                                  } matching "${searchTerm}"`
+                                : `No jobs found matching "${searchTerm}"`}
+                        </p>
                     </div>
 
-                    <SearchBar initialSearchTerm={filters?.search || ""} />
+                    <SearchBar initialSearchTerm={searchTerm} />
 
-                    {!hasData ? (
-                        <div className="text-center py-10">
-                            <p className="text-muted-foreground">
-                                No jobs found in this category
-                            </p>
-                        </div>
+                    {!hasResults ? (
+                        <Alert className="bg-muted/50 my-8">
+                            <Search className="h-5 w-5" />
+                            <AlertTitle>No results found</AlertTitle>
+                            <AlertDescription>
+                                We couldn't find any job posts matching your
+                                search criteria. Try adjusting your search terms
+                                or filters.
+                            </AlertDescription>
+                        </Alert>
                     ) : (
                         <>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -106,12 +93,12 @@ export default function CategoryView({
                                     <JobPostCard
                                         key={job.id}
                                         job={job}
-                                        featured={category === "recommended"}
+                                        featured={false}
                                     />
                                 ))}
                             </div>
 
-                            {isPaginated && totalPages > 1 && (
+                            {hasPagination && (
                                 <JobPostsPagination
                                     currentPage={currentPage}
                                     totalPages={totalPages}

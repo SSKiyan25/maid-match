@@ -45,6 +45,9 @@ export function useBookmark(maidId: string | number) {
             setIsLoading(true);
             setError(null);
 
+            // Optimistically update UI for better user experience
+            setIsBookmarked(!isBookmarked);
+
             const response = await axios.post(
                 `/browse/bookmarks/${maidId}/toggle`
             );
@@ -61,6 +64,18 @@ export function useBookmark(maidId: string | number) {
                 setError(response.data.message || "Failed to update bookmark");
             }
         } catch (err: any) {
+            // If it's a database constraint error (duplicate key), don't revert the UI
+            // This is a temporary fix for the backend issue
+            const errorMessage = err.response?.data?.message || "";
+            const isDuplicateKeyError =
+                errorMessage.includes("Duplicate entry") &&
+                errorMessage.includes("Integrity constraint violation");
+
+            if (!isDuplicateKeyError) {
+                // Only revert the UI state if it's not a duplicate key error
+                setIsBookmarked(isBookmarked);
+            }
+
             // Handle auth redirect if user isn't logged in
             if (err.response?.status === 401 || err.response?.status === 419) {
                 router.visit("/login");
@@ -68,9 +83,11 @@ export function useBookmark(maidId: string | number) {
             }
 
             console.error("Bookmark toggle error:", err);
-            setError(
-                err.response?.data?.message || "Failed to update bookmark"
-            );
+
+            // Don't show the error message to the user for duplicate key errors
+            if (!isDuplicateKeyError) {
+                setError(errorMessage || "Failed to update bookmark");
+            }
         } finally {
             setIsLoading(false);
         }

@@ -2,14 +2,7 @@ import { usePage } from "@inertiajs/react";
 import { Head } from "@inertiajs/react";
 import AgencyLayout from "@/Layouts/AgencyLayout";
 import EmployerLayout from "@/Layouts/EmployerLayout";
-import {
-    Award,
-    Calendar,
-    Languages,
-    Briefcase,
-    User,
-    Image,
-} from "lucide-react";
+import { Languages, Briefcase, User } from "lucide-react";
 import { Badge } from "@/Components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";

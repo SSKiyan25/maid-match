@@ -1,5 +1,4 @@
-import { Search, Filter, X, Briefcase, SortDesc, Loader2 } from "lucide-react";
-import { Input } from "@/Components/ui/input";
+import { Filter, X, Briefcase, SortDesc, Loader2 } from "lucide-react";
 import { Badge } from "@/Components/ui/badge";
 import { Button } from "@/Components/ui/button";
 import {
@@ -22,7 +21,7 @@ import {
     SelectValue,
 } from "@/Components/ui/select";
 
-interface MaidFiltersProps {
+interface SearchFiltersProps {
     skills: string[];
     languages: string[];
     selectedSkills: string[];
@@ -37,7 +36,7 @@ interface MaidFiltersProps {
     isLoading?: boolean;
 }
 
-export default function MaidFilters({
+export default function SearchFilters({
     skills,
     languages,
     selectedSkills,
@@ -50,7 +49,7 @@ export default function MaidFilters({
     sortOrder,
     onSortOrderChange,
     isLoading = false,
-}: MaidFiltersProps) {
+}: SearchFiltersProps) {
     const ALL_JOB_POSTINGS_VALUE = "all_job_postings";
 
     const handleSkillToggle = (skill: string) => {
@@ -134,7 +133,7 @@ export default function MaidFilters({
                     <SheetContent side="right" className="w-full sm:max-w-md">
                         <SheetHeader className="pb-4">
                             <SheetTitle className="text-left">
-                                Filter Maids
+                                Filter Search Results
                             </SheetTitle>
                         </SheetHeader>
 

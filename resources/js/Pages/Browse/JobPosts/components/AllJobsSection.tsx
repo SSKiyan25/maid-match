@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { router } from "@inertiajs/react";
 import JobPostsList from "./JobPostsList";
 import JobPostsPagination from "./JobPostsPagination";
 import {
@@ -11,53 +12,68 @@ import {
 import { AlertCircle } from "lucide-react";
 
 interface AllJobsSectionProps {
-    jobPosts: any[];
+    jobPosts: {
+        data: any[];
+        meta: {
+            current_page: number;
+            last_page: number;
+            total: number;
+            from: number;
+            to: number;
+        };
+    };
 }
 
 export default function AllJobsSection({ jobPosts }: AllJobsSectionProps) {
-    const [currentPage, setCurrentPage] = useState(1);
     const [sortBy, setSortBy] = useState("newest");
 
     // Check if job posts array is empty
-    const isEmpty = !jobPosts || jobPosts.length === 0;
+    const isEmpty = !jobPosts?.data || jobPosts.data.length === 0;
 
-    // Later, we would implement proper pagination or infinite scrolling
-    const ITEMS_PER_PAGE = 8;
-    const totalPages = Math.ceil((jobPosts?.length || 0) / ITEMS_PER_PAGE);
+    // Get pagination data from the meta information
+    const currentPage = jobPosts?.meta?.current_page || 1;
+    const totalPages = jobPosts?.meta?.last_page || 1;
+    const totalJobs = jobPosts?.meta?.total || 0;
 
-    // Sort jobs based on selected option
-    const sortedJobs = isEmpty
-        ? []
-        : [...jobPosts].sort((a, b) => {
-              switch (sortBy) {
-                  case "newest":
-                      return (
-                          new Date(b.created_at).getTime() -
-                          new Date(a.created_at).getTime()
-                      );
-                  case "oldest":
-                      return (
-                          new Date(a.created_at).getTime() -
-                          new Date(b.created_at).getTime()
-                      );
-                  case "salary_high":
-                      return (
-                          parseFloat(b.max_salary) - parseFloat(a.max_salary)
-                      );
-                  case "salary_low":
-                      return (
-                          parseFloat(a.min_salary) - parseFloat(b.min_salary)
-                      );
-                  default:
-                      return 0;
-              }
-          });
+    const handleSortChange = (value: string) => {
+        setSortBy(value);
 
-    // Get current page items
-    const currentJobs = sortedJobs.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
-    );
+        // Map the frontend sort options to backend parameters
+        let sortParams = {};
+        switch (value) {
+            case "newest":
+                sortParams = { sort_by: "created_at", sort_direction: "desc" };
+                break;
+            case "oldest":
+                sortParams = { sort_by: "created_at", sort_direction: "asc" };
+                break;
+            case "salary_high":
+                sortParams = { sort_by: "max_salary", sort_direction: "desc" };
+                break;
+            case "salary_low":
+                sortParams = { sort_by: "min_salary", sort_direction: "asc" };
+                break;
+        }
+
+        // Use Inertia to reload with the sort parameters
+        router.get("/browse/job-posts", sortParams, {
+            preserveState: true,
+            preserveScroll: true,
+            only: ["jobPosts"],
+        });
+    };
+
+    const handlePageChange = (page: number) => {
+        router.get(
+            "/browse/job-posts",
+            { page },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                only: ["jobPosts"],
+            }
+        );
+    };
 
     return (
         <section className="space-y-6 w-full pt-12">
@@ -69,7 +85,7 @@ export default function AllJobsSection({ jobPosts }: AllJobsSectionProps) {
                         <span className="text-sm text-muted-foreground hidden sm:inline">
                             Sort by:
                         </span>
-                        <Select value={sortBy} onValueChange={setSortBy}>
+                        <Select value={sortBy} onValueChange={handleSortChange}>
                             <SelectTrigger className="w-[140px]">
                                 <SelectValue placeholder="Sort by" />
                             </SelectTrigger>
@@ -106,14 +122,14 @@ export default function AllJobsSection({ jobPosts }: AllJobsSectionProps) {
             ) : (
                 <>
                     <JobPostsList
-                        jobs={currentJobs}
+                        jobs={jobPosts.data}
                         emptyMessage="No job posts found"
                     />
 
                     <JobPostsPagination
                         currentPage={currentPage}
                         totalPages={totalPages}
-                        onPageChange={setCurrentPage}
+                        onPageChange={handlePageChange}
                     />
                 </>
             )}

@@ -46,6 +46,7 @@ export default function MaidsIndexPage({
     filterOptions,
     activeFilters,
 }: MaidPageProps) {
+    console.log("Featured sections:", featuredSections);
     // State for filters - initialized from server data
     const [searchTerm, setSearchTerm] = useState(activeFilters.search);
     const [selectedSkills, setSelectedSkills] = useState<string[]>(
@@ -78,7 +79,6 @@ export default function MaidsIndexPage({
         router.get(
             route("browse.maids.index"),
             {
-                search: searchTerm,
                 skills: selectedSkills,
                 languages: selectedLanguages,
                 job_posting_id: selectedJobPosting,
@@ -113,13 +113,7 @@ export default function MaidsIndexPage({
         }, 300);
 
         return () => clearTimeout(handler);
-    }, [
-        searchTerm,
-        selectedSkills,
-        selectedLanguages,
-        selectedJobPosting,
-        sortOrder,
-    ]);
+    }, [selectedSkills, selectedLanguages, selectedJobPosting, sortOrder]);
 
     // Handle page changes
     useEffect(() => {
@@ -132,8 +126,11 @@ export default function MaidsIndexPage({
         <EmployerLayout sidebarDefaultOpen={false}>
             <Head title="Browse Maids" />
 
-            <div className="container mx-auto px-4 py-6 mb-36 sm:px-12 space-y-8 max-w-sm sm:max-w-full overflow-x-hidden">
-                <MaidHeader />
+            <div className="container mx-auto px-4 py-6 mb-36 sm:px-12 space-y-8 max-w-sm sm:max-w-6xl overflow-x-hidden">
+                <MaidHeader
+                    searchTerm={searchTerm}
+                    totalMatches={pagination.total}
+                />
 
                 {/* Bookmarked Maids Section */}
                 {bookmarkedMaids.length > 0 && (
@@ -244,8 +241,6 @@ export default function MaidsIndexPage({
                     </h2>
 
                     <MaidFilters
-                        searchTerm={searchTerm}
-                        onSearchChange={setSearchTerm}
                         skills={filterOptions.skills}
                         languages={filterOptions.languages}
                         selectedSkills={selectedSkills}

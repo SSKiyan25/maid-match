@@ -8,6 +8,7 @@ use Illuminate\Support\Collection;
 use App\Models\Employer\Employer;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Builder;
+use App\Http\Resources\Maid\MaidResource;
 
 class MaidQueryService
 {
@@ -60,10 +61,25 @@ class MaidQueryService
         if (!empty($filters['search'])) {
             $searchTerm = $filters['search'];
             $query->where(function ($q) use ($searchTerm) {
-                $q->where('full_name', 'like', "%{$searchTerm}%")
-                    ->orWhereHas('agency', function ($q) use ($searchTerm) {
-                        $q->where('name', 'like', "%{$searchTerm}%");
-                    });
+                // Search by name through the user relationship
+                $q->whereHas('user.profile', function ($query) use ($searchTerm) {
+                    $query->where('first_name', 'like', "%{$searchTerm}%")
+                        ->orWhere('last_name', 'like', "%{$searchTerm}%");
+                });
+
+                // Search by agency name
+                $q->orWhereHas('agency', function ($query) use ($searchTerm) {
+                    $query->where('name', 'like', "%{$searchTerm}%");
+                });
+
+                // Search by skills (if they're stored as JSON)
+                $q->orWhereRaw("JSON_CONTAINS(skills, '\"$searchTerm\"', '$')");
+
+                // Search by location through user's profile address
+                $q->orWhereHas('user.profile', function ($query) use ($searchTerm) {
+                    $query->whereRaw("JSON_EXTRACT(address, '$.city') LIKE ?", ["%{$searchTerm}%"])
+                        ->orWhereRaw("JSON_EXTRACT(address, '$.province') LIKE ?", ["%{$searchTerm}%"]);
+                });
             });
         }
 
@@ -91,7 +107,7 @@ class MaidQueryService
                 $query->orderBy('created_at', 'desc');
                 break;
             case 'name':
-                $query->orderBy('full_name', 'asc');
+                $query->orderByRaw("(SELECT CONCAT(p.first_name, ' ', p.last_name) FROM profiles p JOIN users u ON p.user_id = u.id WHERE u.id = maids.user_id) ASC");
                 break;
             case 'match':
             default:

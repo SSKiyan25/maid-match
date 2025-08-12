@@ -56,7 +56,7 @@ export default function MaidDetailsModal({
             maid.matchResult;
         const matchColor = getMatchColorClass(percentage);
         const matchLabel = getMatchQualityLabel(percentage);
-
+        console.log("Match data:", maid.matchResult);
         return (
             <>
                 <Separator className="my-4" />

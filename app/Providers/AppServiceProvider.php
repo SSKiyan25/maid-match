@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Services\MaidMatchingService;
 use App\Services\MaidQueryService;
 use App\Services\AgencyQueryService;
+use App\Services\JobPostingService;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Auth;
@@ -39,6 +40,12 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(AgencyQueryService::class, function () {
             return new AgencyQueryService();
         });
+
+        // Register JobPostingService
+        $this->app->singleton(JobPostingService::class, function () {
+            return new JobPostingService();
+        });
+
 
         // Register Agency Dashboard Services
         $this->app->singleton(CreditService::class);

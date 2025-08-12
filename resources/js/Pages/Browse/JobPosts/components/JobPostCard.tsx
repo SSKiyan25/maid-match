@@ -22,6 +22,20 @@ export default function JobPostCard({
         ? `${job.employer.user.profile.first_name} ${job.employer.user.profile.last_name}`.trim()
         : job.employer?.user?.name || "Unknown";
 
+    // Format full location with proper fallbacks
+    const getFormattedLocation = () => {
+        if (!job.location) return "Location not specified";
+
+        const location = job.location;
+        const parts = [];
+
+        if (location.brgy) parts.push(location.brgy);
+        if (location.city) parts.push(location.city);
+        if (location.province) parts.push(location.province);
+
+        return parts.join(", ");
+    };
+
     return (
         <div
             className={`rounded-xl overflow-hidden bg-card border shadow-sm h-full flex flex-col ${
@@ -78,9 +92,9 @@ export default function JobPostCard({
                 </div>
 
                 <div className="flex gap-1 sm:gap-2 text-xs sm:text-sm text-muted-foreground items-center">
-                    <MapPin className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                    <span className="line-clamp-1">
-                        {job.location?.city}, {job.location?.brgy}
+                    <MapPin className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
+                    <span className="line-clamp-2">
+                        {getFormattedLocation()}
                     </span>
                 </div>
 
@@ -130,10 +144,16 @@ export default function JobPostCard({
                         <p className="text-xs font-medium line-clamp-1">
                             {userName}
                         </p>
-                        <div className="flex items-center text-xs text-muted-foreground">
-                            <Check className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-1" />
-                            <span>Verified</span>
-                        </div>
+                        {job.employer?.is_verified ? (
+                            <div className="flex items-center text-xs text-muted-foreground">
+                                <Check className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-1 text-emerald-500" />
+                                <span>Verified</span>
+                            </div>
+                        ) : (
+                            <div className="text-xs text-muted-foreground">
+                                Employer
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

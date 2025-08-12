@@ -34,42 +34,47 @@ class BookmarkController extends Controller
             // Find the maid
             $maid = Maid::findOrFail($maidId);
 
-            // Check if already bookmarked
-            $isBookmarked = $employer->bookmarkedMaids()
+            // Check if this bookmark exists (including archived ones)
+            // Using the new allBookmarkedMaids relationship
+            $existingBookmark = $employer->allBookmarkedMaids()
                 ->wherePivot('maid_id', $maid->id)
-                ->wherePivot('is_archived', false)
-                ->exists();
+                ->first();
 
-            if ($isBookmarked) {
-                // If already bookmarked, remove it (soft delete by marking as archived)
-                $employer->bookmarkedMaids()
-                    ->updateExistingPivot($maid->id, ['is_archived' => true]);
+            if ($existingBookmark) {
+                // Bookmark exists - check if it's active or archived
+                $isArchived = $existingBookmark->pivot->is_archived;
 
-                return response()->json([
-                    'success' => true,
-                    'bookmarked' => false,
-                    'message' => 'Maid removed from bookmarks',
-                ]);
-            } else {
-                // If not bookmarked, add it
-                // First check if it was previously archived
-                $wasArchived = $employer->bookmarkedMaids()
-                    ->wherePivot('maid_id', $maid->id)
-                    ->wherePivot('is_archived', true)
-                    ->exists();
-
-                if ($wasArchived) {
-                    // Reactivate the archived bookmark
-                    $employer->bookmarkedMaids()
+                if ($isArchived) {
+                    // It's archived, so reactivate it
+                    // Using the new allBookmarkedMaids relationship
+                    $employer->allBookmarkedMaids()
                         ->updateExistingPivot($maid->id, ['is_archived' => false]);
+
+                    return response()->json([
+                        'success' => true,
+                        'bookmarked' => true,
+                        'message' => 'Maid added to bookmarks',
+                    ]);
                 } else {
-                    // Create new bookmark
-                    $description = $request->input('description', null);
-                    $employer->bookmarkedMaids()->attach($maid->id, [
-                        'description' => $description,
-                        'is_archived' => false,
+                    // It's active, so archive it
+                    // Using the new allBookmarkedMaids relationship
+                    $employer->allBookmarkedMaids()
+                        ->updateExistingPivot($maid->id, ['is_archived' => true]);
+
+                    return response()->json([
+                        'success' => true,
+                        'bookmarked' => false,
+                        'message' => 'Maid removed from bookmarks',
                     ]);
                 }
+            } else {
+                // No existing bookmark, create a new one
+                // We can use the regular bookmarkedMaids() here since it's a new record
+                $description = $request->input('description', null);
+                $employer->bookmarkedMaids()->attach($maid->id, [
+                    'description' => $description,
+                    'is_archived' => false,
+                ]);
 
                 return response()->json([
                     'success' => true,
@@ -111,7 +116,6 @@ class BookmarkController extends Controller
 
             $isBookmarked = $employer->bookmarkedMaids()
                 ->wherePivot('maid_id', $maidId)
-                ->wherePivot('is_archived', false)
                 ->exists();
 
             return response()->json([
@@ -147,7 +151,6 @@ class BookmarkController extends Controller
 
         $bookmarkedMaids = $employer->bookmarkedMaids()
             ->with(['user.profile', 'user.photos', 'agency'])
-            ->wherePivot('is_archived', false)
             ->paginate(20);
 
         // Transform collection for the frontend
