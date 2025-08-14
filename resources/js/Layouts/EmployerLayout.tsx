@@ -40,7 +40,7 @@ interface EmployerLayoutProps extends PropsWithChildren {
 
 const employerMobileLinks: MobileNavLink[] = [
     { label: "Home", icon: Home, href: "/browse/maids" },
-    { label: "Jobs", icon: Briefcase, href: "/employer/job-postings" },
+    { label: "Your Jobs", icon: Briefcase, href: "/employer/job-postings" },
     {
         label: "Applicants",
         icon: UserRoundSearch,
@@ -49,7 +49,6 @@ const employerMobileLinks: MobileNavLink[] = [
     { label: "Profile", icon: UserIcon, href: "/employer/profile" },
 ];
 
-// Sidebar navMain and browseItems (from app-employer.tsx)
 const navMain = [
     {
         title: "Home",
