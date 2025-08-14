@@ -266,6 +266,7 @@ export default function MaidsIndexPage({
                         useComputedMatch={true}
                         selectedJobId={selectedJobPosting}
                         isLoading={isLoading}
+                        showMatchDetails={true}
                     />
 
                     {/* Pagination */}

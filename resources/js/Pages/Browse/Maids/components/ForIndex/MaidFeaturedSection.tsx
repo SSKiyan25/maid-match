@@ -11,6 +11,7 @@ interface MaidFeaturedSectionProps {
     highlightNew?: boolean;
     useComputedMatch?: boolean;
     selectedJobId?: string | null;
+    showMatchDetails?: boolean;
 }
 
 export default function MaidFeaturedSection({
@@ -20,6 +21,7 @@ export default function MaidFeaturedSection({
     highlightNew = false,
     useComputedMatch = false,
     selectedJobId = null,
+    showMatchDetails = true,
 }: MaidFeaturedSectionProps) {
     const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -83,6 +85,7 @@ export default function MaidFeaturedSection({
                             compact={false}
                             useComputedMatch={useComputedMatch}
                             selectedJobId={selectedJobId}
+                            showMatchDetails={showMatchDetails}
                         />
                     </div>
                 ))}

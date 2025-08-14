@@ -11,6 +11,7 @@ interface MaidGridProps {
     showMatchBadge?: boolean;
     showLocationBadge?: boolean;
     showBookmarked?: boolean;
+    showMatchDetails?: boolean;
 }
 
 export default function MaidGrid({
@@ -23,6 +24,7 @@ export default function MaidGrid({
     showMatchBadge = false,
     showLocationBadge = false,
     showBookmarked = false,
+    showMatchDetails = true,
 }: MaidGridProps) {
     if (isLoading) {
         return (
@@ -55,6 +57,7 @@ export default function MaidGrid({
                     showBookmarked={showBookmarked}
                     useComputedMatch={useComputedMatch}
                     selectedJobId={selectedJobId}
+                    showMatchDetails={showMatchDetails}
                 />
             ))}
         </div>

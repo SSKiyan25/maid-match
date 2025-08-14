@@ -12,7 +12,8 @@ export default function MaidCard({
     compact = false,
     useComputedMatch = true,
     selectedJobId = null,
-    showBookmarked = false, // Add default value
+    showBookmarked = false,
+    showMatchDetails = true,
 }: MaidCardProps) {
     // Early return if maid is undefined or null
     if (!maid) {
@@ -138,6 +139,14 @@ export default function MaidCard({
         years_experience: maid.years_experience,
     };
 
+    // Determine if we should show match details button
+    // Only show it if there's actually match info available
+    const hasMatchDetails =
+        showMatchDetails &&
+        matchInfo &&
+        matchInfo.job_id &&
+        matchInfo.match_percentage;
+
     // Return the appropriate card type based on props
     return compact ? (
         <CompactCard
@@ -148,7 +157,8 @@ export default function MaidCard({
             showMatchBadge={shouldShowMatchBadge}
             showLocationBadge={showLocationBadge}
             showNewBadge={showNewBadge}
-            showBookmarked={showBookmarked} // Pass it to CompactCard
+            showBookmarked={showBookmarked}
+            showMatchDetails={hasMatchDetails}
         />
     ) : (
         <RegularCard
@@ -160,7 +170,8 @@ export default function MaidCard({
             showLocationBadge={showLocationBadge}
             showNewBadge={showNewBadge}
             featured={featured}
-            showBookmarked={showBookmarked} // Pass it to RegularCard
+            showBookmarked={showBookmarked}
+            showMatchDetails={hasMatchDetails}
         />
     );
 }

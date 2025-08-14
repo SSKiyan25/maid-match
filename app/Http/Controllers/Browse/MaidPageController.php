@@ -36,7 +36,7 @@ class MaidPageController extends Controller
         $maid = Maid::with([
             'user.profile',
             'user.photos',
-            'agency',
+            'agency.user',
             'documents',
             'characterReferences',
         ])->findOrFail($id);

@@ -18,6 +18,7 @@ interface CompactCardProps {
     showLocationBadge: boolean;
     showNewBadge: boolean;
     showBookmarked?: boolean;
+    showMatchDetails?: boolean;
 }
 
 export function CompactCard({
@@ -29,6 +30,7 @@ export function CompactCard({
     showLocationBadge = false,
     showNewBadge = false,
     showBookmarked = false,
+    showMatchDetails = false,
 }: CompactCardProps) {
     const {
         id,
@@ -134,6 +136,7 @@ export function CompactCard({
                     jobId={jobId}
                     matchPercentage={matchPercentage}
                     compact={true}
+                    showMatchDetails={showMatchDetails}
                 />
             </div>
         </Card>

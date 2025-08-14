@@ -202,6 +202,7 @@ export default function Maid() {
 
 // Simple component to show the maid's agency information in the sidebar
 function AgencyInfo({ agency }: any) {
+    console.log("Agency Data:", agency);
     return (
         <Card>
             <CardHeader className="pb-3">

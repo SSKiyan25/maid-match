@@ -21,6 +21,7 @@ interface RegularCardProps {
     showNewBadge: boolean;
     featured?: boolean;
     showBookmarked?: boolean;
+    showMatchDetails?: boolean;
 }
 
 export function RegularCard({
@@ -33,6 +34,7 @@ export function RegularCard({
     showNewBadge,
     featured = false,
     showBookmarked = false,
+    showMatchDetails = false,
 }: RegularCardProps) {
     const {
         id,
@@ -168,6 +170,7 @@ export function RegularCard({
                     maidId={id}
                     jobId={jobId}
                     matchPercentage={matchPercentage}
+                    showMatchDetails={showMatchDetails}
                 />
             </CardFooter>
         </Card>

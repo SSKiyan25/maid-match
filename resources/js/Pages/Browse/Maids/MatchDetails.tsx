@@ -15,7 +15,6 @@ import {
     User,
     MapPin,
     Languages,
-    Briefcase,
     Home,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -28,7 +27,7 @@ import { getInitials } from "@/utils/useGeneralUtils";
 export default function MatchDetails({ maid, jobPosting }: any) {
     // Unwrap the maid data if it's wrapped in a data property
     const maidData = maid.data || maid;
-
+    console.log("Maid Data:", maidData);
     // Ensure data has the right format for the matching algorithm
     const preparedMaidData = {
         ...maidData,
@@ -146,7 +145,7 @@ export default function MatchDetails({ maid, jobPosting }: any) {
                                     )}
                                 >
                                     <Percent className="h-4 w-4 mr-1" />
-                                    {matchResult.percentage}% Match
+                                    {matchResult.percentage.toFixed(2)}% Match
                                 </Badge>
                             </div>
 
@@ -195,9 +194,16 @@ export default function MatchDetails({ maid, jobPosting }: any) {
                                     Location
                                 </p>
                                 <p className="font-medium line-clamp-1">
-                                    {maidData.location?.city ||
-                                        maidData.formatted_location ||
-                                        "Private"}
+                                    {maidData.location
+                                        ? [
+                                              maidData.location.barangay,
+                                              maidData.location.city,
+                                              maidData.location.province,
+                                          ]
+                                              .filter(Boolean)
+                                              .join(", ")
+                                        : maidData.formatted_location ||
+                                          "Private"}
                                 </p>
                             </div>
                         </div>
@@ -259,7 +265,7 @@ export default function MatchDetails({ maid, jobPosting }: any) {
                                     className="h-2 mb-1"
                                 />
                                 <p className="text-right text-xs font-medium">
-                                    {matchResult.factors.skillMatch}%
+                                    {matchResult.factors.skillMatch.toFixed(2)}%
                                 </p>
                             </div>
 
@@ -272,7 +278,10 @@ export default function MatchDetails({ maid, jobPosting }: any) {
                                     className="h-2 mb-1"
                                 />
                                 <p className="text-right text-xs font-medium">
-                                    {matchResult.factors.languageMatch}%
+                                    {matchResult.factors.languageMatch.toFixed(
+                                        2
+                                    )}
+                                    %
                                 </p>
                             </div>
 
@@ -285,7 +294,10 @@ export default function MatchDetails({ maid, jobPosting }: any) {
                                     className="h-2 mb-1"
                                 />
                                 <p className="text-right text-xs font-medium">
-                                    {matchResult.factors.locationMatch}%
+                                    {matchResult.factors.locationMatch.toFixed(
+                                        2
+                                    )}
+                                    %
                                 </p>
                             </div>
 
@@ -298,7 +310,8 @@ export default function MatchDetails({ maid, jobPosting }: any) {
                                     className="h-2 mb-1"
                                 />
                                 <p className="text-right text-xs font-medium">
-                                    {matchResult.factors.salaryMatch}%
+                                    {matchResult.factors.salaryMatch.toFixed(2)}
+                                    %
                                 </p>
                             </div>
 
@@ -313,7 +326,10 @@ export default function MatchDetails({ maid, jobPosting }: any) {
                                     className="h-2 mb-1"
                                 />
                                 <p className="text-right text-xs font-medium">
-                                    {matchResult.factors.accommodationMatch}%
+                                    {matchResult.factors.accommodationMatch.toFixed(
+                                        2
+                                    )}
+                                    %
                                 </p>
                             </div>
                         </div>

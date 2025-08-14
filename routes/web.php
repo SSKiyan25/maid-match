@@ -216,6 +216,8 @@ Route::middleware(['auth'])->prefix('browse')->name('browse.')->group(function (
         ->name('agencies.all.popular');
     Route::get('/agencies/all/recent', [AgencyPageController::class, 'allRecent'])
         ->name('agencies.all.recent');
+    Route::get('/agencies/all/nearby', [AgencyPageController::class, 'allNearby'])
+        ->name('agencies.all.nearby');
 
     // Maid routes
     Route::get('/maids/search', [MaidPageController::class, 'search'])

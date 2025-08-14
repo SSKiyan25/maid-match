@@ -254,13 +254,13 @@ export function calculateMaidJobMatch(maid: any, jobPost: any): MatchResult {
             ) {
                 factors.locationMatch = 100;
                 strengths.push(
-                    "Maid is located in the same barangay and city as the job"
+                    "Helper is located in the same barangay and city as the job"
                 );
             }
             // Check for same city
             else if (maidCity && jobCity && maidCity === jobCity) {
                 factors.locationMatch = 90;
-                strengths.push("Maid is located in the same city as the job");
+                strengths.push("Helper is located in the same city as the job");
             }
             // Check for same province
             else if (
@@ -270,25 +270,25 @@ export function calculateMaidJobMatch(maid: any, jobPost: any): MatchResult {
             ) {
                 factors.locationMatch = 75;
                 strengths.push(
-                    "Maid is located in the same province as the job"
+                    "Helper is located in the same province as the job"
                 );
             }
             // Different province
             else {
                 factors.locationMatch = 0;
-                weaknesses.push("Maid is located in a different province");
+                weaknesses.push("Helper is located in a different province");
             }
         } else {
             factors.locationMatch = 0;
             if (!maidAddress) {
-                weaknesses.push("Maid location is private or not provided");
+                weaknesses.push("Helper location is private or not provided");
             } else if (!jobPost.location) {
                 weaknesses.push("Job location information is not provided");
             }
         }
     } else {
         factors.locationMatch = 0;
-        weaknesses.push("Maid location is private or not provided");
+        weaknesses.push("Helper location is private or not provided");
     }
 
     // Calculate overall match percentage

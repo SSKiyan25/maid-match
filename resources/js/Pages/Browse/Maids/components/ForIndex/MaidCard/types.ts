@@ -8,6 +8,7 @@ export interface MaidCardProps {
     useComputedMatch?: boolean;
     selectedJobId?: string | null;
     showBookmarked?: boolean;
+    showMatchDetails?: boolean;
 }
 
 export interface MatchInfo {
