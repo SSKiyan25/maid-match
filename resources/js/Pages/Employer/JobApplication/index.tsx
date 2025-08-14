@@ -12,7 +12,10 @@ import { Separator } from "@/Components/ui/separator";
 export default function JobApplicationsPage({
     allApplicants = [],
     jobPostings = [],
+    documentTypes = {},
+    requiredDocuments = {},
 }: any) {
+    console.log("Applicants data", allApplicants);
     const [filteredApplicants, setFilteredApplicants] = useState(allApplicants);
     const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
     const [showFilters, setShowFilters] = useState(false);
@@ -193,10 +196,12 @@ export default function JobApplicationsPage({
                     />
                 )}
 
-                {/* Applicants list */}
+                {/* Applicants list - Pass the document properties */}
                 <ApplicantsList
                     applicants={filteredApplicants}
                     jobPostings={jobPostings}
+                    documentTypes={documentTypes}
+                    requiredDocuments={requiredDocuments}
                 />
 
                 {/* Empty state */}

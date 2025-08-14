@@ -363,8 +363,8 @@ export default function ApplicantDetailsDialog({
                         <CircleAlert className="h-4 w-4" />
                         <AlertTitle>Heads up!</AlertTitle>
                         <AlertDescription className="text-xs text-muted-foreground">
-                            You can view this maid's documents and full profile
-                            by clicking the button "Learn More" below.
+                            You can view this maid's full profile by clicking
+                            the button "Learn More" below.
                         </AlertDescription>
                     </Alert>
                     <Link href={route("browse.maids.show", maid.id)}>

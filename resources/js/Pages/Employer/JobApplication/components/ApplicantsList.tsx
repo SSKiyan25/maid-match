@@ -4,9 +4,13 @@ import ApplicantCard from "./ApplicantCard";
 export default function ApplicantsList({
     applicants,
     jobPostings,
+    documentTypes = {},
+    requiredDocuments = {},
 }: {
     applicants: any[];
     jobPostings?: any[];
+    documentTypes?: Record<string, string>;
+    requiredDocuments?: Record<string, string>;
 }) {
     // Group applicants by job posting
     const groupedApplicants = applicants.reduce((acc, app) => {
@@ -38,6 +42,8 @@ export default function ApplicantsList({
                                 key={applicant.application.id}
                                 applicant={applicant}
                                 jobPostings={jobPostings}
+                                documentTypes={documentTypes}
+                                requiredDocuments={requiredDocuments}
                             />
                         ))}
                     </div>

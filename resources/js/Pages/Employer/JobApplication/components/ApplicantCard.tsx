@@ -10,13 +10,35 @@ import {
     getMatchColorClass,
     getMatchQualityLabel,
 } from "@/utils/matchingUtils";
-import { Briefcase, MapPin, Building2, Eye, Percent } from "lucide-react";
+import {
+    Briefcase,
+    MapPin,
+    Building2,
+    Eye,
+    Percent,
+    FileText,
+} from "lucide-react";
 import ApplicantDetailsDialog from "./ApplicantDetailsDialog";
+import DocumentViewerDialog from "./DocumentViewerDialog";
 
-export default function ApplicantCard({ applicant, jobPostings }: any) {
+export default function ApplicantCard({
+    applicant,
+    jobPostings,
+    documentTypes,
+    requiredDocuments,
+}: any) {
     const [showDetails, setShowDetails] = useState(false);
+    const [showDocuments, setShowDocuments] = useState(false);
 
-    const { application, job_title, job_posting_id } = applicant;
+    const {
+        application,
+        job_title,
+        job_posting_id,
+        documents,
+        documents_by_type,
+        has_required_documents,
+        missing_documents,
+    } = applicant;
     const { maid, status, applied_at } = application;
     const { user, skills, languages, years_experience } = maid;
     const { profile } = user;
@@ -51,6 +73,9 @@ export default function ApplicantCard({ applicant, jobPostings }: any) {
         }
     };
 
+    const hasDocuments = documents && documents.length > 0;
+    const maidName = `${profile.first_name} ${profile.last_name}`;
+
     return (
         <>
             <Card className="overflow-hidden h-full">
@@ -64,12 +89,10 @@ export default function ApplicantCard({ applicant, jobPostings }: any) {
                                         ? `/storage/${user.avatar}`
                                         : undefined
                                 }
-                                alt={`${profile.first_name} ${profile.last_name}`}
+                                alt={maidName}
                             />
                             <AvatarFallback>
-                                {getInitials(
-                                    `${profile.first_name} ${profile.last_name}`
-                                )}
+                                {getInitials(maidName)}
                             </AvatarFallback>
                         </Avatar>
 
@@ -160,19 +183,59 @@ export default function ApplicantCard({ applicant, jobPostings }: any) {
                             )}
                         </div>
 
-                        {/* View Details Button */}
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            className="w-full mt-1 text-xs h-8"
-                            onClick={() => setShowDetails(true)}
-                        >
-                            <Eye className="h-3.5 w-3.5 mr-1.5" />
-                            View & Take Action
-                        </Button>
+                        {/* Documents indicator */}
+                        {hasDocuments && (
+                            <div className="flex items-center justify-between mb-2">
+                                <span className="text-xs flex items-center">
+                                    <FileText className="h-3.5 w-3.5 mr-1.5 text-blue-600" />
+                                    <span className="text-blue-600 font-medium">
+                                        {documents.length} document
+                                        {documents.length !== 1 ? "s" : ""}
+                                    </span>
+                                </span>
+                                <Badge
+                                    variant={
+                                        has_required_documents
+                                            ? "default"
+                                            : "destructive"
+                                    }
+                                    className="text-[10px]"
+                                >
+                                    {has_required_documents
+                                        ? "Complete"
+                                        : "Incomplete"}
+                                </Badge>
+                            </div>
+                        )}
+
+                        {/* Action Buttons */}
+                        <div className="grid grid-cols-2 gap-2 mt-1">
+                            {/* View Documents Button */}
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="text-[11px] sm:text-xs h-8"
+                                onClick={() => setShowDocuments(true)}
+                                disabled={!hasDocuments}
+                            >
+                                <FileText className="h-3.5 w-3.5 mr-1.5" />
+                                Documents
+                            </Button>
+
+                            {/* View Details Button */}
+                            <Button
+                                variant="default"
+                                size="sm"
+                                className="text-[11px] sm:text-xs h-8"
+                                onClick={() => setShowDetails(true)}
+                            >
+                                <Eye className="h-3.5 w-3.5 mr-1.5" />
+                                Details and Actions
+                            </Button>
+                        </div>
+
                         <span className="block text-[9px] text-muted-foreground mt-1 text-center">
-                            You can review, shortlist, reject, or hire from the
-                            clicking the button above.
+                            Review, shortlist, or hire from the details.
                         </span>
                     </div>
                 </CardContent>
@@ -188,6 +251,21 @@ export default function ApplicantCard({ applicant, jobPostings }: any) {
                     }}
                     open={showDetails}
                     onClose={() => setShowDetails(false)}
+                />
+            )}
+
+            {/* Documents Dialog */}
+            {showDocuments && (
+                <DocumentViewerDialog
+                    open={showDocuments}
+                    onClose={() => setShowDocuments(false)}
+                    documents={documents || []}
+                    documentsByType={documents_by_type || {}}
+                    hasRequiredDocuments={has_required_documents}
+                    missingDocuments={missing_documents || []}
+                    maidName={maidName}
+                    documentTypes={documentTypes || {}}
+                    requiredDocuments={requiredDocuments || {}}
                 />
             )}
         </>
