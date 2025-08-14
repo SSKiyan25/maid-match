@@ -2,6 +2,28 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Badge } from "@/Components/ui/badge";
 
 export default function MaidAbout({ maid }: any) {
+    // Calculate age from birth_date if available
+    const calculateAge = (birthDate: string | null) => {
+        if (!birthDate) return null;
+
+        const dob = new Date(birthDate);
+        const today = new Date();
+        let age = today.getFullYear() - dob.getFullYear();
+        const monthDiff = today.getMonth() - dob.getMonth();
+
+        // Adjust age if birthday hasn't occurred yet this year
+        if (
+            monthDiff < 0 ||
+            (monthDiff === 0 && today.getDate() < dob.getDate())
+        ) {
+            age--;
+        }
+
+        return age;
+    };
+
+    const age = calculateAge(maid.user?.profile?.birth_date);
+
     return (
         <div className="space-y-6">
             <Card>
@@ -28,6 +50,18 @@ export default function MaidAbout({ maid }: any) {
                                     </dt>
                                     <dd className="font-medium">
                                         {maid.nationality || "Not specified"}
+                                    </dd>
+                                </div>
+
+                                {/* Age - Add this new field */}
+                                <div>
+                                    <dt className="text-muted-foreground mb-1">
+                                        Age
+                                    </dt>
+                                    <dd className="font-medium">
+                                        {age
+                                            ? `${age} years old`
+                                            : "Not specified"}
                                     </dd>
                                 </div>
 
