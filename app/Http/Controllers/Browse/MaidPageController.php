@@ -85,9 +85,7 @@ class MaidPageController extends Controller
         // Get all featured sections regardless of job selection
         $featuredSections = [
             'bestMatches' => $this->queryService->getBestMatchedMaids($jobPostings),
-            'nearbyMaids' => $jobPostings->isNotEmpty()
-                ? $this->queryService->getNearbyMaids($jobPostings[0]->location->toArray())
-                : collect([]),
+            'nearbyMaids' => $this->queryService->getNearbyMaids($employer),
             'recentMaids' => $this->queryService->getRecentMaids(),
             'bookmarkedMaids' => $employer ? $this->queryService->getBookmarkedMaids($employer) : [],
         ];

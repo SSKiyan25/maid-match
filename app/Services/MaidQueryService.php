@@ -6,9 +6,6 @@ use App\Models\Maid\Maid;
 use App\Models\JobPosting\JobPosting;
 use Illuminate\Support\Collection;
 use App\Models\Employer\Employer;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Database\Eloquent\Builder;
-use App\Http\Resources\Maid\MaidResource;
 
 class MaidQueryService
 {
@@ -204,23 +201,30 @@ class MaidQueryService
     }
 
     /**
-     * Get nearby maids based on location
+     * Get nearby maids based on employer's location
      */
-    public function getNearbyMaids(array $location, $limit = 8)
+    public function getNearbyMaids(Employer $employer, $limit = 8)
     {
-        if (empty($location)) {
+        // Check if employer exists and has a profile with address
+        if (!$employer || !$employer->user || !$employer->user->profile || !$employer->user->profile->address) {
             return collect([]);
         }
 
-        $cityToMatch = $location['city'] ?? '';
-        $provinceToMatch = $location['province'] ?? '';
+        $employerProfile = $employer->user->profile;
+        $cityToMatch = $employerProfile->getAddressComponent('city', '');
+        $provinceToMatch = $employerProfile->getAddressComponent('province', '');
+
+        // If no location data available, return empty collection
+        if (empty($cityToMatch) && empty($provinceToMatch)) {
+            return collect([]);
+        }
 
         $maids = Maid::with(['user.profile', 'user.photos', 'agency'])
             ->whereHas('user', function ($query) {
                 $query->where('status', 'active');
             })
             ->whereHas('user.profile', function ($query) use ($cityToMatch, $provinceToMatch) {
-                // Use JSON column queries instead of relationship queries
+                // Match either city or province (prioritize city match if available)
                 if (!empty($cityToMatch)) {
                     $query->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(address, '$.city')) = ?", [$cityToMatch]);
                 }
@@ -232,7 +236,7 @@ class MaidQueryService
             ->take($limit)
             ->get();
 
-        return $maids->map(function ($maid) {
+        return $maids->map(function ($maid) use ($cityToMatch, $provinceToMatch) {
             $maidArray = $maid->toArray();
 
             // Add agency name for easier access
@@ -240,8 +244,20 @@ class MaidQueryService
                 $maidArray['agency_name'] = $maid->agency->name;
             }
 
+            // Add a flag to identify exact city matches for sorting
+            $maidProfile = $maid->user->profile;
+            $maidCity = $maidProfile ? $maidProfile->getAddressComponent('city', '') : '';
+            $maidArray['exact_city_match'] = !empty($cityToMatch) && $maidCity === $cityToMatch;
+
+            // Add formatted location for display
+            $maidArray['formatted_location'] = $maidProfile ? $maidProfile->getFormattedAddressAttribute() : '';
+
             return $maidArray;
-        })->values()->all();
+        })
+            // Sort to prioritize exact city matches
+            ->sortByDesc('exact_city_match')
+            ->values()
+            ->all();
     }
 
     /**
