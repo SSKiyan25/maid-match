@@ -2,7 +2,6 @@ import { Sparkles, UserSearch, Search } from "lucide-react";
 import { Input } from "@/Components/ui/input";
 import { Button } from "@/Components/ui/button";
 import { cn } from "@/lib/utils";
-import { router } from "@inertiajs/react";
 import { useState } from "react";
 
 interface MaidHeaderProps {
