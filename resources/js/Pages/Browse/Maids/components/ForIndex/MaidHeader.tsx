@@ -19,7 +19,6 @@ export default function MaidHeader({
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         if (localSearchTerm.trim()) {
-            // FIX: Add /browse prefix to match the route in web.php
             window.location.href = `/browse/maids/search?query=${encodeURIComponent(
                 localSearchTerm
             )}`;
