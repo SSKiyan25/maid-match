@@ -31,7 +31,7 @@ export default function Welcome({
         const role = auth.user.role;
 
         if (role === "employer") {
-            return route("employer.dashboard");
+            return route("browse.maids.index");
         } else if (role === "maid") {
             return route("maid.dashboard");
         } else if (role === "agency") {

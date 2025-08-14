@@ -80,6 +80,6 @@ class EmployerRegisterController extends Controller
         event(new Registered($user));
         Auth::login($user);
 
-        return redirect()->route('employer.dashboard')->with('success', 'Welcome to Maid Match!');
+        return redirect()->route('browse.maids.index')->with('success', 'Welcome to Maid Match!');
     }
 }
