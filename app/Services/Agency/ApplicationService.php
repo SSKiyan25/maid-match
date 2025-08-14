@@ -34,13 +34,13 @@ class ApplicationService
         $pendingApplications = $applications->where('status', 'pending')->count();
         $reviewedApplications = $applications->where('status', 'reviewed')->count();
         $shortlistedApplications = $applications->where('status', 'shortlisted')->count();
-        $acceptedApplications = $applications->where('status', 'accepted')->count();
+        $hiredApplications = $applications->where('status', 'hired')->count(); // Changed from accepted to hired
         $rejectedApplications = $applications->where('status', 'rejected')->count();
         $withdrawnApplications = $applications->where('status', 'withdrawn')->count();
 
-        // Calculate success rate (accepted / total applications)
+        // Calculate success rate (hired / total applications)
         $successRate = $totalApplications > 0
-            ? round(($acceptedApplications / $totalApplications) * 100)
+            ? round(($hiredApplications / $totalApplications) * 100)
             : 0;
 
         return [
@@ -48,7 +48,7 @@ class ApplicationService
             'pendingApplications' => $pendingApplications,
             'reviewedApplications' => $reviewedApplications,
             'shortlistedApplications' => $shortlistedApplications,
-            'acceptedApplications' => $acceptedApplications,
+            'hiredApplications' => $hiredApplications,
             'rejectedApplications' => $rejectedApplications,
             'withdrawnApplications' => $withdrawnApplications,
             'successRate' => $successRate,
@@ -65,7 +65,7 @@ class ApplicationService
             'pendingApplications' => 0,
             'reviewedApplications' => 0,
             'shortlistedApplications' => 0,
-            'acceptedApplications' => 0,
+            'hiredApplications' => 0,
             'rejectedApplications' => 0,
             'withdrawnApplications' => 0,
             'successRate' => 0,

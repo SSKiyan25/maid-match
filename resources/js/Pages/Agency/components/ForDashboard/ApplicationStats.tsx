@@ -12,7 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import { Skeleton } from "@/Components/ui/skeleton";
 import { Link } from "@inertiajs/react";
 import { PieChart } from "@/Components/ui/chart";
-import { FileText, CheckCircle, List, Briefcase } from "lucide-react";
+import { FileText, CheckCircle, List, Briefcase, Award } from "lucide-react";
 
 interface ApplicationStatsProps {
     stats: any;
@@ -32,7 +32,7 @@ export default function ApplicationStats({
                   { name: "Pending", value: stats.pendingApplications },
                   { name: "Reviewed", value: stats.reviewedApplications },
                   { name: "Shortlisted", value: stats.shortlistedApplications },
-                  { name: "Accepted", value: stats.acceptedApplications },
+                  { name: "Hired", value: stats.hiredApplications },
                   { name: "Rejected", value: stats.rejectedApplications },
                   { name: "Withdrawn", value: stats.withdrawnApplications },
               ].filter((item) => item.value > 0)
@@ -41,7 +41,7 @@ export default function ApplicationStats({
     return (
         <div className="space-y-6">
             {/* Application Statistics */}
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                 <StatCard
                     title="Total"
                     value={stats?.totalApplications || 0}
@@ -52,6 +52,12 @@ export default function ApplicationStats({
                     title="Shortlisted"
                     value={stats?.shortlistedApplications || 0}
                     icon={<List className="h-4 w-4" />}
+                    isLoading={isLoading}
+                />
+                <StatCard
+                    title="Hired"
+                    value={stats?.hiredApplications || 0}
+                    icon={<Award className="h-4 w-4" />}
                     isLoading={isLoading}
                 />
                 <StatCard
@@ -206,7 +212,7 @@ function ApplicationListItem({ application }: any) {
                 return "secondary";
             case "shortlisted":
                 return "accent";
-            case "accepted":
+            case "hired":
                 return "default";
             case "rejected":
                 return "destructive";
