@@ -9,6 +9,7 @@ use App\Http\Resources\Agency\AgencyPhotoResource;
 use App\Models\Agency\Agency;
 use App\Services\AgencyQueryService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class AgencyPageController extends Controller
@@ -28,6 +29,15 @@ class AgencyPageController extends Controller
      */
     public function index(Request $request)
     {
+        // Get the authenticated employer
+        $employer = Auth::user()->employer;
+
+        // Get employer's address from profile
+        $employerAddress = null;
+        if ($employer && $employer->user && $employer->user->profile) {
+            $employerAddress = $employer->user->profile->address;
+        }
+
         // Get filter parameters
         $filters = [
             'search' => $request->input('search', ''),
@@ -44,6 +54,7 @@ class AgencyPageController extends Controller
             'verifiedAgencies' => $this->agencyQueryService->getVerifiedAgencies(),
             'recentAgencies' => $this->agencyQueryService->getRecentAgencies(),
             'popularAgencies' => $this->agencyQueryService->getPopularAgencies(),
+            'nearbyAgencies' => $employerAddress ? $this->agencyQueryService->getNearbyAgencies($employerAddress) : [],
         ];
 
         // Return Inertia view with data

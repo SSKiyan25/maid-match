@@ -7,7 +7,7 @@ import AgencyFeaturedSection from "./components/ForIndex/AgencyFeaturedSection";
 import AgencyGrid from "./components/ForIndex/AgencyGrid";
 import { Separator } from "@/Components/ui/separator";
 import PaginationComponent from "@/Components/PaginationComponent";
-import { Award, Clock, Building2, CheckCircle } from "lucide-react";
+import { Award, Clock, Building2, CheckCircle, MapPin } from "lucide-react";
 
 interface AgencyPageProps {
     agencies: any[];
@@ -22,6 +22,7 @@ interface AgencyPageProps {
         verifiedAgencies?: any[];
         recentAgencies?: any[];
         popularAgencies?: any[];
+        nearbyAgencies?: any[];
     };
     activeFilters: {
         search: string;
@@ -50,6 +51,7 @@ export default function AgenciesIndexPage({
         verifiedAgencies = [],
         recentAgencies = [],
         popularAgencies = [],
+        nearbyAgencies = [],
     } = featuredSections;
 
     // Handler for filter changes - send to server
@@ -105,6 +107,28 @@ export default function AgenciesIndexPage({
 
             <div className="container mx-auto px-4 py-6 mb-36 sm:px-12 space-y-8 max-w-sm sm:max-w-full overflow-x-hidden">
                 <AgencyHeader />
+
+                {/* Nearby Agencies Section */}
+                {nearbyAgencies.length > 0 && (
+                    <section className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-2xl font-bold flex items-center">
+                                <MapPin className="h-6 w-6 mr-2 text-rose-500" />
+                                Agencies Near You
+                            </h2>
+                            <Link
+                                href={route("browse.agencies.all.nearby")}
+                                className="text-primary text-sm hover:underline"
+                            >
+                                View all
+                            </Link>
+                        </div>
+                        <AgencyFeaturedSection
+                            agencies={nearbyAgencies}
+                            highlightVerified={true}
+                        />
+                    </section>
+                )}
 
                 {/* Popular Agencies Section */}
                 {popularAgencies.length > 0 && (
