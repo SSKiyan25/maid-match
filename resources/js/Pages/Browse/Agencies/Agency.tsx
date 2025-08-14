@@ -27,6 +27,7 @@ type ProfileTab = {
 
 export default function Agency() {
     const { agency, maids, photos } = usePage().props as any;
+    // console.log("Agency Data:", agency);
     const agencyData = agency.data || agency;
     const maidsData = maids.data || maids;
     const photosData = photos.data || photos;

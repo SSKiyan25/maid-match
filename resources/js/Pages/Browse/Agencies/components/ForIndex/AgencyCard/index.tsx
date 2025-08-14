@@ -16,10 +16,14 @@ export default function AgencyCard({
         return null;
     }
 
+    // console.log("Agency Data:", agency);
     // Extract agency data
     const name = agency.name || "";
     const description = agency.description || "";
-    const mainPhoto = agency.main_photo || null;
+    // const mainPhoto = agency.main_photo || null;
+    const avatar = agency.user?.data?.avatar || null;
+    const mainPhoto = avatar ? `/storage/${avatar}` : null;
+
     const formattedAddress =
         agency.formatted_address || "Address not specified";
     const maidsCount = agency.maids_count || 0;
