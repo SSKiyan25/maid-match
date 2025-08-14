@@ -72,7 +72,7 @@ export default function MaidHeader({
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
-                            placeholder="Search by name, skills, or location..."
+                            placeholder="Search by name..."
                             className="pl-9 w-full text-xs sm:text-sm"
                             value={localSearchTerm || ""}
                             onChange={(e) => setLocalSearchTerm(e.target.value)}

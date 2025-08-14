@@ -33,16 +33,19 @@ export default function MaidCard({
 
     // Get primary photo from user photos if available
     let mainPhoto = null;
-    const primaryPhoto = userPhotos.find((photo: any) => photo.is_primary);
-
-    // If no primary photo, just use the first one
-    if (primaryPhoto) {
-        mainPhoto = `/storage/${primaryPhoto.url}`;
-    } else if (userPhotos.length > 0) {
-        mainPhoto = `/storage/${userPhotos[0].url}`;
-    } else if (avatar) {
+    if (avatar) {
         mainPhoto = `/storage/${avatar}`;
     }
+    // const primaryPhoto = userPhotos.find((photo: any) => photo.is_primary);
+
+    // If no primary photo, just use the first one
+    // if (primaryPhoto) {
+    //     mainPhoto = `/storage/${primaryPhoto.url}`;
+    // } else if (userPhotos.length > 0) {
+    //     mainPhoto = `/storage/${userPhotos[0].url}`;
+    // } else if (avatar) {
+    //     mainPhoto = `/storage/${avatar}`;
+    // }
 
     // Check if address is private by examining the profile directly
     const profile = maid.user?.profile || {};
