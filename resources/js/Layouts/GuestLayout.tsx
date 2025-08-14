@@ -1,10 +1,14 @@
 import ApplicationLogo from "@/Components/ApplicationLogo";
-import { Link } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 import { PropsWithChildren } from "react";
 import { Toaster } from "@/Components/ui/sonner";
 import { ModeToggle } from "@/Components/mode-toggle";
+import { Button } from "@/Components/ui/button";
 
 export default function Guest({ children }: PropsWithChildren) {
+    const { component } = usePage();
+    const isLoginPage = component === "Auth/Login";
+
     return (
         <div className="min-h-screen bg-background">
             {/* Header */}
@@ -20,12 +24,21 @@ export default function Guest({ children }: PropsWithChildren) {
 
                         <div className="flex items-center space-x-4">
                             <ModeToggle />
-                            <Link
-                                href={route("login")}
-                                className="text-muted-foreground hover:text-foreground font-medium transition-colors"
-                            >
-                                Sign In
-                            </Link>
+
+                            {isLoginPage ? (
+                                <Button asChild variant="default" size="sm">
+                                    <Link href={route("register")}>
+                                        Get Started
+                                    </Link>
+                                </Button>
+                            ) : (
+                                <Link
+                                    href={route("login")}
+                                    className="text-muted-foreground hover:text-foreground font-medium transition-colors"
+                                >
+                                    Sign In
+                                </Link>
+                            )}
                         </div>
                     </div>
                 </div>
