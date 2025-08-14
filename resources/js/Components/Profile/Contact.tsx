@@ -1,6 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Badge } from "@/Components/ui/badge";
-import { Mail, Phone, MapPin, Calendar, Globe } from "lucide-react";
+import {
+    Mail,
+    Phone,
+    MapPin,
+    Calendar,
+    Globe,
+    AlertCircle,
+} from "lucide-react";
 import { format } from "date-fns";
 
 interface ContactInfo {
@@ -12,6 +19,8 @@ interface ContactInfo {
     birthDate?: string;
     preferredLanguage?: string;
     preferredContactMethods?: string[];
+    emergencyContactName?: string;
+    emergencyContactPhone?: string;
 }
 
 interface ProfileContactProps {
@@ -32,6 +41,8 @@ export default function ProfileContact({
         birthDate,
         preferredLanguage,
         preferredContactMethods = [],
+        emergencyContactName,
+        emergencyContactPhone,
     } = contactInfo;
 
     const age = birthDate
@@ -102,6 +113,25 @@ export default function ProfileContact({
                                 <p className="text-sm">{phone}</p>
                                 <p className="text-xs text-muted-foreground">
                                     Phone
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Emergency Contact */}
+                    {(emergencyContactName || emergencyContactPhone) && (
+                        <div className="flex items-start gap-2">
+                            <AlertCircle className="h-4 w-4 mt-0.5 text-muted-foreground" />
+                            <div>
+                                <p className="text-sm">
+                                    {emergencyContactName &&
+                                    emergencyContactPhone
+                                        ? `${emergencyContactName} (${emergencyContactPhone})`
+                                        : emergencyContactName ||
+                                          emergencyContactPhone}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                    Emergency Contact
                                 </p>
                             </div>
                         </div>

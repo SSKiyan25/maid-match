@@ -33,6 +33,7 @@ type ProfileTab = {
 
 export default function Maid() {
     const { auth, maid, documents } = usePage().props as any;
+    console.log("Maid Data:", maid);
     const maidData = maid.data || maid;
     const documentsData = documents.data || documents;
 
@@ -100,14 +101,14 @@ export default function Maid() {
             count: hasPhotos ? maidData.user.photos.length : 0,
             content: <MaidPhotos photos={maidData.user?.photos || []} />,
         },
-        documentsData.length > 0
-            ? {
-                  id: "documents",
-                  label: "Documents",
-                  count: documentsData.length,
-                  content: <MaidDocuments documents={documentsData} />,
-              }
-            : null,
+        // documentsData.length > 0
+        //     ? {
+        //           id: "documents",
+        //           label: "Documents",
+        //           count: documentsData.length,
+        //           content: <MaidDocuments documents={documentsData} />,
+        //       }
+        //     : null,
         {
             id: "reviews",
             label: "Reviews",
@@ -145,6 +146,9 @@ export default function Maid() {
         isPhonePrivate: maidData.user?.profile?.is_phone_private,
         preferredContactMethods: maidData.user?.profile
             ?.preferred_contact_methods || ["email"],
+        birthDate: maidData.user?.profile?.birth_date,
+        emergencyContactName: maidData.emergency_contact_name,
+        emergencyContactPhone: maidData.emergency_contact_phone,
     };
 
     return (
