@@ -18,43 +18,64 @@ import {
     Clock,
     ArrowRight,
     CheckCircle,
+    BriefcaseBusiness,
 } from "lucide-react";
 
 export default function Register() {
     const registrationOptions = [
         {
             role: "employer",
-            title: "Find Household Help",
-            subtitle: "Hire trusted maids and helpers",
+            title: "Looking for Household Help",
+            subtitle: "Find and hire qualified domestic workers",
             description:
-                "Post job openings, browse qualified candidates, and find the perfect household help for your family.",
+                "Post job listings, browse verified domestic helper profiles, and find the perfect match for your household needs.",
             icon: Users,
             colorClass:
                 "bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700",
             features: [
-                "Post job listings",
-                "Browse verified maid profiles",
-                "Direct messaging with candidates",
-                "Background check reports",
+                "Post detailed job listings",
+                "Browse verified helper profiles",
+                "Direct communication with candidates",
+                "Access background verification reports",
             ],
             cta: "Find Help Now",
             route: "employer.register",
             popular: false,
         },
         {
-            role: "agency",
-            title: "Agency Partnership",
-            subtitle: "Professional staffing services",
+            role: "maid",
+            title: "Domestic Helper",
+            subtitle: "Find work & connect directly with employers",
             description:
-                "Join our network of trusted agencies. Manage your maid roster and connect with employers.",
+                "Create your professional profile, showcase your skills and experience, and connect with employers or agencies to find the right job.",
+            icon: BriefcaseBusiness,
+            colorClass:
+                "bg-teal-500 hover:bg-teal-600 dark:bg-teal-600 dark:hover:bg-teal-700",
+            features: [
+                "Create a professional verified profile",
+                "Apply directly to job postings",
+                "Connect with reputable agencies",
+                "Receive and manage job offers",
+            ],
+            cta: "Join as Domestic Helper",
+            route: "login", // Temporary route, will be updated later
+            comingSoon: true,
+            popular: false,
+        },
+        {
+            role: "agency",
+            title: "Staffing Agency",
+            subtitle: "Manage domestic workers & connect with employers",
+            description:
+                "Showcase your domestic worker roster, connect with employers seeking help, and grow your staffing business with our specialized tools.",
             icon: Building2,
             colorClass:
                 "bg-purple-500 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-700",
             features: [
-                "Manage your maid portfolio",
-                "Receive employer inquiries",
-                "Professional verification",
-                "Business growth tools",
+                "Manage helper profiles and credentials",
+                "Receive direct employer inquiries",
+                "Apply to job listings on behalf of your workers",
+                "Verified business badge for credibility",
             ],
             cta: "Join as Agency",
             route: "agency.register",
@@ -80,7 +101,7 @@ export default function Register() {
                     </div>
 
                     {/* Registration Cards */}
-                    <div className="grid gap-6 lg:gap-8 xl:gap-10 grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
+                    <div className="grid gap-6 lg:gap-8 xl:gap-10 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                         {registrationOptions.map((option) => (
                             <Card
                                 key={option.role}
@@ -94,6 +115,13 @@ export default function Register() {
                                     <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-purple-500 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-700 text-white">
                                         <Star className="w-3 h-3 mr-1" />
                                         Most Popular
+                                    </Badge>
+                                )}
+
+                                {option.comingSoon && (
+                                    <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-amber-500 hover:bg-amber-600 dark:bg-amber-600 dark:hover:bg-amber-700 text-white">
+                                        <Clock className="w-3 h-3 mr-1" />
+                                        Coming Soon
                                     </Badge>
                                 )}
 
@@ -151,10 +179,23 @@ export default function Register() {
                                     <div className="pt-6 mt-auto">
                                         <Button
                                             asChild
-                                            className={`w-full ${option.colorClass} text-white font-semibold transition-all duration-200 shadow-lg hover:shadow-xl`}
+                                            className={`w-full ${
+                                                option.colorClass
+                                            } text-white font-semibold transition-all duration-200 shadow-lg hover:shadow-xl ${
+                                                option.comingSoon
+                                                    ? "opacity-70 cursor-not-allowed"
+                                                    : ""
+                                            }`}
                                             size="lg"
+                                            disabled={option.comingSoon}
                                         >
-                                            <Link href={route(option.route)}>
+                                            <Link
+                                                href={
+                                                    option.comingSoon
+                                                        ? "#"
+                                                        : route(option.route)
+                                                }
+                                            >
                                                 {option.cta}
                                                 <ArrowRight className="w-4 h-4 ml-2" />
                                             </Link>
