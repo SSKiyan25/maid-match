@@ -46,7 +46,7 @@ export default function MaidsIndexPage({
     filterOptions,
     activeFilters,
 }: MaidPageProps) {
-    console.log("Featured sections:", featuredSections);
+    // console.log("Featured sections:", featuredSections);
     // State for filters - initialized from server data
     const [searchTerm, setSearchTerm] = useState(activeFilters.search);
     const [selectedSkills, setSelectedSkills] = useState<string[]>(

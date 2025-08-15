@@ -1,6 +1,5 @@
 import { Card, CardContent } from "@/Components/ui/card";
 import { Badge } from "@/Components/ui/badge";
-import { MaidData } from "@/types";
 import {
     User,
     MapPin,
@@ -15,6 +14,7 @@ import {
     Languages,
     HomeIcon,
     Wallet,
+    Cake,
 } from "lucide-react";
 import { formatDate } from "@/utils/formFunctions";
 import {
@@ -22,14 +22,17 @@ import {
     formatCurrency,
     getSocialMediaIcon,
 } from "./helpers";
+import { calculateAge, formatBirthdate } from "@/utils/useGeneralUtils";
 
 interface OverviewTabProps {
-    maid: MaidData;
+    maid: any;
 }
 
 export default function OverviewTab({ maid }: OverviewTabProps) {
     const { profile } = maid.maid.user;
     const { maid: maidData } = maid;
+
+    const age = calculateAge(profile.birth_date);
 
     return (
         <div className="p-6 pt-5">
@@ -62,6 +65,20 @@ export default function OverviewTab({ maid }: OverviewTabProps) {
                     <Card>
                         <CardContent className="p-4 space-y-3">
                             <div className="grid grid-cols-1 gap-3">
+                                <div>
+                                    <span className="text-xs font-medium text-muted-foreground block mb-1">
+                                        Birth Date / Age
+                                    </span>
+                                    <div className="flex items-center text-sm">
+                                        <Cake className="h-3.5 w-3.5 mr-1.5 text-primary/70" />
+                                        {formatBirthdate(profile.birth_date)}
+                                        {age && (
+                                            <span className="ml-1">
+                                                ({age} years old)
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
                                 <div>
                                     <span className="text-xs font-medium text-muted-foreground block mb-1">
                                         Email
@@ -251,15 +268,17 @@ export default function OverviewTab({ maid }: OverviewTabProps) {
                                 <div className="flex flex-wrap gap-2">
                                     {maidData.skills &&
                                     maidData.skills.length > 0 ? (
-                                        maidData.skills.map((skill, index) => (
-                                            <Badge
-                                                key={index}
-                                                variant="secondary"
-                                                className="text-xs font-normal"
-                                            >
-                                                {skill}
-                                            </Badge>
-                                        ))
+                                        maidData.skills.map(
+                                            (skill: any, index: any) => (
+                                                <Badge
+                                                    key={index}
+                                                    variant="secondary"
+                                                    className="text-xs font-normal"
+                                                >
+                                                    {skill}
+                                                </Badge>
+                                            )
+                                        )
                                     ) : (
                                         <div className="text-sm text-muted-foreground italic">
                                             No skills listed
@@ -282,7 +301,7 @@ export default function OverviewTab({ maid }: OverviewTabProps) {
                                     {maidData.languages &&
                                     maidData.languages.length > 0 ? (
                                         maidData.languages.map(
-                                            (language, index) => (
+                                            (language: any, index: any) => (
                                                 <Badge
                                                     key={index}
                                                     variant="outline"

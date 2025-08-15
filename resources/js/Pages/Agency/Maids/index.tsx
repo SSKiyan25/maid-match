@@ -19,7 +19,7 @@ interface MaidsIndexProps extends PageProps {
 
 export default function MaidsIndexPage(props: MaidsIndexProps) {
     const { maids, agencyData, stats, flash } = props; // Destructure props including agencyData
-
+    // console.log("Maids Data:", maids);
     const [filters, setFilters] = useState({
         search: "",
         status: "all",

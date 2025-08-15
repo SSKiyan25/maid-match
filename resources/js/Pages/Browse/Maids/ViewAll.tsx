@@ -27,14 +27,12 @@ interface ViewAllProps {
     jobTitle?: string | null;
 }
 
-// Define common config properties
 interface BaseConfig {
     title: string;
     icon: React.ReactNode;
     emptyMessage: string;
 }
 
-// Define config for best-matches
 interface BestMatchesConfig extends BaseConfig {
     showMatchBadge: boolean;
     highlightMatch: boolean;
@@ -43,7 +41,6 @@ interface BestMatchesConfig extends BaseConfig {
     showBookmarked?: never;
 }
 
-// Define config for nearby
 interface NearbyConfig extends BaseConfig {
     showLocationBadge: boolean;
     highlightLocation: boolean;
@@ -52,7 +49,6 @@ interface NearbyConfig extends BaseConfig {
     showBookmarked?: never;
 }
 
-// Define config for bookmarked
 interface BookmarkedConfig extends BaseConfig {
     showBookmarked: boolean;
     showMatchBadge?: never;
@@ -157,7 +153,7 @@ export default function ViewAll({
                     </Button>
                 </div>
 
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row items-start space-y-4 sm:space-y-0 sm:items-center justify-between">
                     <div className="flex items-center">
                         {config.icon}
                         <h1 className="text-2xl font-bold">{config.title}</h1>

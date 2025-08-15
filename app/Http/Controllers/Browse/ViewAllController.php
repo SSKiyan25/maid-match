@@ -98,14 +98,9 @@ class ViewAllController extends Controller
             ->with('location')
             ->get();
 
-        if ($jobPostings->isEmpty() || !$jobPostings[0]->location) {
-            return redirect()->route('browse.maids.index')
-                ->with('message', 'No location information available to find nearby maids.');
-        }
-
         // Get all nearby maids (extended limit for pagination)
         $nearbyMaids = $this->queryService->getNearbyMaids(
-            $jobPostings[0]->location->toArray(),
+            $employer,
             50 // Increased limit for pagination
         );
 

@@ -29,6 +29,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/Components/ui/tooltip";
+import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import {
     calculateMaidJobMatch,
     getMatchColorClass,
@@ -39,11 +40,13 @@ import {
 interface ApplicantMaid {
     id: number;
     user: {
+        avatar?: string;
         profile: {
             first_name: string;
             last_name: string;
         };
     };
+
     experience_level: string;
     years_experience: number;
     status: string;
@@ -81,6 +84,7 @@ export default function ShortlistTable({
     onViewDetails,
     jobPosting,
 }: ShortlistTableProps) {
+    console.log("Applicants:", applicants);
     const [isRanking, setIsRanking] = useState(false);
     const [localApplicants, setLocalApplicants] = useState<Applicant[]>([]);
     const [applicantsWithMatch, setApplicantsWithMatch] = useState<
@@ -276,11 +280,22 @@ export default function ShortlistTable({
 
                                     <TableCell>
                                         <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
-                                                {getInitials(
-                                                    `${applicant.application.maid.user.profile.first_name} ${applicant.application.maid.user.profile.last_name}`
-                                                )}
-                                            </div>
+                                            <Avatar className="w-8 h-8">
+                                                <AvatarImage
+                                                    src={
+                                                        applicant.application
+                                                            .maid.user.avatar
+                                                            ? `/storage/${applicant.application.maid.user.avatar}`
+                                                            : undefined
+                                                    }
+                                                    alt={`${applicant.application.maid.user.profile.first_name} ${applicant.application.maid.user.profile.last_name}`}
+                                                />
+                                                <AvatarFallback>
+                                                    {getInitials(
+                                                        `${applicant.application.maid.user.profile.first_name} ${applicant.application.maid.user.profile.last_name}`
+                                                    )}
+                                                </AvatarFallback>
+                                            </Avatar>
                                             <div className="font-medium">
                                                 {`${applicant.application.maid.user.profile.first_name} ${applicant.application.maid.user.profile.last_name}`}
                                             </div>

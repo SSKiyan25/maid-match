@@ -83,3 +83,39 @@ export function formatDate(dateString: string): string {
         day: "numeric",
     });
 }
+
+/**
+ * Calculate age from birthdate
+ */
+export const calculateAge = (birthdate: string | null): number | null => {
+    if (!birthdate) return null;
+
+    const birth = new Date(birthdate);
+    const today = new Date();
+
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+
+    // Adjust age if birthday hasn't occurred yet this year
+    if (
+        monthDiff < 0 ||
+        (monthDiff === 0 && today.getDate() < birth.getDate())
+    ) {
+        age--;
+    }
+
+    return age;
+};
+
+/**
+ * Format birthdate to readable format
+ */
+export const formatBirthdate = (birthdate: string | null): string => {
+    if (!birthdate) return "Not provided";
+
+    return new Date(birthdate).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+    });
+};

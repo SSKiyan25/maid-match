@@ -224,7 +224,7 @@ export function useMaidForm(initialData?: Partial<MaidFormData>) {
         []
     );
 
-    console.log("Is Editing:", !!(initialData && initialData.id));
+    // console.log("Is Editing:", !!(initialData && initialData.id));
     const submitMaid = useCallback(async () => {
         setIsSubmitting(true);
         setSubmissionErrors({});
